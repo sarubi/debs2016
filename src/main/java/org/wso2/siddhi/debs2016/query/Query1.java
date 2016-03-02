@@ -6,9 +6,6 @@ import org.wso2.siddhi.debs2016.input.FileType;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by miyurud on 2/12/16.
- */
 public class Query1 {
     public static void main(String[] args){
         Query1 query1 = new Query1(args);

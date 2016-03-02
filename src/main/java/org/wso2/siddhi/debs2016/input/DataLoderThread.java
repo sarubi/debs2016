@@ -11,9 +11,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by miyurud on 2/9/16.
- */
 public class DataLoderThread extends Thread {
     private String fileName;
     private static Splitter splitter = Splitter.on(',');

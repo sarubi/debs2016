@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-/**
- * Created by miyurud on 2/12/16.
- */
+
 public class Ranker extends StreamProcessor {
     private TreeMap<Integer, TreeSet<PostRecord>> rankTreeMap;
 
