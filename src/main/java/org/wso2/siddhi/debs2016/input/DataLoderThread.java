@@ -100,6 +100,5 @@ public class DataLoderThread extends Thread {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
     }
 }

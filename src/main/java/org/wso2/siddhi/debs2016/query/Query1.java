@@ -15,14 +15,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Query1 {
     private static LinkedBlockingQueue<Object[]> eventBufferList = null;
-
+    private String dataSetFolder;
     public static void main(String[] args){
+        if(args.length != 1){
+            System.err.println("Usage java org.wso2.siddhi.debs2016.query.Query1 <full path to data set folder>");
+            return;
+        }
+
         Query1 query1 = new Query1(args);
         query1.run();
     }
 
     public Query1(String[] args){
-
+        dataSetFolder = args[0];
     }
 
     public void run(){
@@ -61,12 +66,12 @@ public class Query1 {
         System.out.println("Incremental data loading is performed.");
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
 
-        DataLoderThread dataLoaderThreadPosts = new DataLoderThread("/home/miyurud/DEBS2016/DataSet/data/posts.dat", eventBufferListPosts, FileType.POSTS);
+        DataLoderThread dataLoaderThreadPosts = new DataLoderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
         InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
         EventSenderThread senderThreadPosts = new EventSenderThread(eventBufferListPosts, inputHandlerPosts, 100);
 
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
-        DataLoderThread dataLoaderThreadComments = new DataLoderThread("/home/miyurud/DEBS2016/DataSet/data/comments.dat", eventBufferListComments, FileType.COMMENTS);
+        DataLoderThread dataLoaderThreadComments = new DataLoderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
         EventSenderThread senderThreadComments = new EventSenderThread(eventBufferListComments, inputHandlerComments, 100);
 
