@@ -28,13 +28,21 @@ public class Query1 {
     public void run(){
         SiddhiManager siddhiManager = new SiddhiManager();
 
-        String inStreamDefinition = "@config(async = 'true')define stream postsStream (ts long, post_id long, user_id long, post string, user string, iij_timestamp float);";
+        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp float, ts long, post_id long, user_id long, post string, user string);";
+        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp float, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
+
         String query = ("@info(name = 'query1') from postsStream  " +
-                "select ts, post_id, user_id, post, user, iij_timestamp " +
-                "insert into outputStream;");
+                "select iij_timestamp, ts, post_id, user_id, post, user " +
+                "insert into outputStream1;");
+
+        query += ("@info(name = 'query2') from commentsStream  " +
+                "select iij_timestamp, ts, comment_id, user_id, comment, user, comment_replied, post_commented " +
+                "insert into outputStream2;");
+
 
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
-        executionPlanRuntime.addCallback("outputStream", new StreamCallback() {
+
+        executionPlanRuntime.addCallback("outputStream1", new StreamCallback() {
 
             @Override
             public void receive(Event[] events) {
@@ -42,17 +50,32 @@ public class Query1 {
             }
         });
 
-        LinkedBlockingQueue<Object[]> eventBufferList = new LinkedBlockingQueue<Object[]>();
+        executionPlanRuntime.addCallback("outputStream2", new StreamCallback() {
+
+            @Override
+            public void receive(Event[] events) {
+                EventPrinter.print(events);
+            }
+        });
 
         System.out.println("Incremental data loading is performed.");
-        eventBufferList = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
-        DataLoderThread dataLoaderThread = new DataLoderThread("/home/miyurud/DEBS2016/DataSet/data/posts.dat", eventBufferList, FileType.POSTS);
-        InputHandler inputHandler = executionPlanRuntime.getInputHandler("postsStream");
-        EventSenderThread senderThread = new EventSenderThread(eventBufferList, inputHandler, 100);
+        LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
+
+        DataLoderThread dataLoaderThreadPosts = new DataLoderThread("/home/miyurud/DEBS2016/DataSet/data/posts.dat", eventBufferListPosts, FileType.POSTS);
+        InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
+        EventSenderThread senderThreadPosts = new EventSenderThread(eventBufferListPosts, inputHandlerPosts, 100);
+
+        LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
+        DataLoderThread dataLoaderThreadComments = new DataLoderThread("/home/miyurud/DEBS2016/DataSet/data/comments.dat", eventBufferListComments, FileType.COMMENTS);
+        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
+        EventSenderThread senderThreadComments = new EventSenderThread(eventBufferListComments, inputHandlerComments, 100);
+
         executionPlanRuntime.start();
         //start the data loading process
-        dataLoaderThread.start();
+        dataLoaderThreadPosts.start();
+        dataLoaderThreadComments.start();
         //from here onwards we start sending the events
-        senderThread.start();
+        senderThreadPosts.start();
+        senderThreadComments.start();
     }
 }
