@@ -91,6 +91,13 @@ public class DataLoderThread extends Thread {
 
                         eventBufferList.put(eventData);
                         break;
+                    case FRIENDSHIPS:
+
+
+                        break;
+                    case LIKES:
+
+                        break;
                 }
             }
         } catch (FileNotFoundException e) {

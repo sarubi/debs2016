@@ -11,9 +11,9 @@ public class EventSenderThread extends Thread {
     private LinkedBlockingQueue<Object[]> eventBufferList;
     private InputHandler inputHandler;
     private Date startDateTime;
-    private int EVENT_COUNT;
+    private long EVENT_COUNT;
 
-    public EventSenderThread(LinkedBlockingQueue<Object[]> eventBuffer, InputHandler inputHandler, int eventCount){
+    public EventSenderThread(LinkedBlockingQueue<Object[]> eventBuffer, InputHandler inputHandler, long eventCount){
         super("Event Sender");
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;

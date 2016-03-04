@@ -12,6 +12,7 @@ import org.wso2.siddhi.debs2016.input.PostRecord;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -19,6 +20,7 @@ import java.util.TreeSet;
 
 public class Ranker extends StreamProcessor {
     private TreeMap<Integer, TreeSet<PostRecord>> rankTreeMap;
+    private ExpressionExecutor timestampExecutor;
 
     @Override
     protected void process(ComplexEventChunk<StreamEvent> streamEventChunk, Processor nextProcessor, StreamEventCloner streamEventCloner, ComplexEventPopulater complexEventPopulater) {
@@ -33,6 +35,11 @@ public class Ranker extends StreamProcessor {
     @Override
     protected List<Attribute> init(AbstractDefinition inputDefinition, ExpressionExecutor[] attributeExpressionExecutors, ExecutionPlanContext executionPlanContext) {
         rankTreeMap = new TreeMap<Integer, TreeSet<PostRecord>>();
+
+        ArrayList<Attribute> attributes = new ArrayList<Attribute>();
+
+        //We assume that attributeExpressionLength is 6. We will not include any if condition based checks here to avoid performance penalties.
+
 
         return null;
     }
