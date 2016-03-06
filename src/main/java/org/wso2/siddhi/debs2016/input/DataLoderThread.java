@@ -8,20 +8,31 @@ import java.io.FileReader;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Reads the data from the file and store it in memory
+ * 
+ */
 public class DataLoderThread extends Thread {
     private String fileName;
     private static Splitter splitter = Splitter.on('|');
     private LinkedBlockingQueue<Object[]> eventBufferList;
     private BufferedReader br;
     private int count;
-    private FileType typ;
+    private FileType fileType;
     private String MINUS_ONE = "-1";
 
+    /**
+     * The constructor
+     *
+     * @param fileName the name of the file to be read
+     * @param eventBuffer the blocking queue which stores the data read from the file
+     * @param fileType the type of the file to be read
+     */
     public DataLoderThread(String fileName, LinkedBlockingQueue<Object[]> eventBuffer, FileType fileType){
         super("Data Loader");
         this.fileName = fileName;
         this.eventBufferList = eventBuffer;
-        this.typ = fileType;
+        this.fileType = fileType;
     }
 
     public void run() {
@@ -36,7 +47,7 @@ public class DataLoderThread extends Thread {
                 //We make an assumption here that we do not get empty strings due to missing values that may present in the input data set.
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
 
-                switch(typ) {
+                switch(fileType) {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
                         String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
@@ -92,11 +103,9 @@ public class DataLoderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
-
-
                         break;
-                    case LIKES:
 
+                    case LIKES:
                         break;
                 }
             }
