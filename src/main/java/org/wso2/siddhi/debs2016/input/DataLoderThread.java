@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class DataLoderThread extends Thread {
     private String fileName;
-    private static Splitter splitter = Splitter.on('|');
+    private final static Splitter splitter = Splitter.on('|');
     private LinkedBlockingQueue<Object[]> eventBufferList;
     private BufferedReader br;
     private int count;
@@ -46,7 +46,6 @@ public class DataLoderThread extends Thread {
             while (line != null) {
                 //We make an assumption here that we do not get empty strings due to missing values that may present in the input data set.
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
-
                 switch(fileType) {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
@@ -104,7 +103,6 @@ public class DataLoderThread extends Thread {
                         break;
                     case FRIENDSHIPS:
                         break;
-
                     case LIKES:
                         break;
                 }
@@ -116,5 +114,14 @@ public class DataLoderThread extends Thread {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *
+     * @return the event buffer which has the event data
+     */
+    public LinkedBlockingQueue<Object[]> getEventBuffer()
+    {
+        return eventBufferList;
     }
 }
