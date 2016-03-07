@@ -34,36 +34,36 @@ public class Query1 {
     public void run(){
         SiddhiManager siddhiManager = new SiddhiManager();
 
-        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp float, ts long, post_id long, user_id long, post string, user string);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp float, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
-        inStreamDefinition += "@config(async = 'true')define stream friendshipsStream (iij_timestamp float, ts long, user_id_1 long, user_id_2 long);";
-        inStreamDefinition += "@config(async = 'true')define stream likesStream (iij_timestamp float, ts long, user_id long, comment_id long);";
-        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp float, ts long, post_id long, post_comment string, comment_id long, comment_replied long);";
+        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string);";
+        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
+        inStreamDefinition += "@config(async = 'true')define stream friendshipsStream (iij_timestamp long, ts long, user_id_1 long, user_id_2 long);";
+        inStreamDefinition += "@config(async = 'true')define stream likesStream (iij_timestamp long, ts long, user_id long, comment_id long);";
+        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, isPostFlag bool );";
 
-        String query = ("@info(name = 'query1') from postsStream  " +
-                "select iij_timestamp, ts, post_id, post, -1, -1 " +
+        String query = ("@info(name = 'query1') from postsStream " +
+                "select iij_timestamp, ts, post_id, -1l as comment_id, -1l as comment_replied_id, true as isPostFlag " +
                 "insert into postCommentsStream;");
 
         query += ("@info(name = 'query2') from commentsStream  " +
-                "select iij_timestamp, ts, post_commented, comment, comment_id, comment_replied " +
+                "select iij_timestamp, ts, post_commented as post_id, comment_id, comment_replied as comment_replied_id, false as isPostFlag " +
                 "insert into postCommentsStream;");
 
-        query += ("@info(name = 'query3') from postCommentsStream#debs2016:ranker(iij_timestamp, ts, post_id, post_comment, comment_id, comment_replied)  " +
-                "select iij_timestamp, ts, comment_id, user_id, comment, user, comment_replied, post_commented " +
-                "insert into outputStream2;");
+        query += ("@info(name = 'query3') from postCommentsStream#debs2016:ranker(iij_timestamp, ts, post_id, comment_id, comment_replied_id, isPostFlag)  " +
+                "select iij_timestamp, ts, post_id, comment_id, comment_replied_id " +
+                "insert into query1OutputStream;");
 
+        System.out.println(inStreamDefinition+query);
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition+query);
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
+//        executionPlanRuntime.addCallback("outputStream1", new StreamCallback() {
+//
+//            @Override
+//            public void receive(Event[] events) {
+//                EventPrinter.print(events);
+//            }
+//        });
 
-        executionPlanRuntime.addCallback("outputStream1", new StreamCallback() {
-
-            @Override
-            public void receive(Event[] events) {
-                EventPrinter.print(events);
-            }
-        });
-
-        executionPlanRuntime.addCallback("outputStream2", new StreamCallback() {
+        executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
 
             @Override
             public void receive(Event[] events) {
@@ -72,6 +72,7 @@ public class Query1 {
         });
 
         System.out.println("Incremental data loading is performed.");
+
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
 
         //Posts
@@ -86,9 +87,11 @@ public class Query1 {
         EventSenderThread senderThreadComments = new EventSenderThread(eventBufferListComments, inputHandlerComments, Long.MAX_VALUE);
 
         executionPlanRuntime.start();
+
         //start the data loading process
         dataLoaderThreadPosts.start();
         dataLoaderThreadComments.start();
+
         //from here onwards we start sending the events
         senderThreadPosts.start();
         senderThreadComments.start();
