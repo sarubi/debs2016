@@ -6,7 +6,7 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
 import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.debs2016.input.DataLoderThread;
+import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.EventSenderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.util.Constants;
@@ -74,17 +74,16 @@ public class Query1 {
         System.out.println("Incremental data loading is performed.");
 
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
-
         //Posts
-        DataLoderThread dataLoaderThreadPosts = new DataLoderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
+        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
         InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
-        EventSenderThread senderThreadPosts = new EventSenderThread(eventBufferListPosts, inputHandlerPosts, Long.MAX_VALUE);
+        EventSenderThread senderThreadPosts = new EventSenderThread(dataLoaderThreadPosts.getEventBuffer(), inputHandlerPosts, 100);
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
-        DataLoderThread dataLoaderThreadComments = new DataLoderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
+        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
-        EventSenderThread senderThreadComments = new EventSenderThread(eventBufferListComments, inputHandlerComments, Long.MAX_VALUE);
+        EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, 100);
 
         executionPlanRuntime.start();
 

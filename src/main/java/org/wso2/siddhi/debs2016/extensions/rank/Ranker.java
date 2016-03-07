@@ -41,8 +41,8 @@ public class Ranker extends StreamFunctionProcessor {
             commentsForPostMap.put(post_id, treeSet);
             treeSet = postRankTreeMap.get(10);
             treeSet.add(post_id);//Initially the total score of the new post is 10.
-
             TreeSet<Long> posts = postLifeTimeTreeMap.get(ts);
+
             if(posts==null){
                 posts = new TreeSet<Long>();
             }
@@ -50,17 +50,18 @@ public class Ranker extends StreamFunctionProcessor {
             posts.add(post_id);
             postLifeTimeTreeMap.put(ts, posts);
         } else {
+            TreeSet<Long> treeSet = null;
+
             if(comment_replied_id == -1){ //This is a comment posted to an existing post
-                TreeSet<Long> treeSet = commentsForPostMap.get(post_id);
+                treeSet = commentsForPostMap.get(post_id);
                 treeSet.add(comment_id);
-                treeSet = commentRankTreeMap.get(10);
-                treeSet.add(comment_id);//Initially the total score of the new comment is 10.
             } else if(comment_replied_id != -1) { //This is a comment posted to an existing comment
-                TreeSet<Long> treeSet = commentsForCommentMap.get(comment_replied_id);
+                treeSet = commentsForCommentMap.get(comment_replied_id);
                 treeSet.add(comment_id);
-                treeSet = commentRankTreeMap.get(10);
-                treeSet.add(comment_id);//Initially the total score of the new comment is 10.
             }
+
+            treeSet = commentRankTreeMap.get(10);
+            treeSet.add(comment_id);//Initially the total score of the new comment is 10.
         }
 
 
@@ -96,12 +97,12 @@ public class Ranker extends StreamFunctionProcessor {
 
         List<Attribute> attributeList = new ArrayList<Attribute>();
 
-        attributeList.add(new Attribute("iij_timestamp", Attribute.Type.LONG));
-        attributeList.add(new Attribute("ts", Attribute.Type.LONG));
-        attributeList.add(new Attribute("postID", Attribute.Type.LONG));
-        attributeList.add(new Attribute("commentID", Attribute.Type.LONG));
-        attributeList.add(new Attribute("commentRepliedID", Attribute.Type.LONG));
-        attributeList.add(new Attribute("isPostFlag", Attribute.Type.BOOL));
+//        attributeList.add(new Attribute("iij_timestamp", Attribute.Type.LONG));
+//        attributeList.add(new Attribute("ts", Attribute.Type.LONG));
+//        attributeList.add(new Attribute("postID", Attribute.Type.LONG));
+//        attributeList.add(new Attribute("commentID", Attribute.Type.LONG));
+//        attributeList.add(new Attribute("commentRepliedID", Attribute.Type.LONG));
+//        attributeList.add(new Attribute("isPostFlag", Attribute.Type.BOOL));
 
         return attributeList;
     }

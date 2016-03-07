@@ -5,6 +5,7 @@ import com.google.common.base.Splitter;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -39,23 +40,20 @@ public class DataLoaderThread extends Thread {
         try {
             br = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024);
             String line = br.readLine();
-            Object[] eventData = null;
-            Long userID = -1l;
-            String user = null;
+            Object[] eventData;
+            String user ;
 
             while (line != null) {
-                //We make an assumption here that we do not get empty strings due to missing values that may present in the input data set.
+                //We make an assumption here that we do not get empty strings due to missing values that may present in the input data set
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
-
                 switch(fileType) {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
                         String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
                         Long postID = Long.parseLong(dataStrIterator.next());
-                        userID = Long.parseLong(dataStrIterator.next());
+                        Long userID = Long.parseLong(dataStrIterator.next());
                         String post = dataStrIterator.next();
                         user = dataStrIterator.next();
-
                         eventData = new Object[]{
                                 0l,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
@@ -66,13 +64,12 @@ public class DataLoaderThread extends Thread {
                                 post,
                                 user
                         };
-
+                        //System.out.println(count++);
                         eventBufferList.put(eventData);
                         break;
                     case COMMENTS:
                         //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
                         // post_commented long
-
                         String commentTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
                         Long commentID = Long.parseLong(dataStrIterator.next());
                         userID = Long.parseLong(dataStrIterator.next());
@@ -85,7 +82,13 @@ public class DataLoaderThread extends Thread {
                         }
 
                         Long comment_replied = Long.parseLong(commentReplied);
-                        Long post_commented = Long.parseLong(dataStrIterator.next());
+                        String postCommented = dataStrIterator.next();
+
+                        if(postCommented.equals("")){
+                            postCommented = MINUS_ONE;
+                        }
+
+                        Long post_commented = Long.parseLong(postCommented);
 
                         eventData = new Object[]{
                                 0l,//We need to attach the time when we are injecting an event to the query network.
@@ -99,26 +102,25 @@ public class DataLoaderThread extends Thread {
                                 comment_replied,
                                 post_commented
                         };
-
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
-
-
                         break;
                     case LIKES:
-
                         break;
                 }
-                line = br.readLine();
+				line = br.readLine();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (NumberFormatException ec){
             ec.printStackTrace();
-        } catch (Throwable e) {
+        } catch (IOException ec){
+            ec.printStackTrace();
+        } catch (InterruptedException e){
             e.printStackTrace();
         }
+
     }
 
     /**
