@@ -48,20 +48,12 @@ public class Query1 {
                 "select iij_timestamp, ts, post_commented as post_id, comment_id, comment_replied as comment_replied_id, false as isPostFlag " +
                 "insert into postCommentsStream;");
 
-        query += ("@info(name = 'query3') from postCommentsStream#debs2016:ranker(iij_timestamp, ts, post_id, comment_id, comment_replied_id, isPostFlag)  " +
+        query += ("@info(name = 'query3') from postCommentsStream#debs2016:rankerQuery1(iij_timestamp, ts, post_id, comment_id, comment_replied_id, isPostFlag)  " +
                 "select iij_timestamp, ts, post_id, comment_id, comment_replied_id " +
                 "insert into query1OutputStream;");
 
         System.out.println(inStreamDefinition+query);
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition+query);
-
-//        executionPlanRuntime.addCallback("outputStream1", new StreamCallback() {
-//
-//            @Override
-//            public void receive(Event[] events) {
-//                EventPrinter.print(events);
-//            }
-//        });
 
         executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
 

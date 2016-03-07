@@ -10,7 +10,7 @@ import org.wso2.siddhi.query.api.definition.Attribute;
 import java.util.*;
 
 
-public class Ranker extends StreamFunctionProcessor {
+public class RankerQuery1 extends StreamFunctionProcessor {
     private HashMap<Long, TreeSet<Long>> commentsForPostMap; //Key is a post_id, values is the list of comments posted to that post
     private HashMap<Long, TreeSet<Long>> commentsForCommentMap; //Key is a comment_id, values is the list of comments posted to that comment
     private TreeMap<Long, TreeSet<Long>> postRankTreeMap; //Key is the total score of the post, value is the list of posts which has that particular total score
@@ -96,13 +96,6 @@ public class Ranker extends StreamFunctionProcessor {
         isPostFlag = ((VariableExpressionExecutor) expressionExecutors[5]).getAttribute().getName();
 
         List<Attribute> attributeList = new ArrayList<Attribute>();
-
-//        attributeList.add(new Attribute("iij_timestamp", Attribute.Type.LONG));
-//        attributeList.add(new Attribute("ts", Attribute.Type.LONG));
-//        attributeList.add(new Attribute("postID", Attribute.Type.LONG));
-//        attributeList.add(new Attribute("commentID", Attribute.Type.LONG));
-//        attributeList.add(new Attribute("commentRepliedID", Attribute.Type.LONG));
-//        attributeList.add(new Attribute("isPostFlag", Attribute.Type.BOOL));
 
         return attributeList;
     }
