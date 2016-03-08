@@ -14,8 +14,6 @@ public class FriendshipGraphTest {
     {
        // FriendshipGraph graph = new FriendshipGraph(null);
         // edges = graph.getNumberOfEdges();
-
-
         //assertEquals(3,edges);
 
     }
