@@ -1,6 +1,9 @@
 package org.wso2.siddhi.debs2016.input;
 
 import com.google.common.base.Splitter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -50,6 +53,10 @@ public class DataLoaderThread extends Thread {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
                         String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+//                        String startDate = "2013-07-12T18:31:01.000Z";
+                        DateTime dt = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
+                        Long postsTimeStampLong = dt.getMillis();
                         Long postID = Long.parseLong(dataStrIterator.next());
                         Long userID = Long.parseLong(dataStrIterator.next());
                         String post = dataStrIterator.next();
@@ -58,7 +65,7 @@ public class DataLoaderThread extends Thread {
                                 0l,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
-                                postsTimeStamp,
+                                postsTimeStampLong,
                                 postID,
                                 userID,
                                 post,
@@ -71,6 +78,8 @@ public class DataLoaderThread extends Thread {
                         //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
                         // post_commented long
                         String commentTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        DateTime dt2 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(commentTimeStamp);
+                        Long commentTimeStampLong = dt2.getMillis();
                         Long commentID = Long.parseLong(dataStrIterator.next());
                         userID = Long.parseLong(dataStrIterator.next());
                         String comment = dataStrIterator.next();
@@ -94,7 +103,7 @@ public class DataLoaderThread extends Thread {
                                 0l,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
-                                commentTimeStamp,
+                                commentTimeStampLong,
                                 commentID,
                                 userID,
                                 comment,

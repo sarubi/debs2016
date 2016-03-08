@@ -5,7 +5,6 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.EventSenderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
@@ -59,7 +58,7 @@ public class Query1 {
 
             @Override
             public void receive(Event[] events) {
-                EventPrinter.print(events);
+                //EventPrinter.print(events);
             }
         });
 
@@ -69,13 +68,13 @@ public class Query1 {
         //Posts
         DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
         InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
-        EventSenderThread senderThreadPosts = new EventSenderThread(dataLoaderThreadPosts.getEventBuffer(), inputHandlerPosts, 100);
+        EventSenderThread senderThreadPosts = new EventSenderThread(dataLoaderThreadPosts.getEventBuffer(), inputHandlerPosts, Integer.MAX_VALUE);
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
-        EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, 100);
+        EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, Integer.MAX_VALUE);
 
         executionPlanRuntime.start();
 
