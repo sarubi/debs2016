@@ -54,8 +54,8 @@ public class FriendshipGraph {
     public void printGraphInfo()
     {
         System.out.println(graph.toString()); /*Print the Graph itself*/
-        System.out.println(graph.size()); /*Print number of vertices*/
-        System.out.println(getNumberOfEdges()); /*Print the Graph itself*/
+        System.out.println("Vertices: " + getNumberOfVertices()); /*Print number of vertices*/
+        System.out.println("Edges: " + getNumberOfEdges()); /*Print the number of edges*/
 
     }
 
@@ -67,20 +67,11 @@ public class FriendshipGraph {
      * @param uId2 user id 2
      */
 
-    private void addEdge(long uId1, long uId2){
-        if(checkVertex(uId1)){
-            graph.get(uId1).add(uId2);  /*If vertex already present create edge*/
-        }else{
-            graph.put(uId1, new ArrayList<Long>()); /*If vertex not present, create it*/
-            graph.get(uId1).add(uId2); /*Create Edge*/
-        }
-        /*Same procedure for second vertex because it is undirected graph*/
-        if(checkVertex(uId2)){
-            graph.get(uId2).add(uId1);
-        }else{
-            graph.put(uId2, new ArrayList<Long>());
-            graph.get(uId2).add(uId1);
-        }
+    public void addEdge(long uId1, long uId2){
+        addVertex(uId1);
+        graph.get(uId1).add(uId2);
+        addVertex(uId2);
+        graph.get(uId2).add(uId1);
     }
 
     /**
@@ -96,11 +87,23 @@ public class FriendshipGraph {
     }
 
     /**
+     * Create new vertex if vertex not already present
+     *
+     * @param uId the user id
+     *
+     */
+    public void addVertex(long uId){
+        if (!checkVertex(uId)){
+            graph.put(uId, new ArrayList<Long>());
+        }
+    }
+
+    /**
      * Gets the number of edges
      *
      * @return the number of edges
      */
-    private int getNumberOfEdges(){ /*Calculate number of edges*/
+    public int getNumberOfEdges(){ /*Calculate number of edges*/
         int numberOfEdges = 0;
         for (List<Long> val: graph.values()) {
             numberOfEdges += val.size();
@@ -108,12 +111,20 @@ public class FriendshipGraph {
         return numberOfEdges/2; /*Because undirected, same edge will be calculated twice*/
     }
 
+    /**
+     * Gets the number of vertices
+     *
+     * @return the number of vertices
+     */
+    public int getNumberOfVertices(){
+        return graph.size();
+    }
     //TODO:  Implement logic to decide largest connected component
 
     /**
      * Gets the largest connect component of the graph
      *
-     * @return the larget connected components
+     * @return the largest connected components
      */
     public FriendshipGraph getLargestConnectedComponent(){
         return null;
