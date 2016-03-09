@@ -8,10 +8,8 @@ package org.wso2.siddhi.debs2016.graph;
 public class CommentLikeGraph {
 
     private long ts;
-    private FriendshipGraph friendshipGraph = new FriendshipGraph();
-    private String comment;
-
-
+    private Graph commentLikeGraph = new Graph();
+	private String comment;
     /**
      *
      * @param ts the arrival time of the comment
@@ -33,6 +31,20 @@ public class CommentLikeGraph {
         return 1000;
     }
 
+    /**
+     * Register a new like for the comment
+     *
+     * @param uId is user id of person who likes comment
+     */
+    public void registerLike(long uId)
+    {
+        commentLikeGraph.addVertex(uId);
 
+        for (long vertex: commentLikeGraph.getVerticesList()) {
 
+                if (Graph.friendshipGraph.hasEdge(uId, vertex)){
+                    commentLikeGraph.addEdge(uId, vertex);
+                }
+        }
+    }
 }

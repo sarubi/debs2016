@@ -3,7 +3,7 @@ package org.wso2.siddhi.debs2016.extensions.rank;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
-import org.wso2.siddhi.debs2016.graph.FriendshipGraph;
+import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 
 public class RankerQuery2 extends StreamFunctionProcessor {
-    private FriendshipGraph friendsGraph;
+    private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
 
@@ -33,7 +33,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             return null;
         }
 
-        friendsGraph = new FriendshipGraph();
+        friendsGraph = new Graph();
 
         List<Attribute> attributeList = new ArrayList<Attribute>();
 
