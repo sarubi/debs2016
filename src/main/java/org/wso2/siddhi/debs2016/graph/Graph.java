@@ -2,25 +2,23 @@ package org.wso2.siddhi.debs2016.graph;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
- * Create New FriendshipGraph
+ * Create New Graph
  * Created by anoukh on 3/7/16.
  */
-public class FriendshipGraph {
+public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
+    public static Graph friendshipGraph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
 
     /**
      * The constructor
      *
      * @param location the location of the file to create the graph from
      */
-    public FriendshipGraph(String location) { /*Constructor*/
+    public Graph(String location) { /*Constructor*/
         final String file = location;
         long uId1;
         long uId2;
@@ -42,7 +40,7 @@ public class FriendshipGraph {
     /**
      * The constructor
      */
-    public FriendshipGraph() {
+    public Graph() {
 
     }
 
@@ -137,6 +135,27 @@ public class FriendshipGraph {
         }
     }
 
+
+    /**
+     * Check if vertex is present in the graph
+     *
+     * @param uId the vertex
+     * @return true if vertex is found else false
+     */
+    public boolean hasVertex(long uId){
+        return graph.containsKey(uId);
+    }
+
+    /**
+     * Get set of vertices
+     *
+     *
+     * @return set of vertices
+     */
+    public Set<Long> getVerticesList(){
+        return graph.keySet();
+    }
+
     //TODO:  Implement logic to decide largest connected component
 
     /**
@@ -144,7 +163,7 @@ public class FriendshipGraph {
      *
      * @return the largest connected components
      */
-    public FriendshipGraph getLargestConnectedComponent(){
+    public Graph getLargestConnectedComponent(){
         return null;
     }
 }

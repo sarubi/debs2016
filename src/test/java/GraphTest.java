@@ -1,18 +1,18 @@
 import org.junit.Test;
-import org.wso2.siddhi.debs2016.graph.FriendshipGraph;
+import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by malithjayasinghe on 3/8/16.
  */
-public class FriendshipGraphTest {
+public class GraphTest {
 
 
     @Test
     public void testGraphConstructionDataSet1()
     {
-        FriendshipGraph graph = new FriendshipGraph("/usr/wso2/DEBS/data/friendships.dat");
+        Graph graph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
         assertEquals(63409,graph.getNumberOfEdges());
         assertEquals(4139,graph.getNumberOfVertices());
     }
@@ -26,7 +26,7 @@ public class FriendshipGraphTest {
     @Test
     public void testAddEdge()
     {
-        FriendshipGraph graph = new FriendshipGraph();
+        Graph graph = new Graph();
         assertEquals(0,graph.getNumberOfEdges());
         graph.addEdge(1,2);
         assertEquals(1,graph.getNumberOfEdges());
@@ -36,7 +36,7 @@ public class FriendshipGraphTest {
 
     @Test
     public void testAddVertex(){
-        FriendshipGraph graph = new FriendshipGraph();
+        Graph graph = new Graph();
         assertEquals(0,graph.getNumberOfVertices());
 
         graph.addEdge(1,2); /*Adding 2 new vertices in the form of an edge*/
@@ -54,13 +54,18 @@ public class FriendshipGraphTest {
 
     @Test
     public void testHasEdge(){
-        FriendshipGraph friendshipGraph = new FriendshipGraph();
+        Graph friendshipGraph = new Graph();
         friendshipGraph.addEdge(1,2);
 
         assertEquals(true,friendshipGraph.hasEdge(1,2));
         assertEquals(false,friendshipGraph.hasEdge(1,3));
         assertEquals(false,friendshipGraph.hasEdge(3,1));
         assertEquals(true,friendshipGraph.hasEdge(2,1));
+    }
+
+    @Test
+    public void testFriendshipGraph(){
+        assertEquals(4139, Graph.friendshipGraph.getNumberOfVertices());
     }
 
     public void testGetConnectedComponents()
