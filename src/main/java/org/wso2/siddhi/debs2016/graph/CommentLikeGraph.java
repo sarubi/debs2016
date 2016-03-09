@@ -1,5 +1,5 @@
 package org.wso2.siddhi.debs2016.graph;
-
+import java.util.*;
 /**
  * The graph of users who have liked a given comment where edges of the represents the friendship relationship between them.
  *
@@ -10,7 +10,10 @@ public class CommentLikeGraph {
     private long ts;
     private Graph commentLikeGraph = new Graph();
 	private String comment;
+
     /**
+     *
+     * The constructor
      *
      * @param ts the arrival time of the comment
      */
@@ -28,7 +31,7 @@ public class CommentLikeGraph {
      */
     public long getArrivalTime()
     {
-        return 1000;
+        return ts;
     }
 
     /**
@@ -39,8 +42,8 @@ public class CommentLikeGraph {
     public void registerLike(long uId)
     {
         commentLikeGraph.addVertex(uId);
-
-        for (long vertex: commentLikeGraph.getVerticesList()) {
+        Set<Long> verticesList = commentLikeGraph.getVerticesList();
+        for (long vertex: verticesList) {
 
                 if (Graph.friendshipGraph.hasEdge(uId, vertex)){
                     commentLikeGraph.addEdge(uId, vertex);
