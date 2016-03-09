@@ -35,8 +35,6 @@ public class Query1 {
 
         String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string);";
         inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
-        inStreamDefinition += "@config(async = 'true')define stream friendshipsStream (iij_timestamp long, ts long, user_id_1 long, user_id_2 long);";
-        inStreamDefinition += "@config(async = 'true')define stream likesStream (iij_timestamp long, ts long, user_id long, comment_id long);";
         inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, isPostFlag bool );";
 
         String query = ("@info(name = 'query1') from postsStream " +
@@ -85,5 +83,19 @@ public class Query1 {
         //from here onwards we start sending the events
         senderThreadPosts.start();
         senderThreadComments.start();
+
+        //Just make the main thread sleep infinitely
+        //Note that we cannot have an event based mechanism to exit from this infinit loop. It is
+        //because even if the data sending thread has completed its task of sending the data to
+        //the SiddhiManager, the SiddhiManager object may be conducting the processing of the remaining
+        //data. Furthermore, since this is CEP its better have this type of mechanism, rather than
+        //terminating once we are done sending the data to the CEP engine.
+        while(true){
+            try {
+                Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
