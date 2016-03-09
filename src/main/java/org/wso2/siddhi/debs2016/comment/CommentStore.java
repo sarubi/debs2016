@@ -24,7 +24,7 @@ public class CommentStore {
     public void updateCommentStore(long time)
     {
 
-            // for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
+            //for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
             //get the new time stamp and the time stamp of the comment (where do we store this)
 
     }
@@ -92,9 +92,20 @@ public class CommentStore {
      */
     private void registerLike(long commentID, long userID)
     {
-        //TO DO
-        // Get the CommentLikeGraph from the hash map
-        // commentLikeGraph.registerLike(userID);
+        graph.get(commentID).registerLike(userID);
+
+    }
+    /**
+     * Handles a new friendship
+     *
+     * @param uId1 the userID of friend one
+     * @param uId2 the userID of friend two
+     */
+    private void handleNewFriendship(long uId1, long uId2)
+    {
+        for (CommentLikeGraph commentLikeGraph: graph.values()) {
+            commentLikeGraph.handleNewFriendship(uId1, uId2);
+        }
 
     }
 

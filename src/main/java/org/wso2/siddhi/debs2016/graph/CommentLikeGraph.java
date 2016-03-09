@@ -50,4 +50,16 @@ public class CommentLikeGraph {
                 }
         }
     }
+
+    /**
+     * Handle event of a new friendship in CommentLikeGraph
+     *
+     * @param uId1 the userID of friend one
+     * @param uId2 the userID of friend two
+     */
+    public void handleNewFriendship(long uId1, long uId2) {
+        if (commentLikeGraph.hasVertex(uId1) && commentLikeGraph.hasVertex(uId2)){
+            commentLikeGraph.addEdge(uId1, uId2);
+        }
+    }
 }
