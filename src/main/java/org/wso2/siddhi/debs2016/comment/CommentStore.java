@@ -24,7 +24,7 @@ public class CommentStore {
     public void updateCommentStore(long time)
     {
 
-            //for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
+            // for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
             //get the new time stamp and the time stamp of the comment (where do we store this)
 
     }
@@ -46,12 +46,10 @@ public class CommentStore {
      *
      * @param k the number of comments
      */
-    public void getKLargestComments(int k)
+    public String [] getKLargestComments(int k)
     {
 
-
-        // loop through the hash map map and compute the largest connected component of each comment
-        // sort the comment hash map based on the size of the largest connected component (decending order)
+        // go through the hash map map and get largest connected component of each like graph
         // the first k elements (note that we will only write this to the output steam if there has been a change in the output)
 
     }
@@ -95,6 +93,8 @@ public class CommentStore {
     private void registerLike(long commentID, long userID)
     {
         //TO DO
+        // Get the CommentLikeGraph from the hash map
+        // commentLikeGraph.registerLike(userID);
 
     }
 
