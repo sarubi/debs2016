@@ -9,14 +9,17 @@ public class CommentLikeGraph {
 
     private long ts;
     private FriendshipGraph friendshipGraph = new FriendshipGraph();
+    private String comment;
+
 
     /**
      *
      * @param ts the arrival time of the comment
      */
-    public CommentLikeGraph(long ts)
+    public CommentLikeGraph(long ts, String comment)
     {
         this.ts = ts;
+        this.comment = comment;
 
     }
 
