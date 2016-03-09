@@ -52,6 +52,17 @@ public class FriendshipGraphTest {
         assertEquals(4,graph.getNumberOfVertices());
     }
 
+    @Test
+    public void testHasEdge(){
+        FriendshipGraph friendshipGraph = new FriendshipGraph();
+        friendshipGraph.addEdge(1,2);
+
+        assertEquals(true,friendshipGraph.hasEdge(1,2));
+        assertEquals(false,friendshipGraph.hasEdge(1,3));
+        assertEquals(false,friendshipGraph.hasEdge(3,1));
+        assertEquals(true,friendshipGraph.hasEdge(2,1));
+    }
+
     public void testGetConnectedComponents()
     {
 

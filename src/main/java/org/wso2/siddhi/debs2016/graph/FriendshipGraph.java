@@ -119,6 +119,24 @@ public class FriendshipGraph {
     public int getNumberOfVertices(){
         return graph.size();
     }
+
+
+    /**
+     * Check if an edge is present in the graph
+     *
+     * @param uId1 the vertex 1
+     * @param uId2 the vertex 2
+     * @return true if edge is found else false
+     */
+    public boolean hasEdge(long uId1, long uId2){
+        List<Long> adjacentVertices = graph.get(uId1);
+        if (adjacentVertices == null){
+            return false;
+        }else{
+            return adjacentVertices.contains(uId2);
+        }
+    }
+
     //TODO:  Implement logic to decide largest connected component
 
     /**
