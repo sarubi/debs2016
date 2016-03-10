@@ -114,6 +114,23 @@ public class DataLoaderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
+
+                        String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
+                        Long  friendshipTimeStampLong = dt3.getMillis();
+                        Long user1ID = Long.parseLong(dataStrIterator.next());
+                        user1ID = Long.parseLong(dataStrIterator.next());
+                        Long user2ID = Long.parseLong(dataStrIterator.next());
+
+                        eventData = new Object[]{
+                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                // For that we have to set a separate field which will be populated when we are
+                                // injecting an event to the input stream.
+                                friendshipTimeStampLong,
+                                user1ID,
+                                user2ID,
+                        };
+                        eventBufferList.put(eventData);
                         break;
                     case LIKES:
                         break;
