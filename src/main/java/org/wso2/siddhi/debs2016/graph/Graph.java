@@ -3,6 +3,7 @@ package org.wso2.siddhi.debs2016.graph;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 /**
  * Create New Graph
@@ -163,7 +164,54 @@ public class Graph {
      *
      * @return the largest connected components
      */
-    public Graph getLargestConnectedComponent(){
-        return null;
+    public long getLargestConnectedComponent(Graph graph){
+        List<Long> list = (List<Long>) graph.getVerticesList();
+        List<Component> newList = null;
+        for (int i=0;i<list.size();i++) {
+            newList.add(new Component(list.get(i),(long)i));
+        }
+        for(int k=1;k<newList.size();k++) {
+            for (int j = k + 1; j < newList.size(); j++) {
+                if (hasEdge(newList.get(k).getNId(), newList.get(j).getUId())) {
+                    newList.get(j).setNId(newList.get(k).getNId());
+                }
+            }
+        }
+        long largeComponent=0;
+            int count=1;
+            for (int m=0;m<newList.size();m++){
+                for (int n=m+1;n<newList.size();n++){
+                    if (newList.get(m).getNId()==newList.get(n).getNId()){
+                        count++;
+                    }
+                }
+                if (count>largeComponent){
+                    largeComponent=count;
+                }
+            }
+
+        return largeComponent;
     }
 }
+
+class Component{
+    private long uId;
+    private long nId;
+    public void setUId(long uId){
+        this.uId=uId;
+    }
+    public void setNId(long nId){
+        this.nId=nId;
+    }
+    public long getUId(){
+        return uId;
+    }
+    public long getNId(){
+        return nId;
+    }
+    public Component(long userId,long nodeId){
+        setUId(userId);
+        setNId(nodeId);
+    }
+}
+

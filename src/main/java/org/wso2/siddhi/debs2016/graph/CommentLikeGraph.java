@@ -8,7 +8,7 @@ import java.util.*;
 public class CommentLikeGraph {
 
     private long ts;
-    private Graph commentLikeGraph = new Graph();
+    public Graph commentLikeGraph = new Graph();
 	private String comment;
 
     /**
