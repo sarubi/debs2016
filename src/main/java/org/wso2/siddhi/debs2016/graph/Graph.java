@@ -12,7 +12,7 @@ import java.util.List;
 public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
-    public static Graph friendshipGraph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
+    public static Graph friendshipGraph = new Graph("/usr/wso2/DEBS/debs2016/src/main/resources/data/friendships.dat");
 
     /**
      * The constructor
@@ -160,40 +160,63 @@ public class Graph {
     //TODO:  Implement logic to decide largest connected component
 
     /**
-     * Gets the largest connect component of the graph
+     * Gets the number of vertices of the largest connected component of the graph
      *
      * @return the largest connected components
      */
-    public long getLargestConnectedComponent(Graph graph){
-        List<Long> list = (List<Long>) graph.getVerticesList();
-        List<Component> newList = null;
-        for (int i=0;i<list.size();i++) {
-            newList.add(new Component(list.get(i),(long)i));
+    public static long getLargestConnectedComponent(Graph graph){
+        /*Creating the Pegasus Data Structure*/
+        List<Long> list = new ArrayList<Long>(graph.getVerticesList());
+        List<Component> componentList = new ArrayList<Component>();
+
+        for (int i = 0; i < list.size(); i++) {
+                componentList.add(new Component(list.get(i),(long)i));
         }
-        for(int k=1;k<newList.size();k++) {
-            for (int j = k + 1; j < newList.size(); j++) {
-                if (hasEdge(newList.get(k).getNId(), newList.get(j).getUId())) {
-                    newList.get(j).setNId(newList.get(k).getNId());
+
+        int changes = 1;
+        while(changes != 0){
+            changes = 0;
+            for(int k = 0;k < componentList.size();k++) {
+                for (int j = 0; j < componentList.size(); j++) {
+                    if (graph.hasEdge(componentList.get(k).getUId(), componentList.get(j).getUId())) {
+
+                        if (componentList.get(k).getNId() > componentList.get(j).getNId()) {
+                            componentList.get(k).setNId(componentList.get(j).getNId());
+                            changes++;
+                        } else if (componentList.get(k).getNId() < componentList.get(j).getNId()) {
+                            componentList.get(j).setNId(componentList.get(k).getNId());
+                            changes++;
+                        }
+                    }
                 }
             }
         }
-        long largeComponent=0;
-            int count=1;
-            for (int m=0;m<newList.size();m++){
-                for (int n=m+1;n<newList.size();n++){
-                    if (newList.get(m).getNId()==newList.get(n).getNId()){
+        /*End Creating the Pegasus Data Structure*/
+
+        /*Calculate Largest Component*/
+        long largeComponent = 0;
+            int count;
+
+            for (int m = 0; m < componentList.size(); m++){
+                count = 1;
+                for (int n = 0; n < componentList.size(); n++){
+                    if (m == n){
+                        continue;
+                    }
+                    if (componentList.get(m).getNId() == componentList.get(n).getNId()){
                         count++;
                     }
                 }
-                if (count>largeComponent){
-                    largeComponent=count;
+                if (count > largeComponent){
+                    largeComponent = count;
                 }
             }
 
         return largeComponent;
+        /*End Calculate Largest Component*/
     }
 }
-
+/*Component Object to hold UserID and NodeID*/
 class Component{
     private long uId;
     private long nId;

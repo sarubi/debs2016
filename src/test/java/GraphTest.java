@@ -1,4 +1,5 @@
 import org.junit.Test;
+import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
@@ -74,10 +75,75 @@ public class GraphTest {
 
     }
 
-    public void getLargestConnectedComponent()
+    @Test
+    public void testGetLargestConnectedComponentData1()
     {
+        CommentLikeGraph graph = new CommentLikeGraph(1,"Hi");
+
+        graph.registerLike(100);
+        graph.registerLike(101);
+        graph.registerLike(102);
+        graph.registerLike(103);
+        graph.registerLike(104);
+        graph.registerLike(105);
+        graph.registerLike(106);
+        graph.registerLike(107);
+        graph.registerLike(108);
+        graph.registerLike(109);
+
+        graph.handleNewFriendship(100, 101);
+        graph.handleNewFriendship(100, 105);
+        graph.handleNewFriendship(105, 106);
+        graph.handleNewFriendship(106, 103);
+        graph.handleNewFriendship(107, 102);
+        graph.handleNewFriendship(107, 104);
+        graph.handleNewFriendship(102, 108);
+        graph.handleNewFriendship(109, 108);
+
+        assertEquals(5, graph.commentLikeGraph.getLargestConnectedComponent(graph.commentLikeGraph));
+    }
+
+    @Test
+    public void testGetLargestConnectedComponentData2()
+    {
+        CommentLikeGraph graph = new CommentLikeGraph(1,"Hi");
+
+        graph.registerLike(100);
+        graph.registerLike(101);
+        graph.registerLike(102);
+        graph.registerLike(103);
+        graph.registerLike(104);
+        graph.registerLike(105);
+        graph.registerLike(106);
+        graph.registerLike(107);
+        graph.registerLike(108);
+        graph.registerLike(109);
+        graph.registerLike(110);
+        graph.registerLike(111);
+        graph.registerLike(112);
+        graph.registerLike(113);
+        graph.registerLike(114);
+        graph.registerLike(115);
+        graph.registerLike(116);
+        graph.registerLike(120);
 
 
+        graph.handleNewFriendship(113, 103);
+        graph.handleNewFriendship(101, 103);
+        graph.handleNewFriendship(103, 114);
+        graph.handleNewFriendship(102, 103);
+        graph.handleNewFriendship(104, 102);
+        graph.handleNewFriendship(109, 102);
+        graph.handleNewFriendship(109, 110);
+        graph.handleNewFriendship(105, 106);
+        graph.handleNewFriendship(107, 106);
+        graph.handleNewFriendship(107, 115);
+        graph.handleNewFriendship(107, 111);
+        graph.handleNewFriendship(107, 108);
+        graph.handleNewFriendship(112, 108);
+        graph.handleNewFriendship(116, 120);
+
+        assertEquals(8, graph.commentLikeGraph.getLargestConnectedComponent(graph.commentLikeGraph));
     }
 
 
