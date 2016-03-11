@@ -90,7 +90,7 @@ public class CommentStore {
      * @param userID the userID
      * @param commentID the comment id
      */
-    private void registerLike(long commentID, long userID)
+    public void registerLike(long commentID, long userID)
     {
         graph.get(commentID).registerLike(userID);
 
