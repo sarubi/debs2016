@@ -50,7 +50,7 @@ public class CommentStoreTest {
 
 @Test
     public void testGetKLargestComments(){
-        CommentStore theStore = new CommentStore();
+        CommentStore theStore = new CommentStore(100);
 
         theStore.registerComment(1,100,"Comment One");
         theStore.registerComment(2,101,"Comment Two");

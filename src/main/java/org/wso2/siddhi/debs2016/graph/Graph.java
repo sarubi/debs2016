@@ -12,7 +12,7 @@ import java.util.List;
 public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
-    public static Graph friendshipGraph = new Graph("/usr/wso2/DEBS/debs2016/src/main/resources/data/friendships.dat");
+    public static Graph friendshipGraph = new Graph();
 
     /**
      * The constructor

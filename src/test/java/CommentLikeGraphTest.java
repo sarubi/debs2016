@@ -19,7 +19,7 @@ public class CommentLikeGraphTest {
         Graph testGraph = new Graph();
         testGraph.addVertex(31);
         testGraph.addVertex(12);
-        testGraph.addEdge(12,31);
+        testGraph.addEdge(12, 31);
 
         assertTrue(testGraph.equals(commentLikeGraph.getGraph()));
 
@@ -28,11 +28,11 @@ public class CommentLikeGraphTest {
     @Test
     public void testRegisterLike(){
         CommentLikeGraph graph = new CommentLikeGraph(1, "Hi");
-        assertEquals(0,graph.commentLikeGraph.getNumberOfVertices());
+        assertEquals(0,graph.getGraph().getNumberOfVertices());
         graph.registerLike(31);
-        assertEquals(1,graph.commentLikeGraph.getNumberOfVertices());
+        assertEquals(1,graph.getGraph().getNumberOfVertices());
         graph.registerLike(12);
-        assertEquals(2,graph.commentLikeGraph.getNumberOfVertices());
+        assertEquals(2,graph.getGraph().getNumberOfVertices());
     }
 
     @Test

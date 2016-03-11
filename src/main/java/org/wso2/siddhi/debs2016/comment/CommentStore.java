@@ -1,7 +1,9 @@
 package org.wso2.siddhi.debs2016.comment;
 
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
+import org.wso2.siddhi.debs2016.graph.Graph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -11,7 +13,8 @@ import java.util.HashMap;
  */
 public class CommentStore{
     private long duration;
-   private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
+    private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
+    String [] previousKcomments;
 
 
 public  CommentStore(long d){
@@ -58,7 +61,7 @@ public  CommentStore(long d){
         String [] kComments = new String[k];
 
         for (CommentLikeGraph eachCommentLikeGraph: this.graph.values()) {
-                long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.commentLikeGraph);
+                long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
                 String comment = eachCommentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
