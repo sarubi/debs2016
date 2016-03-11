@@ -101,7 +101,7 @@ public class CommentStore {
      * @param uId1 the userID of friend one
      * @param uId2 the userID of friend two
      */
-    private void handleNewFriendship(long uId1, long uId2)
+    public void handleNewFriendship(long uId1, long uId2)
     {
         for (CommentLikeGraph commentLikeGraph: graph.values()) {
             commentLikeGraph.handleNewFriendship(uId1, uId2);
