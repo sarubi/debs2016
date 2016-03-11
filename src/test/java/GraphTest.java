@@ -78,72 +78,72 @@ public class GraphTest {
     @Test
     public void testGetLargestConnectedComponentData1()
     {
-        CommentLikeGraph graph = new CommentLikeGraph(1,"Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi");
 
-        graph.registerLike(100);
-        graph.registerLike(101);
-        graph.registerLike(102);
-        graph.registerLike(103);
-        graph.registerLike(104);
-        graph.registerLike(105);
-        graph.registerLike(106);
-        graph.registerLike(107);
-        graph.registerLike(108);
-        graph.registerLike(109);
+        commentLikeGraph.registerLike(100);
+        commentLikeGraph.registerLike(101);
+        commentLikeGraph.registerLike(102);
+        commentLikeGraph.registerLike(103);
+        commentLikeGraph.registerLike(104);
+        commentLikeGraph.registerLike(105);
+        commentLikeGraph.registerLike(106);
+        commentLikeGraph.registerLike(107);
+        commentLikeGraph.registerLike(108);
+        commentLikeGraph.registerLike(109);
 
-        graph.handleNewFriendship(100, 101);
-        graph.handleNewFriendship(100, 105);
-        graph.handleNewFriendship(105, 106);
-        graph.handleNewFriendship(106, 103);
-        graph.handleNewFriendship(107, 102);
-        graph.handleNewFriendship(107, 104);
-        graph.handleNewFriendship(102, 108);
-        graph.handleNewFriendship(109, 108);
+        commentLikeGraph.handleNewFriendship(100, 101);
+        commentLikeGraph.handleNewFriendship(100, 105);
+        commentLikeGraph.handleNewFriendship(105, 106);
+        commentLikeGraph.handleNewFriendship(106, 103);
+        commentLikeGraph.handleNewFriendship(107, 102);
+        commentLikeGraph.handleNewFriendship(107, 104);
+        commentLikeGraph.handleNewFriendship(102, 108);
+        commentLikeGraph.handleNewFriendship(109, 108);
 
-        assertEquals(5, graph.commentLikeGraph.getLargestConnectedComponent(graph.commentLikeGraph));
+        assertEquals(5, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
     }
 
     @Test
     public void testGetLargestConnectedComponentData2()
     {
-        CommentLikeGraph graph = new CommentLikeGraph(1,"Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi");
 
-        graph.registerLike(100);
-        graph.registerLike(101);
-        graph.registerLike(102);
-        graph.registerLike(103);
-        graph.registerLike(104);
-        graph.registerLike(105);
-        graph.registerLike(106);
-        graph.registerLike(107);
-        graph.registerLike(108);
-        graph.registerLike(109);
-        graph.registerLike(110);
-        graph.registerLike(111);
-        graph.registerLike(112);
-        graph.registerLike(113);
-        graph.registerLike(114);
-        graph.registerLike(115);
-        graph.registerLike(116);
-        graph.registerLike(120);
+        commentLikeGraph.registerLike(100);
+        commentLikeGraph.registerLike(101);
+        commentLikeGraph.registerLike(102);
+        commentLikeGraph.registerLike(103);
+        commentLikeGraph.registerLike(104);
+        commentLikeGraph.registerLike(105);
+        commentLikeGraph.registerLike(106);
+        commentLikeGraph.registerLike(107);
+        commentLikeGraph.registerLike(108);
+        commentLikeGraph.registerLike(109);
+        commentLikeGraph.registerLike(110);
+        commentLikeGraph.registerLike(111);
+        commentLikeGraph.registerLike(112);
+        commentLikeGraph.registerLike(113);
+        commentLikeGraph.registerLike(114);
+        commentLikeGraph.registerLike(115);
+        commentLikeGraph.registerLike(116);
+        commentLikeGraph.registerLike(120);
 
 
-        graph.handleNewFriendship(113, 103);
-        graph.handleNewFriendship(101, 103);
-        graph.handleNewFriendship(103, 114);
-        graph.handleNewFriendship(102, 103);
-        graph.handleNewFriendship(104, 102);
-        graph.handleNewFriendship(109, 102);
-        graph.handleNewFriendship(109, 110);
-        graph.handleNewFriendship(105, 106);
-        graph.handleNewFriendship(107, 106);
-        graph.handleNewFriendship(107, 115);
-        graph.handleNewFriendship(107, 111);
-        graph.handleNewFriendship(107, 108);
-        graph.handleNewFriendship(112, 108);
-        graph.handleNewFriendship(116, 120);
+        commentLikeGraph.handleNewFriendship(113, 103);
+        commentLikeGraph.handleNewFriendship(101, 103);
+        commentLikeGraph.handleNewFriendship(103, 114);
+        commentLikeGraph.handleNewFriendship(102, 103);
+        commentLikeGraph.handleNewFriendship(104, 102);
+        commentLikeGraph.handleNewFriendship(109, 102);
+        commentLikeGraph.handleNewFriendship(109, 110);
+        commentLikeGraph.handleNewFriendship(105, 106);
+        commentLikeGraph.handleNewFriendship(107, 106);
+        commentLikeGraph.handleNewFriendship(107, 115);
+        commentLikeGraph.handleNewFriendship(107, 111);
+        commentLikeGraph.handleNewFriendship(107, 108);
+        commentLikeGraph.handleNewFriendship(112, 108);
+        commentLikeGraph.handleNewFriendship(116, 120);
 
-        assertEquals(8, graph.commentLikeGraph.getLargestConnectedComponent(graph.commentLikeGraph));
+        assertEquals(8, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
     }
 
 
