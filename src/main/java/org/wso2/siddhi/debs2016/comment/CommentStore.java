@@ -2,7 +2,9 @@ package org.wso2.siddhi.debs2016.comment;
 
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Created by malithjayasinghe on 3/8/16.
@@ -19,11 +21,23 @@ public class CommentStore {
      *
      * Updates the comment store based on the logical time of a new event
      *
-     * @param time logical time of the new even
+     * @param time logical time of the new event and d is the duration which comment is valid
      */
-    public void updateCommentStore(long time)
+    public void updateCommentStore(long time, long d)
     {
+        ArrayList<Long> keyListToDelete = new ArrayList<Long>();
+        for (Long key: this.graph.keySet()) {
+            long arrivalTime = this.graph.get(key).getArrivalTime();
+            long lifetime = time -  arrivalTime;
 
+            if(d < lifetime){
+                keyListToDelete.add(key);
+            }
+
+        }
+        for(int i = 0; i < keyListToDelete.size(); i++){
+            graph.remove(keyListToDelete.get(i));
+        }
             //for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
             //get the new time stamp and the time stamp of the comment (where do we store this)
 
@@ -34,7 +48,6 @@ public class CommentStore {
      * Deletes a comment with a given ID
      *
      * @param commentID of the comment to delete
-     */
 
     private void deleteComment(long commentID)
     {
@@ -107,6 +120,10 @@ public class CommentStore {
             commentLikeGraph.handleNewFriendship(uId1, uId2);
         }
 
+    }
+
+    public long getNumberOfComments(){
+        return graph.size();
     }
 
 }
