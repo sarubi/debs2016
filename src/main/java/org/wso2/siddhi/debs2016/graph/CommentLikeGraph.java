@@ -8,7 +8,7 @@ import java.util.*;
 public class CommentLikeGraph {
 
     private long ts;
-    public Graph commentLikeGraph = new Graph();
+    private Graph graph = new Graph();
 	private String comment;
 
     /**
@@ -41,12 +41,12 @@ public class CommentLikeGraph {
      */
     public void registerLike(long uId)
     {
-        commentLikeGraph.addVertex(uId);
-        Set<Long> verticesList = commentLikeGraph.getVerticesList();
+        graph.addVertex(uId);
+        Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
 
                 if (Graph.friendshipGraph.hasEdge(uId, vertex)){
-                    commentLikeGraph.addEdge(uId, vertex);
+                    graph.addEdge(uId, vertex);
                 }
         }
     }
@@ -58,8 +58,13 @@ public class CommentLikeGraph {
      * @param uId2 the userID of friend two
      */
     public void handleNewFriendship(long uId1, long uId2) {
-        if (commentLikeGraph.hasVertex(uId1) && commentLikeGraph.hasVertex(uId2)){
-            commentLikeGraph.addEdge(uId1, uId2);
+        if (graph.hasVertex(uId1) && graph.hasVertex(uId2)){
+            graph.addEdge(uId1, uId2);
         }
+    }
+
+    public Graph getGraph()
+    {
+        return graph;
     }
 }
