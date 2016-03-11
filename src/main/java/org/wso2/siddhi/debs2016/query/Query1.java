@@ -34,7 +34,7 @@ public class Query1 {
         SiddhiManager siddhiManager = new SiddhiManager();
 
         String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
+        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user string, comment_replied long, post_commented long);";
         inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, isPostFlag bool );";
 
         String query = ("@info(name = 'query1') from postsStream " +
