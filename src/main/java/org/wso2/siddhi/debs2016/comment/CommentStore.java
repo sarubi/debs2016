@@ -1,6 +1,7 @@
 package org.wso2.siddhi.debs2016.comment;
 
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
+import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,26 +12,30 @@ import java.util.Set;
  *
  * Stores a list of active comments (i.e. comments arrived < d time)
  */
-public class CommentStore {
+public class CommentStore{
+    private long duration;
+    private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
+    String [] previousKcomments;
 
    private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
 
-
-
+public  CommentStore(long d){
+    duration=d;
+}
     /**
      *
      * Updates the comment store based on the logical time of a new event
      *
      * @param time logical time of the new event and d is the duration which comment is valid
      */
-    public void updateCommentStore(long time, long d)
+    public void updateCommentStore(long time)
     {
         ArrayList<Long> keyListToDelete = new ArrayList<Long>();
         for (Long key: this.graph.keySet()) {
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time -  arrivalTime;
 
-            if(d < lifetime){
+            if(duration < lifetime){
                 keyListToDelete.add(key);
             }
 
@@ -61,10 +66,71 @@ public class CommentStore {
      */
     public String [] getKLargestComments(int k)
     {
+        ArrayList<String> commentsList = new ArrayList<String>();
+        ArrayList<Long> list = new ArrayList<Long>();
+
+        String [] kComments = new String[k];
+
+        for (CommentLikeGraph eachCommentLikeGraph: this.graph.values()) {
+                long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
+                String comment = eachCommentLikeGraph.getComment();
+
+            /*If this is the first comment, add it to the list*/
+            if (list.size() == 0){
+                list.add(sizeOfComponent);
+                commentsList.add(comment);
+                continue;
+            }
+
+            /*If the element is the largest, add it to the end*/
+            if (sizeOfComponent > list.get(list.size()-1)){
+                list.add(list.size(), sizeOfComponent);
+                commentsList.add(commentsList.size(), comment);
+                continue;
+            }
+
+            /*Check each element to find correct position*/
+            for (int i = 0; i < list.size(); i++){
+                if (sizeOfComponent == list.get(i)){
+
+                    list.add(i, sizeOfComponent);
+                    commentsList.add(i, comment);
+                    //TODO: Lexicographical Ordering
+                    break;
+                }else if (sizeOfComponent < list.get(i)){
+                    list.add(i, sizeOfComponent);
+                    commentsList.add(i, comment);
+                    break;
+                }
+            }
+        }
+
+        /*Check if a change has taken place in K largest comments*/
+        boolean flagChange = false;
+
+        if (list.size() == 0){
+
+        }else{
+            for (int i = list.size()-1, j = 0; i >= (list.size()-k); i--, j++){
+                kComments[j] = commentsList.get(i);
+
+                if (this.previousKcomments == null){
+                    flagChange =  true;
+                }else if (!(kComments[j].equals(this.previousKcomments[j]))) {
+                    flagChange = true;
+                }
+            }
+
+            if (flagChange){
+                previousKcomments = kComments;
+                return kComments;
+            }
+        }
+
 
         // go through the hash map map and get largest connected component of each like graph
         // the first k elements (note that we will only write this to the output steam if there has been a change in the output)
-        return new String[0];
+        return previousKcomments;
     }
 
 

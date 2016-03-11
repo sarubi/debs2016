@@ -12,7 +12,6 @@ import java.util.List;
 public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
-    public static Graph friendshipGraph = new Graph("/usr/wso2/DEBS/debs2016/src/main/resources/data/friendships.dat");
 
     /**
      * The constructor
@@ -162,7 +161,7 @@ public class Graph {
     /**
      * Gets the number of vertices of the largest connected component of the graph
      *
-     * @return the largest connected components
+     * @return the number of vertices in the largest connected component
      */
     public static long getLargestConnectedComponent(Graph graph){
         /*Creating the Pegasus Data Structure*/

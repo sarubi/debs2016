@@ -24,8 +24,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
+    private long duration=10;
     public static Graph FRIENDSHIPGRAPH = new Graph();
-    private CommentStore commentStore = new CommentStore();
+    private CommentStore commentStore = new CommentStore(duration);
     private int k = 10;
 
     /**
@@ -72,8 +73,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
 
     @Override
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
-        if (expressionExecutors.length != 10) {
-            throw new RuntimeException("Required Parameters : Six");
+        if (expressionExecutors.length != 9) {
+            throw new RuntimeException("Required Parameters : Nine");
         }
         List<Attribute> attributeList = new ArrayList<Attribute>();
         return attributeList;

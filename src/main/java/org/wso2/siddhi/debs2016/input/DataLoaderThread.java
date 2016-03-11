@@ -24,7 +24,7 @@ public class DataLoaderThread extends Thread {
     private int count;
     private FileType fileType;
     private String MINUS_ONE = "-1";
-    private boolean debug = true;
+    private boolean debug = false;
 
     /**
      * The constructor

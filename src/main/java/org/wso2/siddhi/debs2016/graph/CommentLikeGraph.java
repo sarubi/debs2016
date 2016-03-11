@@ -45,9 +45,10 @@ public class CommentLikeGraph {
         Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
 
-                if (Graph.friendshipGraph.hasEdge(uId, vertex)){
-                    graph.addEdge(uId, vertex);
-                }
+//+Miyuru : Just commenting out the following three lines for the moment.
+//                if (Graph.friendshipGraph.hasEdge(uId, vertex)){
+//                    graph.addEdge(uId, vertex);
+//                }
         }
     }
 
@@ -63,8 +64,21 @@ public class CommentLikeGraph {
         }
     }
 
-    public Graph getGraph()
-    {
+    /**
+     * Getter method for comment variable
+     *
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Getter method for graph
+     *
+     * @return the graph
+     */
+    public Graph getGraph() {
         return graph;
     }
 }
