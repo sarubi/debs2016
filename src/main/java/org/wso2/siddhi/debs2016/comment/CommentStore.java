@@ -11,26 +11,28 @@ import java.util.Set;
  *
  * Stores a list of active comments (i.e. comments arrived < d time)
  */
-public class CommentStore {
-
+public class CommentStore{
+    private long duration;
    private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
 
 
-
+public  CommentStore(long d){
+    duration=d;
+}
     /**
      *
      * Updates the comment store based on the logical time of a new event
      *
      * @param time logical time of the new event and d is the duration which comment is valid
      */
-    public void updateCommentStore(long time, long d)
+    public void updateCommentStore(long time)
     {
         ArrayList<Long> keyListToDelete = new ArrayList<Long>();
         for (Long key: this.graph.keySet()) {
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time -  arrivalTime;
 
-            if(d < lifetime){
+            if(duration < lifetime){
                 keyListToDelete.add(key);
             }
 
@@ -43,16 +45,7 @@ public class CommentStore {
 
     }
 
-    /**
-     *
-     * Deletes a comment with a given ID
-     *
-     * @param commentID of the comment to delete
 
-    private void deleteComment(long commentID)
-    {
-            // remove the item in the hash map where the comment id= commentID
-    }
 
     /**
      * Gets the k largest comments

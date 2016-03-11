@@ -24,8 +24,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
+    private long duration=10;
     public static Graph FRIENDSHIPGRAPH = new Graph();
-    private CommentStore commentStore = new CommentStore();
+    private CommentStore commentStore = new CommentStore(duration);
     private int k = 10;
 
     /**
