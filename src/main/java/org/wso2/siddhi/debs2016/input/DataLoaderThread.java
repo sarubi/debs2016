@@ -24,6 +24,7 @@ public class DataLoaderThread extends Thread {
     private int count;
     private FileType fileType;
     private String MINUS_ONE = "-1";
+    private boolean debug = true;
 
     /**
      * The constructor
@@ -119,9 +120,10 @@ public class DataLoaderThread extends Thread {
                         DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
                         Long  friendshipTimeStampLong = dt3.getMillis();
                         Long user1ID = Long.parseLong(dataStrIterator.next());
-                        user1ID = Long.parseLong(dataStrIterator.next());
                         Long user2ID = Long.parseLong(dataStrIterator.next());
-
+                        if(debug == true) {
+                            System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + friendshipTimeStampLong + ", user_1_ID = " + user1ID + ", user_2_ID = " + user2ID + "\n");
+                        }
                         eventData = new Object[]{
                                 0l,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
@@ -133,6 +135,24 @@ public class DataLoaderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                     case LIKES:
+                        String likeTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        DateTime dt4 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(likeTimeStamp);
+                        Long  likeTimeStampLong = dt4.getMillis();
+                        userID = Long.parseLong(dataStrIterator.next());
+                        commentID = Long.parseLong(dataStrIterator.next());
+                        if(debug == true) {
+                            System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + likeTimeStampLong + ", user_id = " + userID + ", comment_ID = " + commentID + "\n");
+                        }
+                        eventData = new Object[]{
+                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                // For that we have to set a separate field which will be populated when we are
+                                // injecting an event to the input stream.
+                                likeTimeStampLong,
+                                userID,
+                                commentID,
+                        };
+                        eventBufferList.put(eventData);
+
                         break;
                 }
 				line = br.readLine();
