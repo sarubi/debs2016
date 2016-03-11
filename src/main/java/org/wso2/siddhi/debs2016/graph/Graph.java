@@ -162,7 +162,7 @@ public class Graph {
     /**
      * Gets the number of vertices of the largest connected component of the graph
      *
-     * @return the largest connected components
+     * @return the number of vertices in the largest connected component
      */
     public static long getLargestConnectedComponent(Graph graph){
         /*Creating the Pegasus Data Structure*/

@@ -101,7 +101,7 @@ public class GraphTest {
         commentLikeGraph.handleNewFriendship(102, 108);
         commentLikeGraph.handleNewFriendship(109, 108);
 
-        assertEquals(5, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
+        assertEquals(5, graph.commentLikeGraph.getLargestConnectedComponent(graph.commentLikeGraph));
     }
 
     @Test
@@ -147,9 +147,11 @@ public class GraphTest {
         assertEquals(8, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
     }
 
-
-
-
-
+    @Test
+    public void testFriendshipGraphLargestComponent(){
+//        assertEquals(4139,Graph.friendshipGraph.getNumberOfVertices());
+//        assertEquals(63409,Graph.friendshipGraph.getNumberOfEdges());
+        assertEquals(4139,Graph.getLargestConnectedComponent(Graph.friendshipGraph));
+    }
 
 }

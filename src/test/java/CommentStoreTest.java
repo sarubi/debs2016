@@ -1,8 +1,8 @@
 import org.junit.Test;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
+import java.util.Arrays;
 /**
  * Created by bhagya on 3/11/16.
  */
@@ -27,6 +27,7 @@ public class CommentStoreTest {
         assertEquals(9,comment.getNumberOfComments());
 
     }
+
     @Test
     public void testUpdateCommentStoreData2(){
         CommentStore comment = new CommentStore(1);
@@ -45,5 +46,61 @@ public class CommentStoreTest {
         comment.updateCommentStore(111);
         assertEquals(0,comment.getNumberOfComments());
 
+    }
+
+@Test
+    public void testGetKLargestComments(){
+        CommentStore theStore = new CommentStore();
+
+        theStore.registerComment(1,100,"Comment One");
+        theStore.registerComment(2,101,"Comment Two");
+        theStore.registerComment(3,102,"Comment Three");
+        theStore.registerComment(4,103,"Comment Four");
+        theStore.registerComment(5,104,"Comment Five");
+        theStore.registerComment(6,105,"Comment Six");
+
+        theStore.registerLike(1,1);
+        theStore.registerLike(1,2);
+        theStore.registerLike(1,3);
+        theStore.registerLike(1,4);
+        theStore.registerLike(1,5);
+
+        theStore.registerLike(2,8);
+        theStore.registerLike(2,9);
+        theStore.registerLike(2,10);
+        theStore.registerLike(2,100);
+        theStore.registerLike(2,105);
+        theStore.registerLike(2,110);
+
+        theStore.registerLike(3,13);
+        theStore.registerLike(3,24);
+        theStore.registerLike(3,15);
+        theStore.registerLike(3,17);
+        theStore.registerLike(3,19);
+        theStore.registerLike(3,20);
+
+        theStore.registerLike(4,31);
+        theStore.registerLike(4,51);
+        theStore.registerLike(4,61);
+        theStore.registerLike(4,47);
+
+        theStore.handleNewFriendship(1,2);
+        theStore.handleNewFriendship(1,5);
+        theStore.handleNewFriendship(1,3);
+        theStore.handleNewFriendship(5,4);
+        theStore.handleNewFriendship(8,10);
+        theStore.handleNewFriendship(10,9);
+        theStore.handleNewFriendship(13,20);
+        theStore.handleNewFriendship(24,20);
+        theStore.handleNewFriendship(19,15);
+        theStore.handleNewFriendship(15,17);
+        theStore.handleNewFriendship(31,47);
+        theStore.handleNewFriendship(47,51);
+        theStore.handleNewFriendship(20,19);
+        theStore.handleNewFriendship(8,100);
+        theStore.handleNewFriendship(100,105);
+        theStore.handleNewFriendship(8,110);
+
+        System.out.println(Arrays.toString(theStore.getKLargestComments(4)));
     }
 }
