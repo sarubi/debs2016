@@ -5,7 +5,7 @@ import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
-import org.wso2.siddhi.debs2016.input.FileType;
+import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -31,30 +31,31 @@ public class RankerQuery2 extends StreamFunctionProcessor {
      */
     @Override
     protected Object[] process(Object[] objects) {
-
         long iij_timestamp = (Long)objects[0];
         long ts = (Long)objects[1];
-        long comment_id = (Long)objects[2];
-        String comment = (String)objects[3];
-        long comment_user_id = (Long) objects[4];
-        long friendship_user_id_1 = (Long) objects [5];
-        long friendship_user_id_2 = (Long) objects [6];
-        long like_user_id = (Long) objects [7];
-        long like_comment_id = (Long) objects [8];
-        FileType streamType= (FileType) objects[9];
+        long user_id_1 = (Long) objects [2]; //Note that user_id_1 is common for both friendship_user_id_1 and like_user_id
+        //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
+        int streamType= (Integer) objects[8];
 
         commentStore.updateCommentStore(ts);
 
         switch(streamType) {
-            case COMMENTS:
+            case Constants.COMMENTS:
+                long comment_id = (Long)objects[3];
+                String comment = (String)objects[4];
+                System.out.println("Comment");
                 commentStore.registerComment(comment_id, ts,comment);
                 break;
-            case FRIENDSHIPS:
-                FRIENDSHIPGRAPH.addEdge(friendship_user_id_1, friendship_user_id_2);
-                commentStore.handleNewFriendship(friendship_user_id_1,friendship_user_id_2);
+            case Constants.FRIENDSHIPS:
+                long friendship_user_id_2 = (Long) objects [3];
+                System.out.println("Friendship");
+                FRIENDSHIPGRAPH.addEdge(user_id_1, friendship_user_id_2);
+                commentStore.handleNewFriendship(user_id_1,friendship_user_id_2);
                 break;
-            case LIKES:
-                commentStore.registerLike(like_comment_id, like_user_id);
+            case Constants.LIKES:
+                long like_comment_id = (Long) objects [3];
+                System.out.println("Like");
+                commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
         commentStore.getKLargestComments(k);

@@ -82,13 +82,13 @@ public class Query2 {
                 "select iij_timestamp, ts, user_id_1, user_id_2 as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 0 as eventType  " +
                 "insert into likesFriendshipsCommentsStream;");
 
-//        query += ("@info(name = 'query2') from commentsStream  " +
-//                "select iij_timestamp, ts, user_id, comment_id  as field_1, comment, user, comment_replied, post_commented, 1 as eventType " +
-//                "insert into likesFriendshipsCommentsStream;");
-//
-//        query += ("@info(name = 'query3') from likesStream  " +
-//                "select iij_timestamp, ts, user_id, comment_id as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 2 as eventType " +
-//                "insert into likesFriendshipsCommentsStream;");
+        query += ("@info(name = 'query2') from commentsStream  " +
+                "select iij_timestamp, ts, user_id as user_id_1, comment_id  as field_1, comment, user, comment_replied, post_commented, 1 as eventType " +
+                "insert into likesFriendshipsCommentsStream;");
+
+        query += ("@info(name = 'query3') from likesStream  " +
+                "select iij_timestamp, ts, user_id as user_id_1, comment_id as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 2 as eventType " +
+                "insert into likesFriendshipsCommentsStream;");
 
         query += ("@info(name = 'query4') from likesFriendshipsCommentsStream#debs2016:rankerQuery2(iij_timestamp, ts, user_id_1, field_1, comment, user, comment_replied, post_commented, eventType)  " +
                 "select iij_timestamp " +
