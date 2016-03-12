@@ -24,7 +24,7 @@ public class DataLoaderThread extends Thread {
     private int count;
     private FileType fileType;
     private String MINUS_ONE = "-1";
-    private boolean debug = true;
+    private boolean debug = false;
 
     /**
      * The constructor
@@ -105,8 +105,8 @@ public class DataLoaderThread extends Thread {
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
                                 commentTimeStampLong,
-                                commentID,
                                 userID,
+                                commentID,
                                 comment,
                                 user,
                                 comment_replied,
@@ -115,7 +115,6 @@ public class DataLoaderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
-
                         String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
                         DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
                         Long  friendshipTimeStampLong = dt3.getMillis();

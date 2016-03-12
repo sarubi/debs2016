@@ -73,28 +73,30 @@ public class Query2 {
         SiddhiManager siddhiManager = new SiddhiManager();
 
         String inStreamDefinition = "@config(async = 'true')define stream friendshipsStream (iij_timestamp long, ts long, user_id_1 long, user_id_2 long);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, comment_id long, user_id long, comment string, user string, comment_replied long, post_commented long);";
+        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long," +
+                " comment string, user string, comment_replied long, post_commented long);";
         inStreamDefinition += "@config(async = 'true')define stream likesStream (iij_timestamp long, ts long, user_id long, comment_id long);";
+        inStreamDefinition += "@config(async = 'true')define stream likesFriendshipsCommentsStream (iij_timestamp long, ts long, user_id_1 long, field_1 long, comment string, user string, comment_replied long, post_commented long, eventType int );";
 
         String query = ("@info(name = 'query1') from friendshipsStream " +
-                "select * " +
+                "select iij_timestamp, ts, user_id_1, user_id_2 as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 0 as eventType  " +
                 "insert into likesFriendshipsCommentsStream;");
 
         query += ("@info(name = 'query2') from commentsStream  " +
-                "select * " +
+                "select iij_timestamp, ts, user_id as user_id_1, comment_id  as field_1, comment, user, comment_replied, post_commented, 1 as eventType " +
                 "insert into likesFriendshipsCommentsStream;");
 
         query += ("@info(name = 'query3') from likesStream  " +
-                "select * " +
+                "select iij_timestamp, ts, user_id as user_id_1, comment_id as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 2 as eventType " +
                 "insert into likesFriendshipsCommentsStream;");
 
-        query += ("@info(name = 'query4') from likesFriendshipsCommentsStream#debs2016:rankerQuery2(iij_timestamp, ts)  " +
-                "select * " +
+        query += ("@info(name = 'query4') from likesFriendshipsCommentsStream#debs2016:rankerQuery2(iij_timestamp, ts, user_id_1, field_1, comment, user, comment_replied, post_commented, eventType)  " +
+                "select iij_timestamp " +
                 "insert into query2OutputStream;");
 
 
-        System.out.println(inStreamDefinition+query);
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition+query);
+        System.out.println(inStreamDefinition + query);
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
 
         executionPlanRuntime.addCallback("query2OutputStream", new StreamCallback() {
 

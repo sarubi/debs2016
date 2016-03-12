@@ -138,6 +138,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
                     long postID = itr2.next();
                     result[1 + (counter * 4)] = postID;
                     result[2 + (counter * 4)] = posts.get(postID);//this should be topn_post_user
+
                 }
             }
         }

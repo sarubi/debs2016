@@ -67,7 +67,8 @@ public class GraphTest {
 
     @Test
     public void testFriendshipGraph(){
-        assertEquals(4139, Graph.friendshipGraph.getNumberOfVertices());
+        Graph friendshipGraph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
+        assertEquals(4139, friendshipGraph.getNumberOfVertices());
     }
 
     public void testGetConnectedComponents()
@@ -100,6 +101,7 @@ public class GraphTest {
         commentLikeGraph.handleNewFriendship(107, 104);
         commentLikeGraph.handleNewFriendship(102, 108);
         commentLikeGraph.handleNewFriendship(109, 108);
+
 
         assertEquals(5, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
     }
@@ -146,46 +148,13 @@ public class GraphTest {
 
         assertEquals(8, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
     }
+
     @Test
-public void testUpdateCommentStoreData1(){
-    CommentStore comment = new CommentStore();
-    comment.registerComment(101,100,"hi");
-    comment.registerComment(102,101,"hi");
-    comment.registerComment(103,102,"hi");
-    comment.registerComment(104,103,"hi");
-    comment.registerComment(105,104,"hi");
-    comment.registerComment(106,105,"hi");
-    comment.registerComment(107,106,"hi");
-    comment.registerComment(108,107,"hi");
-    comment.registerComment(109,108,"hi");
-    comment.registerComment(110,109,"hi");
-    comment.registerComment(111,110,"hi");
-
-    comment.updateCommentStore(111,10);
-    assertEquals(10,comment.getNumberOfComments());
-
-}
-@Test
-public void testUpdateCommentStoreData2(){
-    CommentStore comment = new CommentStore();
-    comment.registerComment(101,100,"hi");
-    comment.registerComment(102,101,"hi");
-    comment.registerComment(103,102,"hi");
-    comment.registerComment(104,103,"hi");
-    comment.registerComment(105,104,"hi");
-    comment.registerComment(106,105,"hi");
-    comment.registerComment(107,106,"hi");
-    comment.registerComment(108,107,"hi");
-    comment.registerComment(109,108,"hi");
-    comment.registerComment(110,109,"hi");
-
-
-    comment.updateCommentStore(111,1);
-    assertEquals(0,comment.getNumberOfComments());
-
-}
-
-
-
+    public void testFriendshipGraphLargestComponent(){
+        Graph friendshipGraph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
+//        assertEquals(4139,Graph.friendshipGraph.getNumberOfVertices());
+//        assertEquals(63409,Graph.friendshipGraph.getNumberOfEdges());
+        assertEquals(4139,Graph.getLargestConnectedComponent(friendshipGraph));
+    }
 
 }
