@@ -12,6 +12,7 @@ import java.util.List;
 public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
+    public static Graph friendshipGraph = new Graph();
 
     /**
      * The constructor

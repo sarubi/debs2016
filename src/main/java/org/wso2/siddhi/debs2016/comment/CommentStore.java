@@ -5,7 +5,6 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Created by malithjayasinghe on 3/8/16.
@@ -16,8 +15,6 @@ public class CommentStore{
     private long duration;
     private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
     String [] previousKcomments;
-
-   private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
 
 public  CommentStore(long d){
     duration=d;
@@ -48,16 +45,7 @@ public  CommentStore(long d){
 
     }
 
-    /**
-     *
-     * Deletes a comment with a given ID
-     *
-     * @param commentID of the comment to delete
 
-    private void deleteComment(long commentID)
-    {
-            // remove the item in the hash map where the comment id= commentID
-    }
 
     /**
      * Gets the k largest comments
