@@ -1,14 +1,14 @@
 package org.wso2.siddhi.debs2016.graph;
 
 import com.google.common.base.Splitter;
+import org.graphstream.algorithm.Toolkit;
+import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 
 /**
@@ -20,25 +20,17 @@ import java.util.Iterator;
 public class GraphAnalyzer {
 
     org.graphstream.graph.Graph graph = new SingleGraph("Tutorial 1");
-    private int updateRate;
-    private int numOfEvents;
-    /**
-     * The constructor
-     *
-     * @param updateRate graph update rate
-     */
-    public GraphAnalyzer(int updateRate, int numOfEvents)
-    {
-        this.updateRate = updateRate;
-        this.numOfEvents = numOfEvents;
-    }
 
     /**
      * Display the friendship graph
      *
      */
-    public void displayFriendshipGraph() {
-        graph.display();
+    public void loadFriendshipGraph(boolean displayWhileLoading, int numberOfEventsToLoad, int updateRate) {
+
+        if(displayWhileLoading) {
+            graph.display();
+        }
+
         int count = 0;
         try {
             Splitter splitter = Splitter.on('|');
@@ -54,7 +46,7 @@ public class GraphAnalyzer {
                 Long user1ID = Long.parseLong(dataStrIterator.next());
                 Long user2ID = Long.parseLong(dataStrIterator.next());
 
-                if(updateRate>0)
+                if(updateRate > 0)
                 {
                     try {
                         Thread.sleep(updateRate);
@@ -62,10 +54,12 @@ public class GraphAnalyzer {
                         e.printStackTrace();
                     }
                 }
+
                 addEdge(user1ID, user2ID);
                 line =  br.readLine();
                 count++;
-                if(count == numOfEvents)
+
+                if(count == numberOfEventsToLoad)
                 {
                     break;
                 }
@@ -74,6 +68,10 @@ public class GraphAnalyzer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadFriendshipGraph() {
+        loadFriendshipGraph(false, 0, 0);
     }
 
 
@@ -95,12 +93,39 @@ public class GraphAnalyzer {
         graph.addEdge(user1ID.toString()+user2ID.toString(), user1ID.toString(), user2ID.toString());
     }
 
+    /**
+     *
+     * Gets the friendshipgraph
+     *
+     * @return the friendshipgraph
+     */
+    public org.graphstream.graph.Graph getFriendshipGraph()
+    {
+        return graph;
+    }
+
 
 
     public static void main(String args[])
     {
-        GraphAnalyzer analyzer = new GraphAnalyzer(1000, 5);
-        analyzer.displayFriendshipGraph();
+        GraphAnalyzer analyzer = new GraphAnalyzer();
+        analyzer.loadFriendshipGraph(true, 1000, 0);
+        int degreeDistribution [] = Toolkit.degreeDistribution(analyzer.getFriendshipGraph());
+        try {
+            PrintWriter writer = new PrintWriter("/Users/malithjayasinghe/debs2016/DataSet/data" + "/degreeDistribution.csv", "UTF-8");
+
+            int numElements = degreeDistribution.length;
+            for(int i = 0; i <numElements; i++) {
+                writer.println(i + "," + degreeDistribution[i] );
+            }
+            writer.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
 
