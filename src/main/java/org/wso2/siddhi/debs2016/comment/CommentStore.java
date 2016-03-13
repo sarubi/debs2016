@@ -12,18 +12,26 @@ import java.util.HashMap;
  * Stores a list of active comments (i.e. comments arrived < d time)
  */
 public class CommentStore{
+
     private long duration;
     private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
     String [] previousKcomments;
 
-public  CommentStore(long d){
-    duration=d;
-}
+
+    /**
+     * The constructor
+     *
+     * @param d the duration
+     */
+    public  CommentStore(long d){
+
+        duration=d;
+    }
     /**
      *
      * Updates the comment store based on the logical time of a new event
      *
-     * @param time logical time of the new event and d is the duration which comment is valid
+     * @param time logical time of the new event
      */
     public void updateCommentStore(long time)
     {
@@ -40,8 +48,6 @@ public  CommentStore(long d){
         for(int i = 0; i < keyListToDelete.size(); i++){
             graph.remove(keyListToDelete.get(i));
         }
-            //for each comment check if it is publised more than d seconds ago. If so remove the comment from the hash map
-            //get the new time stamp and the time stamp of the comment (where do we store this)
 
     }
 
@@ -59,7 +65,7 @@ public  CommentStore(long d){
 
         String [] kComments = new String[k];
 
-        for (CommentLikeGraph eachCommentLikeGraph: this.graph.values()) {
+        for (CommentLikeGraph eachCommentLikeGraph: graph.values()) {
                 long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
                 String comment = eachCommentLikeGraph.getComment();
 
@@ -83,7 +89,9 @@ public  CommentStore(long d){
 
                     list.add(i, sizeOfComponent);
                     commentsList.add(i, comment);
+
                     //TODO: Lexicographical Ordering
+
                     break;
                 }else if (sizeOfComponent < list.get(i)){
                     list.add(i, sizeOfComponent);
@@ -115,9 +123,6 @@ public  CommentStore(long d){
             }
         }
 
-
-        // go through the hash map map and get largest connected component of each like graph
-        // the first k elements (note that we will only write this to the output steam if there has been a change in the output)
         return previousKcomments;
     }
 
@@ -176,7 +181,13 @@ public  CommentStore(long d){
 
     }
 
+    /**
+     * Get the number of comments in the comment store
+     *
+     * @return the number of comments
+     */
     public long getNumberOfComments(){
+
         return graph.size();
     }
 
