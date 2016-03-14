@@ -169,7 +169,9 @@ public class CommentStore{
      */
     public void registerLike(long commentID, long userID)
     {
-        graph.get(commentID).registerLike(userID);
+        if (graph.get(commentID) != null){
+            graph.get(commentID).registerLike(userID);
+        }
 
     }
     /**
