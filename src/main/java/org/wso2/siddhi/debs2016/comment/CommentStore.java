@@ -4,7 +4,6 @@ import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -20,7 +19,6 @@ public class CommentStore{
     String [] previousKcomments;
     private boolean debug = false;
     private long tsTriggeredChange;
-
 
     /**
      * The constructor
@@ -78,7 +76,7 @@ public class CommentStore{
     }
 
     /**
-     * Gets the k largest comments
+     * print the k largest comments if there is change in the order
      *
      * @param k the number of comments
      */
