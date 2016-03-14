@@ -103,6 +103,6 @@ public class CommentStoreTest {
         theStore.handleNewFriendship(8,110);
 //        theStore.handleNewFriendship(200,24);
 
-        System.out.println(Arrays.toString(theStore.getKLargestComments(6)));
+        System.out.println(Arrays.toString(theStore.getKLargestComments(8)));
     }
 }

@@ -58,13 +58,15 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
-        String comments [] = commentStore.getKLargestComments(k);
+
+        try {
+            String comments[] = commentStore.getKLargestComments(k);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         System.out.println("numOfComments in Store = " + commentStore.getNumberOfComments() + "," + ts + " : ");
 
-        for(int i = 0; i < comments.length;i++) {
-
-            System.out.println(commentStore.getKLargestComments(k) + ",");
-        }
 
         return objects;
     }

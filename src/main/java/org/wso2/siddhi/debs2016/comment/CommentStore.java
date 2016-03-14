@@ -82,7 +82,7 @@ public class CommentStore{
                 commentsList.add(commentsList.size(), comment);
                 continue;
             } else if (sizeOfComponent == list.get(list.size()-1)){
-                if (commentsList.get(commentsList.size()-1).compareTo(comment) < 0) { //Lexicographical Ordering of last element
+                if (commentsList.get(commentsList.size()-1).compareTo(comment) <= 0) { //Lexicographical Ordering of last element
                     list.add(list.size(), sizeOfComponent);
                     commentsList.add(commentsList.size(), comment);
                     continue;
@@ -112,13 +112,20 @@ public class CommentStore{
         if (list.size() == 0){
 
         }else{
-            for (int i = 0; i < k; i++){
+            int limit = (k <= commentsList.size() ? k : commentsList.size());
+            for (int i = 0; i < limit; i++){
                 kComments[i] = commentsList.get(i);
 
                 if (this.previousKcomments == null){
                     flagChange =  true;
                 }else if (!(kComments[i].equals(this.previousKcomments[i]))) {
                     flagChange = true;
+                }
+            }
+
+            if (limit == commentsList.size()){
+                for (int i = commentsList.size(); i < k; i++){
+                    kComments[i] = "-";
                 }
             }
 
