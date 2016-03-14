@@ -83,12 +83,13 @@ public class CommentStore{
     public void printKLargestComments(int k)
     {
         String[] kLargestComments = getKLargestComments(k);
-        if (previousKcomments.equals(kLargestComments)){
+
+        if (previousKcomments ==  null || previousKcomments.equals(kLargestComments)){
             System.out.print(tsTriggeredChange + " ");
 
-//            System.out.print(Arrays.toString(kLargestComments));
             for (String print: kLargestComments) {
                 System.out.print(", " + print);
+                System.out.println();
             }
         }
     }
