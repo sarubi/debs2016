@@ -78,6 +78,7 @@ public class CommentStoreTest {
         theStore.registerLike(3,17);
         theStore.registerLike(3,19);
         theStore.registerLike(3,20);
+        theStore.registerLike(3,200);
 
         theStore.registerLike(4,31);
         theStore.registerLike(4,51);
@@ -100,7 +101,8 @@ public class CommentStoreTest {
         theStore.handleNewFriendship(8,100);
         theStore.handleNewFriendship(100,105);
         theStore.handleNewFriendship(8,110);
+//        theStore.handleNewFriendship(200,24);
 
-        System.out.println(Arrays.toString(theStore.getKLargestComments(4)));
+        System.out.println(Arrays.toString(theStore.getKLargestComments(6)));
     }
 }

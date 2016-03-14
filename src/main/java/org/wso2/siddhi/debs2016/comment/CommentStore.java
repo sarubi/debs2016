@@ -76,24 +76,29 @@ public class CommentStore{
                 continue;
             }
 
-            /*If the element is the largest, add it to the end*/
-            if (sizeOfComponent > list.get(list.size()-1)){
+            /*If the element is the smallest, add it to the end*/
+            if (sizeOfComponent < list.get(list.size()-1)){
                 list.add(list.size(), sizeOfComponent);
                 commentsList.add(commentsList.size(), comment);
                 continue;
+            } else if (sizeOfComponent == list.get(list.size()-1)){
+                if (commentsList.get(commentsList.size()-1).compareTo(comment) < 0) { //Lexicographical Ordering of last element
+                    list.add(list.size(), sizeOfComponent);
+                    commentsList.add(commentsList.size(), comment);
+                    continue;
+                    //TODO: Lexicographical Ordering
+                }
             }
 
             /*Check each element to find correct position*/
-            for (int i = 0; i < list.size(); i++){
-                if (sizeOfComponent == list.get(i)){
-
-                    list.add(i, sizeOfComponent);
-                    commentsList.add(i, comment);
-
-                    //TODO: Lexicographical Ordering
-
-                    break;
-                }else if (sizeOfComponent < list.get(i)){
+            for (int i = 0; i < list.size(); i++) {
+                if (sizeOfComponent == list.get(i)) {
+                    if (commentsList.get(i).compareTo(comment) > 0) { //Lexicographical Ordering
+                        list.add(i, sizeOfComponent);
+                        commentsList.add(i, comment);
+                        break;
+                    }
+                } else if (sizeOfComponent > list.get(i)) {
                     list.add(i, sizeOfComponent);
                     commentsList.add(i, comment);
                     break;
@@ -107,12 +112,12 @@ public class CommentStore{
         if (list.size() == 0){
 
         }else{
-            for (int i = list.size()-1, j = 0; i >= (list.size()-k); i--, j++){
-                kComments[j] = commentsList.get(i);
+            for (int i = 0; i < k; i++){
+                kComments[i] = commentsList.get(i);
 
                 if (this.previousKcomments == null){
                     flagChange =  true;
-                }else if (!(kComments[j].equals(this.previousKcomments[j]))) {
+                }else if (!(kComments[i].equals(this.previousKcomments[i]))) {
                     flagChange = true;
                 }
             }
