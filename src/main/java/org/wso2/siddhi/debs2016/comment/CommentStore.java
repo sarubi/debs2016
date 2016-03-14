@@ -189,7 +189,7 @@ public class CommentStore{
 
         if(printComment)
         {
-            System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts);
+            System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
 
         if(!commentExists(commentID))
