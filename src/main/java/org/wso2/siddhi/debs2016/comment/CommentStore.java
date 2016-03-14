@@ -16,7 +16,7 @@ public class CommentStore{
 
     private long duration;
     private TreeMap<Long,CommentLikeGraph> graph = new TreeMap<Long, CommentLikeGraph>();
-    String [] previousKcomments;
+    String [] previousKcomments ;
     private boolean debug = false;
     private long tsTriggeredChange;
 
@@ -172,11 +172,14 @@ public class CommentStore{
 
             if (flagChange){
                 previousKcomments = kComments;
+
                 return kComments;
             }
         }
 
-        return previousKcomments;
+        return previousKcomments == null ? new String[0]: previousKcomments;
+
+
     }
 
 
