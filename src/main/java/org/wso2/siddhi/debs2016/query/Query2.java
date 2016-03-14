@@ -122,7 +122,7 @@ public class Query2 {
 
         //Likes
         LinkedBlockingQueue<Object[]> eventBufferListLikes = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(dataSetFolder + "/likes.dat", eventBufferListComments, FileType.LIKES);
+        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(dataSetFolder + "/likes.dat", eventBufferListLikes, FileType.LIKES);
         InputHandler inputHandlerLikes = executionPlanRuntime.getInputHandler("likesStream");
         EventSenderThread senderThreadLikes = new EventSenderThread(dataLoaderThreadLikes.getEventBuffer(), inputHandlerLikes, Integer.MAX_VALUE);
 
