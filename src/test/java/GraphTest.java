@@ -80,7 +80,7 @@ public class GraphTest {
     @Test
     public void testGetLargestConnectedComponentData1()
     {
-        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi", new Graph());
 
         commentLikeGraph.registerLike(100);
         commentLikeGraph.registerLike(101);
@@ -109,7 +109,7 @@ public class GraphTest {
     @Test
     public void testGetLargestConnectedComponentData2()
     {
-        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1,"Hi", new Graph());
 
         commentLikeGraph.registerLike(100);
         commentLikeGraph.registerLike(101);

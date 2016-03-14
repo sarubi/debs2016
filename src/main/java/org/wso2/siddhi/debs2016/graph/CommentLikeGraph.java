@@ -10,6 +10,7 @@ public class CommentLikeGraph {
     private long ts;
     private Graph graph = new Graph();
 	private String comment;
+    private Graph friendshipGraph ;
 
     /**
      *
@@ -17,10 +18,11 @@ public class CommentLikeGraph {
      *
      * @param ts the arrival time of the comment
      */
-    public CommentLikeGraph(long ts, String comment)
+    public CommentLikeGraph(long ts, String comment, Graph friendshipGraph)
     {
         this.ts = ts;
         this.comment = comment;
+        this.friendshipGraph = friendshipGraph;
 
     }
 
@@ -44,11 +46,9 @@ public class CommentLikeGraph {
         graph.addVertex(uId);
         Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
-
-//+Miyuru : Just commenting out the following three lines for the moment.
-//                if (Graph.friendshipGraph.hasEdge(uId, vertex)){
-//                    graph.addEdge(uId, vertex);
-//                }
+            if (friendshipGraph.hasEdge(uId, vertex)){
+                    graph.addEdge(uId, vertex);
+            }
         }
     }
 

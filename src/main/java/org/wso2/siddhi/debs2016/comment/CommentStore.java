@@ -19,15 +19,17 @@ public class CommentStore{
     String [] previousKcomments ;
     private boolean debug = false;
     private long tsTriggeredChange;
+    private Graph friendshipGraph;
 
     /**
      * The constructor
      *
      * @param d the duration
      */
-    public  CommentStore(long d){
+    public  CommentStore(long d, Graph friendshipGraph){
 
         duration=d;
+        this.friendshipGraph = friendshipGraph;
     }
     /**
      *
@@ -215,7 +217,7 @@ public class CommentStore{
         if(!commentExists(commentID))
         {
 
-            graph.put(commentID, new CommentLikeGraph(ts, comment));
+            graph.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
         }
     }
 

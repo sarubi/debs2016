@@ -22,8 +22,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private String iij_timestamp;
     private String ts;
     private long duration= Long.MAX_VALUE/100000000;
-    public static Graph FRIENDSHIPGRAPH = new Graph();
-    private CommentStore commentStore = new CommentStore(duration);
+    public  Graph friendshipGraph ;
+    private CommentStore commentStore ;
     private int k = 10;
 
     /**
@@ -39,21 +39,21 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
         int streamType = (Integer) objects[8];
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         commentStore.updateCommentStore(ts);
-        //commentStore.printCommentStore(ts);
+        commentStore.printCommentStore(ts);
 
         switch (streamType) {
             case Constants.COMMENTS:
                 long comment_id = (Long) objects[3];
                 String comment = (String) objects[4];
-                commentStore.registerComment(comment_id, ts, comment, false);
+                commentStore.registerComment(comment_id, ts, comment, true);
                 break;
             case Constants.FRIENDSHIPS:
                 long friendship_user_id_2 = (Long) objects[3];
                 //System.out.println("Friendship");
-                FRIENDSHIPGRAPH.addEdge(user_id_1, friendship_user_id_2);
+                friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
                 commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
                 break;
             case Constants.LIKES:
@@ -63,7 +63,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 break;
         }
 
-            commentStore.printKLargestComments(1);
+            commentStore.printKLargestComments(5);
+            System.out.println("\n\n");
 
 
     }catch (Exception e)
@@ -86,6 +87,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             throw new RuntimeException("Required Parameters : Nine");
         }
         List<Attribute> attributeList = new ArrayList<Attribute>();
+        friendshipGraph = new Graph();
+        commentStore = new CommentStore(duration, friendshipGraph);
         return attributeList;
     }
 

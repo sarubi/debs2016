@@ -11,7 +11,7 @@ public class CommentLikeGraphTest {
 
     @Test
     public void testCommentLikeGraphConstruction(){
-        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1, "Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1, "Hi", new Graph());
         commentLikeGraph.registerLike(31);
         commentLikeGraph.registerLike(12);
         commentLikeGraph.handleNewFriendship(12, 31);
@@ -27,7 +27,7 @@ public class CommentLikeGraphTest {
 
     @Test
     public void testRegisterLike(){
-        CommentLikeGraph graph = new CommentLikeGraph(1, "Hi");
+        CommentLikeGraph graph = new CommentLikeGraph(1, "Hi", new Graph());
         assertEquals(0,graph.getGraph().getNumberOfVertices());
         graph.registerLike(31);
         assertEquals(1,graph.getGraph().getNumberOfVertices());
@@ -37,7 +37,7 @@ public class CommentLikeGraphTest {
 
     @Test
     public void testHandleFriendship(){
-        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1, "Hi");
+        CommentLikeGraph commentLikeGraph = new CommentLikeGraph(1, "Hi", new Graph());
 
         commentLikeGraph.registerLike(12);
         commentLikeGraph.registerLike(15);
