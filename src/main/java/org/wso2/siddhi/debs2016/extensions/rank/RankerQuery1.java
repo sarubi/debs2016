@@ -152,7 +152,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
         int counter = 0;
         while(itr.hasNext()){
             Map.Entry item = itr.next();
-            if(topThreePosts[counter] != item.getValue()){
+            if(topThreePosts[counter] != (Long) item.getValue()){
                 result = true;
             }
 

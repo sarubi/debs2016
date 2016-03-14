@@ -5,6 +5,7 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Created by malithjayasinghe on 3/8/16.
@@ -14,8 +15,9 @@ import java.util.HashMap;
 public class CommentStore{
 
     private long duration;
-    private HashMap<Long,CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
+    private TreeMap<Long,CommentLikeGraph> graph = new TreeMap<Long, CommentLikeGraph>();
     String [] previousKcomments;
+    private boolean debug = false;
 
 
     /**
@@ -40,6 +42,11 @@ public class CommentStore{
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time -  arrivalTime;
 
+            if(debug){
+
+                System.out.println("comment_id = " +  graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
+            }
+
             if(duration < lifetime){
                 keyListToDelete.add(key);
             }
@@ -47,6 +54,23 @@ public class CommentStore{
         }
         for(int i = 0; i < keyListToDelete.size(); i++){
             graph.remove(keyListToDelete.get(i));
+        }
+
+    }
+
+    /**
+     * Print the comment store
+     *
+     * @param time current time
+     */
+    public void printCommentStore(Long time){
+
+        System.out.println("number of comments "  + getNumberOfComments());
+        for (Long key: graph.keySet()) {
+            String comment = graph.get(key).getComment();
+            Long arrivalTime = graph.get(key).getArrivalTime();
+            Long lifeTime = (time - (Long) arrivalTime);
+            System.out.println("   comment_id = " +  key  + ", comment = " + comment + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifeTime + ", Remaining life= " + (duration - lifeTime));
         }
 
     }
@@ -66,8 +90,8 @@ public class CommentStore{
         String [] kComments = new String[k];
 
         for (CommentLikeGraph eachCommentLikeGraph: graph.values()) {
-                long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
-                String comment = eachCommentLikeGraph.getComment();
+            long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
+            String comment = eachCommentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
             if (list.size() == 0){
@@ -82,7 +106,7 @@ public class CommentStore{
                 commentsList.add(commentsList.size(), comment);
                 continue;
             } else if (sizeOfComponent == list.get(list.size()-1)){
-                if (commentsList.get(commentsList.size()-1).compareTo(comment) <= 0) { //Lexicographical Ordering of last element
+                if (commentsList.get(commentsList.size()-1).compareTo(comment) < 0) { //Lexicographical Ordering of last element
                     list.add(list.size(), sizeOfComponent);
                     commentsList.add(commentsList.size(), comment);
                     continue;
@@ -112,20 +136,13 @@ public class CommentStore{
         if (list.size() == 0){
 
         }else{
-            int limit = (k <= commentsList.size() ? k : commentsList.size());
-            for (int i = 0; i < limit; i++){
+            for (int i = 0; i < k; i++){
                 kComments[i] = commentsList.get(i);
 
                 if (this.previousKcomments == null){
                     flagChange =  true;
                 }else if (!(kComments[i].equals(this.previousKcomments[i]))) {
                     flagChange = true;
-                }
-            }
-
-            if (limit == commentsList.size()){
-                for (int i = commentsList.size(); i < k; i++){
-                    kComments[i] = "-";
                 }
             }
 
@@ -158,14 +175,35 @@ public class CommentStore{
      *
      * @param commentID the comment id
      * @param ts the arrival time of the comment
+     * @printComment indicate whether to print the new comment details or not.
+     */
+    public void registerComment(long commentID, long ts, String comment, boolean printComment)
+    {
+
+        if(printComment)
+        {
+            System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts);
+        }
+
+        if(!commentExists(commentID))
+        {
+
+            graph.put(commentID, new CommentLikeGraph(ts, comment));
+        }
+    }
+
+
+    /**
+     * Registers a comment in the comment store
+     *
+     * @param commentID the comment id
+     * @param ts the arrival time of the comment
+     *
      */
     public void registerComment(long commentID, long ts, String comment)
     {
 
-        if(!commentExists(commentID))
-        {
-            graph.put(commentID, new CommentLikeGraph(ts, comment));
-        }
+        registerComment(commentID, ts, comment, false);
     }
 
     /**

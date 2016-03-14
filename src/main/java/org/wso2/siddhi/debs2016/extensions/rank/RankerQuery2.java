@@ -21,7 +21,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
-    private long duration=10;
+    private long duration= Long.MAX_VALUE/1000;
     public static Graph FRIENDSHIPGRAPH = new Graph();
     private CommentStore commentStore = new CommentStore(duration);
     private int k = 10;
@@ -31,42 +31,42 @@ public class RankerQuery2 extends StreamFunctionProcessor {
      */
     @Override
     protected Object[] process(Object[] objects) {
-        long iij_timestamp = (Long)objects[0];
-        long ts = (Long)objects[1];
-        long user_id_1 = (Long) objects [2]; //Note that user_id_1 is common for both friendship_user_id_1 and like_user_id
+        try{
+
+        long iij_timestamp = (Long) objects[0];
+        long ts = (Long) objects[1];
+        long user_id_1 = (Long) objects[2]; //Note that user_id_1 is common for both friendship_user_id_1 and like_user_id
         //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
-        int streamType= (Integer) objects[8];
+        int streamType = (Integer) objects[8];
+
+        Thread.sleep(1000);
 
         commentStore.updateCommentStore(ts);
+        commentStore.printCommentStore(ts);
 
-        switch(streamType) {
+        switch (streamType) {
             case Constants.COMMENTS:
-                long comment_id = (Long)objects[3];
-                String comment = (String)objects[4];
-                //System.out.println("Comment");
-                commentStore.registerComment(comment_id, ts,comment);
+                long comment_id = (Long) objects[3];
+                String comment = (String) objects[4];
+                commentStore.registerComment(comment_id, ts, comment, true);
                 break;
             case Constants.FRIENDSHIPS:
-                long friendship_user_id_2 = (Long) objects [3];
+                long friendship_user_id_2 = (Long) objects[3];
                 //System.out.println("Friendship");
                 FRIENDSHIPGRAPH.addEdge(user_id_1, friendship_user_id_2);
-                commentStore.handleNewFriendship(user_id_1,friendship_user_id_2);
+                commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
                 break;
             case Constants.LIKES:
-                long like_comment_id = (Long) objects [3];
-               // System.out.println("Like");
+                long like_comment_id = (Long) objects[3];
+                // System.out.println("Like");
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
 
-        try {
-            String comments[] = commentStore.getKLargestComments(k);
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        System.out.println("numOfComments in Store = " + commentStore.getNumberOfComments() + "," + ts + " : ");
-
+    }catch (Exception e)
+    {
+        e.printStackTrace();
+    }
 
         return objects;
     }
