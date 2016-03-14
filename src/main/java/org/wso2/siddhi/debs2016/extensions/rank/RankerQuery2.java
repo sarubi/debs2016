@@ -63,7 +63,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 break;
         }
 
-            commentStore.printKLargestComments(1);
+            commentStore.printKLargestComments(5);
 
 
     }catch (Exception e)

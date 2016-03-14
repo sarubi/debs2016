@@ -82,16 +82,25 @@ public class CommentStore{
      */
     public void printKLargestComments(int k)
     {
-        String[] kLargestComments = getKLargestComments(k);
-
-        if (previousKcomments ==  null || previousKcomments.equals(kLargestComments)){
+        if(getKLargestComments(k)){
             System.out.print(tsTriggeredChange + " ");
-
-            for (String print: kLargestComments) {
+            for (String print: previousKcomments) {
                 System.out.print(", " + print);
-                System.out.println();
             }
+            System.out.println();
         }
+
+
+//        String[] kLargestComments = getKLargestComments(k);
+//
+//        if (previousKcomments ==  null || previousKcomments.equals(kLargestComments)){
+//            System.out.print(tsTriggeredChange + " ");
+//
+//            for (String print: kLargestComments) {
+//                System.out.print(", " + print);
+//            }
+//            System.out.println();
+//        }
     }
 
     /**
@@ -99,7 +108,7 @@ public class CommentStore{
      *
      * @param k the number of comments
      */
-    private String [] getKLargestComments(int k)
+    private boolean getKLargestComments(int k)
     {
         ArrayList<String> commentsList = new ArrayList<String>();
         ArrayList<Long> list = new ArrayList<Long>();
@@ -172,14 +181,9 @@ public class CommentStore{
 
             if (flagChange){
                 previousKcomments = kComments;
-
-                return kComments;
             }
         }
-
-        return previousKcomments == null ? new String[0]: previousKcomments;
-
-
+        return flagChange;
     }
 
 
