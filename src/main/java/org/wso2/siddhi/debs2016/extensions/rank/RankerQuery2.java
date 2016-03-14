@@ -21,7 +21,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
-    private long duration= Long.MAX_VALUE/1000;
+    private long duration= Long.MAX_VALUE/100000000;
     public static Graph FRIENDSHIPGRAPH = new Graph();
     private CommentStore commentStore = new CommentStore(duration);
     private int k = 10;
@@ -39,16 +39,16 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
         int streamType = (Integer) objects[8];
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         commentStore.updateCommentStore(ts);
-        commentStore.printCommentStore(ts);
+        //commentStore.printCommentStore(ts);
 
         switch (streamType) {
             case Constants.COMMENTS:
                 long comment_id = (Long) objects[3];
                 String comment = (String) objects[4];
-                commentStore.registerComment(comment_id, ts, comment, true);
+                commentStore.registerComment(comment_id, ts, comment, false);
                 break;
             case Constants.FRIENDSHIPS:
                 long friendship_user_id_2 = (Long) objects[3];
@@ -62,6 +62,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
+
+            commentStore.printKLargestComments(1);
+
 
     }catch (Exception e)
     {
