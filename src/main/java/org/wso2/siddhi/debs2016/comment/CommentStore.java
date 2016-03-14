@@ -18,7 +18,7 @@ public class CommentStore{
     private TreeMap<Long,CommentLikeGraph> graph = new TreeMap<Long, CommentLikeGraph>();
     String [] previousKcomments;
     private boolean debug = false;
-
+    private long tsTriggeredChange;
 
     /**
      * The constructor
