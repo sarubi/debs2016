@@ -83,27 +83,26 @@ public class CommentStore{
      *
      * @param k the number of comments
      */
-    public void printKLargestComments(int k)
+    public void printKLargestComments(int k, String delimater)
     {
         if(getKLargestComments(k)){
-            System.out.print(tsTriggeredChange + " ");
+            System.out.print(tsTriggeredChange );
             for (String print: previousKcomments) {
-                System.out.print(", " + print);
+                System.out.print(delimater + print);
             }
             System.out.println();
         }
+    }
 
 
-//        String[] kLargestComments = getKLargestComments(k);
-//
-//        if (previousKcomments ==  null || previousKcomments.equals(kLargestComments)){
-//            System.out.print(tsTriggeredChange + " ");
-//
-//            for (String print: kLargestComments) {
-//                System.out.print(", " + print);
-//            }
-//            System.out.println();
-//        }
+    /**
+     * print the k largest comments if there is change in the order
+     *
+     * @param k the number of comments
+     */
+    public void printKLargestComments(int k)
+    {
+       printKLargestComments(k, ",");
     }
 
     /**
