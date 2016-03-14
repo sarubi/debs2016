@@ -37,6 +37,7 @@ public class CommentStore{
      */
     public void updateCommentStore(long time)
     {
+        tsTriggeredChange = time;
         ArrayList<Long> keyListToDelete = new ArrayList<Long>();
         for (Long key: this.graph.keySet()) {
             long arrivalTime = this.graph.get(key).getArrivalTime();
