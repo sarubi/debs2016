@@ -1,7 +1,9 @@
 package org.wso2.siddhi.debs2016.sender;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
+import scala.collection.immutable.Stream;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,17 +53,24 @@ public class OrderedEventSenderThread extends Thread {
 
         boolean firstEvent = true;
         float percentageCompleted = 0;
-
+        int flag = 3;
         while(true){
-            try {
-
-                friendshipEvent = eventBufferList[0].take();
-                commentEvent = eventBufferList[1].take();
-                likeEvent = eventBufferList[2].take();
-
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+        try{
+            if (flag == Constants.FRIENDSHIPS){
+                friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+            }else if (flag == 1){
+                commentEvent = eventBufferList[Constants.COMMENTS].take();
+            }else if (flag == 2){
+                likeEvent = eventBufferList[Constants.LIKES].take();
+            }else{
+                friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+                commentEvent = eventBufferList[Constants.COMMENTS].take();
+                likeEvent = eventBufferList[Constants.LIKES].take();
             }
+
+        }catch (InterruptedException ex){
+            ex.printStackTrace();
+        }
 
             try {
                 //In the case of input performance measurements, we mark the time when the first tuple gets emitted to the SiddhiManager.
@@ -74,20 +83,27 @@ public class OrderedEventSenderThread extends Thread {
                     firstEvent = false;
                 }
 
-                cTime = System.currentTimeMillis();
-                friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                likeEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
 
-                long minTS = 0;
+                long tsFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                long tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                long tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
 
-                long tsFriendship = (Long) friendshipEvent[1];
-                long tsComment = (Long) commentEvent[1];
-                long tsLike = (Long) likeEvent[1];
-
-                inputHandler[0].send(cTime, friendshipEvent);
-                inputHandler[1].send(cTime, commentEvent);
-                inputHandler[2].send(cTime, likeEvent);
+                if (tsFriendship < tsComment && tsFriendship < tsLike){
+                    cTime = System.currentTimeMillis();
+                    friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
+                    inputHandler[Constants.FRIENDSHIPS].send(cTime, friendshipEvent);
+                    flag = Constants.FRIENDSHIPS;
+                }else if (tsComment < tsFriendship && tsComment < tsLike){
+                    cTime = System.currentTimeMillis();
+                    commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
+                    inputHandler[Constants.COMMENTS].send(cTime, commentEvent);
+                    flag = Constants.COMMENTS;
+                }else{
+                    cTime = System.currentTimeMillis();
+                    likeEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
+                    inputHandler[Constants.LIKES].send(cTime, likeEvent);
+                    flag = Constants.LIKES;
+                }
 
                 count++;
 
