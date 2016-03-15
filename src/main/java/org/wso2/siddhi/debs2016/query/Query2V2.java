@@ -61,8 +61,6 @@ public class Query2V2 {
             return;
         }
 
-//        Query2 query2 = new Query2(args);
-//        query2.run();
         Query2V2 query2 = new Query2V2(args);
         query2.run();
     }
@@ -100,16 +98,8 @@ public class Query2V2 {
         System.out.println(inStreamDefinition + query);
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
 
-        executionPlanRuntime.addCallback("query2OutputStream", new StreamCallback() {
-
-            @Override
-            public void receive(Event[] events) {
-                //EventPrinter.print(events);
-            }
-        });
 
         System.out.println("Incremental data loading is performed.");
-        //TODO Single Sender. Pass in the 3 buffers
 
         LinkedBlockingQueue<Object[]> eventBufferList [] = new LinkedBlockingQueue[3];
         InputHandler inputHandler [] = new InputHandler[3];
@@ -118,19 +108,16 @@ public class Query2V2 {
         //Friendships
         DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(dataSetFolder + "/friendships.dat", eventBufferListPosts, FileType.FRIENDSHIPS);
         InputHandler inputHandlerFriendships = executionPlanRuntime.getInputHandler("friendshipsStream");
-//        EventSenderThread senderThreadFriendships = new EventSenderThread(dataLoaderThreadFriendships.getEventBuffer(), inputHandlerFriendships, Integer.MAX_VALUE);
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
-//        EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, Integer.MAX_VALUE);
 
         //Likes
         LinkedBlockingQueue<Object[]> eventBufferListLikes = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(dataSetFolder + "/likes.dat", eventBufferListLikes, FileType.LIKES);
         InputHandler inputHandlerLikes = executionPlanRuntime.getInputHandler("likesStream");
-//        EventSenderThread senderThreadLikes = new EventSenderThread(dataLoaderThreadLikes.getEventBuffer(), inputHandlerLikes, Integer.MAX_VALUE);
 
         eventBufferList[0] = dataLoaderThreadFriendships.getEventBuffer();
         eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
@@ -147,11 +134,6 @@ public class Query2V2 {
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
         dataLoaderThreadLikes.start();
-
-        //from here onwards we start sending the events
-//        senderThreadFriendships.start();
-//        senderThreadComments.start();
-//        senderThreadLikes.start();
 
         orderedEventSenderThread.start();
 
