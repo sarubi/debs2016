@@ -1,5 +1,6 @@
 import org.junit.Test;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
+import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 public class CommentStoreTest {
     @Test
     public void testUpdateCommentStoreData1(){
-        CommentStore comment = new CommentStore(10);
+        CommentStore comment = new CommentStore(10, new Graph());
         comment.registerComment(101,100,"hi");
         comment.registerComment(102,101,"hi");
         comment.registerComment(103,102,"hi");
@@ -30,7 +31,7 @@ public class CommentStoreTest {
 
     @Test
     public void testUpdateCommentStoreData2(){
-        CommentStore comment = new CommentStore(1);
+        CommentStore comment = new CommentStore(1, new Graph());
         comment.registerComment(101,100,"hi");
         comment.registerComment(102,101,"hi");
         comment.registerComment(103,102,"hi");
@@ -50,7 +51,7 @@ public class CommentStoreTest {
 
 @Test
     public void testGetKLargestComments(){
-        CommentStore theStore = new CommentStore(100);
+        CommentStore theStore = new CommentStore(100, new Graph());
 
         theStore.registerComment(1,100,"Comment One");
         theStore.registerComment(2,101,"Comment Two");

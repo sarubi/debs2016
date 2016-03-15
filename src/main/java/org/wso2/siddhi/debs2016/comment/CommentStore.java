@@ -106,10 +106,12 @@ public class CommentStore{
     }
 
     /**
-     * Gets the k largest comments
+     * Update the K Largest Comments
      *
      * @param k the number of comments
+     * @return true if K Largest Comments has changed
      */
+    //TODO Change into two methods
     private boolean getKLargestComments(int k)
     {
         ArrayList<String> commentsList = new ArrayList<String>();
@@ -117,9 +119,9 @@ public class CommentStore{
 
         String [] kComments = new String[k];
 
-        for (CommentLikeGraph eachCommentLikeGraph: graph.values()) {
-            long sizeOfComponent = Graph.getLargestConnectedComponent(eachCommentLikeGraph.getGraph());
-            String comment = eachCommentLikeGraph.getComment();
+        for (CommentLikeGraph commentLikeGraph: graph.values()) {
+            long sizeOfComponent = Graph.getLargestConnectedComponent(commentLikeGraph.getGraph());
+            String comment = commentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
             if (list.size() == 0){
@@ -138,7 +140,6 @@ public class CommentStore{
                     list.add(list.size(), sizeOfComponent);
                     commentsList.add(commentsList.size(), comment);
                     continue;
-                    //TODO: Lexicographical Ordering
                 }
             }
 
