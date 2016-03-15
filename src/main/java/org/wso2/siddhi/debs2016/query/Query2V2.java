@@ -61,7 +61,9 @@ public class Query2V2 {
             return;
         }
 
-        Query2 query2 = new Query2(args);
+//        Query2 query2 = new Query2(args);
+//        query2.run();
+        Query2V2 query2 = new Query2V2(args);
         query2.run();
     }
 
@@ -145,6 +147,7 @@ public class Query2V2 {
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
         dataLoaderThreadLikes.start();
+
         //from here onwards we start sending the events
 //        senderThreadFriendships.start();
 //        senderThreadComments.start();

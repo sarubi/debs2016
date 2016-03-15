@@ -21,7 +21,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private Graph friendsGraph;
     private String iij_timestamp;
     private String ts;
-    private long duration= (Long.MAX_VALUE/100000000000L);
+    private long duration= 100000000000l;
     public  Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 10;
@@ -42,13 +42,15 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         //Thread.sleep(25);
         //System.out.println("comments arrives");
         commentStore.updateCommentStore(ts);
-        //commentStore.printCommentStore(ts);
+//        commentStore.printCommentStore(ts);
+
+//                System.out.println(ts);
 
         switch (streamType) {
             case Constants.COMMENTS:
                 long comment_id = (Long) objects[3];
                 String comment = (String) objects[4];
-                commentStore.registerComment(comment_id, ts, comment, true);
+                commentStore.registerComment(comment_id, ts, comment, false);
                 break;
             case Constants.FRIENDSHIPS:
                 long friendship_user_id_2 = (Long) objects[3];
@@ -63,7 +65,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 break;
         }
             //commentStore.updateCommentStore(ts);
-              commentStore.printKLargestComments(1000, " : " );
+              commentStore.printKLargestComments(k, " : " );
            // System.out.println("\n\n");
 
 
