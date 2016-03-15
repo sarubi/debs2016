@@ -18,12 +18,10 @@ public class CommentLikeGraph {
      *
      * @param ts the arrival time of the comment
      */
-    public CommentLikeGraph(long ts, String comment, Graph friendshipGraph)
-    {
+    public CommentLikeGraph(long ts, String comment, Graph friendshipGraph) {
         this.ts = ts;
         this.comment = comment;
         this.friendshipGraph = friendshipGraph;
-
     }
 
     /**
@@ -31,9 +29,9 @@ public class CommentLikeGraph {
      *
      * @return the arrival time of the comment
      */
-    public long getArrivalTime()
-    {
+    public long getArrivalTime() {
         return ts;
+
     }
 
     /**
@@ -41,8 +39,7 @@ public class CommentLikeGraph {
      *
      * @param uId is user id of person who likes comment
      */
-    public void registerLike(long uId)
-    {
+    public void registerLike(long uId) {
         graph.addVertex(uId);
         Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
@@ -70,7 +67,9 @@ public class CommentLikeGraph {
      * @return the comment
      */
     public String getComment() {
+
         return comment;
+
     }
 
     /**
@@ -79,6 +78,7 @@ public class CommentLikeGraph {
      * @return the graph
      */
     public Graph getGraph() {
+
         return graph;
     }
 }
