@@ -9,6 +9,7 @@ import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +72,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
-            commentStore.computeKLargestComments(k, " : " );
+            commentStore.computeKLargestComments(k, " : " , false);
 
             showStatistics(1231511);
 

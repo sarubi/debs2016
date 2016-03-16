@@ -11,6 +11,7 @@ import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
 import org.wso2.siddhi.debs2016.util.Constants;
 
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 /**
  Query 2
@@ -59,6 +60,10 @@ public class Query2V2 extends Thread{
     private String likesFile;
 
     public static void main(String[] args){
+
+        File q2 = new File("q2.txt");
+        q2.delete();
+
         if(args.length == 0){
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
