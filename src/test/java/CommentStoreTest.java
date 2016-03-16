@@ -3,7 +3,7 @@ import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
-import java.util.Arrays;
+
 /**
  * Created by bhagya on 3/11/16.
  */
@@ -103,7 +103,7 @@ public class CommentStoreTest {
         theStore.handleNewFriendship(100,105);
         theStore.handleNewFriendship(8,110);
 //        theStore.handleNewFriendship(200,24);
-        theStore.printKLargestComments(8);
+        theStore.computeKLargestComments(8);
 //        System.out.println(Arrays.toString(theStore.getKLargestComments(8)));
     }
 }

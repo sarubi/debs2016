@@ -157,8 +157,6 @@ public class Graph {
         return graph.keySet();
     }
 
-    //TODO:  Implement logic to decide largest connected component
-
     /**
      * Gets the number of vertices of the largest connected component of the graph
      *

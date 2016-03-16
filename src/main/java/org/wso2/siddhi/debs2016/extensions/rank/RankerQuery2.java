@@ -51,24 +51,27 @@ public class RankerQuery2 extends StreamFunctionProcessor {
 
             count++;
 
+//                System.out.println(ts);
 
         switch (streamType) {
             case Constants.COMMENTS:
                 long comment_id = (Long) objects[3];
                 String comment = (String) objects[4];
-                 commentStore.registerComment(comment_id, ts, comment, false);
+                commentStore.registerComment(comment_id, ts, comment, false);
                 break;
             case Constants.FRIENDSHIPS:
                 long friendship_user_id_2 = (Long) objects[3];
+                //System.out.println("Friendship");
                 friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
                 commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
                 break;
             case Constants.LIKES:
                 long like_comment_id = (Long) objects[3];
+                // System.out.println("Like");
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
         }
-            commentStore.printKLargestComments(k, " : " );
+            commentStore.computeKLargestComments(k, " : " );
 
             showStatistics(1231511);
 

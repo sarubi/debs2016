@@ -36,7 +36,7 @@ public class OrderedEventSenderThread extends Thread {
 
 
     public void run(){
-        Object[] friendshipEvent =null;
+        Object[] friendshipEvent = null;
         Object[] commentEvent = null;
         Object[] likeEvent = null;
 
@@ -45,6 +45,7 @@ public class OrderedEventSenderThread extends Thread {
         long timeDifference = 0; //This is the time difference for this time window.
         long currentTime = 0;
         long prevTime = 0;
+        //long startTime = System.currentTimeMillis();
         long startTime = 0;
         long cTime = 0;
         //Special note : Originally we need not subtract 1. However, due to some reason if there are n events in the input data set that are
@@ -112,6 +113,9 @@ public class OrderedEventSenderThread extends Thread {
                     currentTime = System.currentTimeMillis();
                     timeDifferenceFromStart = (currentTime - startTime);
                     timeDifference = currentTime - prevTime;
+                    //<time from start(ms)><time from start(s)><aggregate throughput (events/s)><throughput in this time window (events/s)><percentage completed (%)>
+                    //aggregateInputList.add(timeDifferenceFromStart + "," + Math.round(timeDifferenceFromStart/1000) + "," + Math.round(count * 1000.0 / timeDifferenceFromStart) + "," + Math.round(Constants.STATUS_REPORTING_WINDOW_INPUT  * 1000.0/timeDifference) + "," + percentageCompleted);
+
                     //At this moment we are done with sending all the events from the queue. Now we are about to complete the experiment.
                     Date dNow = new Date();
                     SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
