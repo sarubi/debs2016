@@ -8,6 +8,7 @@ import scala.collection.immutable.Stream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by anoukh on 3/15/16.
@@ -81,11 +82,11 @@ public class OrderedEventSenderThread extends Thread {
 
                 try{
                     if (flag == Constants.FRIENDSHIPS){
-                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll();
+                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll(500, TimeUnit.MILLISECONDS);
                     }else if (flag == 1){
-                        commentEvent = eventBufferList[Constants.COMMENTS].poll();
+                        commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
                     }else if (flag == 2){
-                        likeEvent = eventBufferList[Constants.LIKES].poll();
+                        likeEvent = eventBufferList[Constants.LIKES].poll(500, TimeUnit.MILLISECONDS);
                     }else{
                         friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
                         commentEvent = eventBufferList[Constants.COMMENTS].take();
@@ -119,12 +120,12 @@ public class OrderedEventSenderThread extends Thread {
                     tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
                 }
 
-                if (tsFriendship < tsComment && tsFriendship < tsLike && tsFriendship != Long.MAX_VALUE){
+                if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
                     inputHandler[Constants.FRIENDSHIPS].send(cTime, friendshipEvent);
                     flag = Constants.FRIENDSHIPS;
-                }else if (tsComment < tsFriendship && tsComment < tsLike && tsComment != Long.MAX_VALUE){
+                }else if (tsComment <= tsFriendship && tsComment <= tsLike && tsComment != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
                     inputHandler[Constants.COMMENTS].send(cTime, commentEvent);
@@ -141,11 +142,11 @@ public class OrderedEventSenderThread extends Thread {
                 //When all buffers are empty
                 if (friendshipEvent == null && commentEvent == null && likeEvent == null){
 
-                    Thread.sleep(5000);
+//                    Thread.sleep(5000);
 
-                    friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll();
-                    commentEvent = eventBufferList[Constants.COMMENTS].poll();
-                    likeEvent = eventBufferList[Constants.LIKES].poll();
+//                    friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll();
+//                    commentEvent = eventBufferList[Constants.COMMENTS].poll();
+//                    likeEvent = eventBufferList[Constants.LIKES].poll();
 
                     //Sending second dummy event to signal end of streams
                     if (friendshipEvent == null && commentEvent == null && likeEvent == null){

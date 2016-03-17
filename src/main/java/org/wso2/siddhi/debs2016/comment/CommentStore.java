@@ -95,7 +95,6 @@ public class CommentStore {
                     System.out.print(tsTriggeredChange);
                 }
                 writer.write(Long.toString(tsTriggeredChange));
-                writer.flush();
 
                 for (String print : previousKcomments) {
                     if (printKComments){
