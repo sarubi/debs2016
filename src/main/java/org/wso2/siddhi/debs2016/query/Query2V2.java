@@ -6,6 +6,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.timestamp.SystemCurrentTimeMillisTimestampGenerator;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
@@ -158,6 +159,9 @@ public class Query2V2 extends Thread{
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+                if (orderedEventSenderThread.doneFlag){
+                    System.exit(0);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
