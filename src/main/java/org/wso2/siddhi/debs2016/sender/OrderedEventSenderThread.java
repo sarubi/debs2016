@@ -56,6 +56,7 @@ public class OrderedEventSenderThread extends Thread {
         boolean firstEvent = true;
         float percentageCompleted = 0;
         int flag = 3;
+<<<<<<< HEAD
 
         while(true){
         try{
@@ -70,10 +71,10 @@ public class OrderedEventSenderThread extends Thread {
                 commentEvent = eventBufferList[Constants.COMMENTS].take();
                 likeEvent = eventBufferList[Constants.LIKES].take();
             }
+=======
+>>>>>>> 5ff111fcd530b2a197b71460310b13f47f2360f1
 
-        }catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        while(true){
 
             try {
                 //Send dummy event to mark the commencement of processing
@@ -111,6 +112,7 @@ public class OrderedEventSenderThread extends Thread {
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
+<<<<<<< HEAD
 
                 long tsFriendship;
                 long tsComment;
@@ -135,6 +137,32 @@ public class OrderedEventSenderThread extends Thread {
                     tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
                 }
 
+=======
+
+                long tsFriendship;
+                long tsComment;
+                long tsLike;
+
+                //handling the instance where the stream of a buffer has no more events
+                if (friendshipEvent == null){
+                    tsFriendship = Long.MAX_VALUE;
+                }else{
+                    tsFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+                if (commentEvent == null){
+                    tsComment = Long.MAX_VALUE;
+                }else{
+                    tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+                if (likeEvent == null){
+                    tsLike = Long.MAX_VALUE;
+                }else{
+                    tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+>>>>>>> 5ff111fcd530b2a197b71460310b13f47f2360f1
                 if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
