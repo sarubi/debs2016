@@ -2,7 +2,6 @@ package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
-import scala.collection.immutable.Stream;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,23 +55,6 @@ public class OrderedEventSenderThread extends Thread {
         boolean firstEvent = true;
         float percentageCompleted = 0;
         int flag = 3;
-<<<<<<< HEAD
-
-        while(true){
-        try{
-            if (flag == Constants.FRIENDSHIPS){
-                friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
-            }else if (flag == 1){
-                commentEvent = eventBufferList[Constants.COMMENTS].take();
-            }else if (flag == 2){
-                likeEvent = eventBufferList[Constants.LIKES].take();
-            }else{
-                friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
-                commentEvent = eventBufferList[Constants.COMMENTS].take();
-                likeEvent = eventBufferList[Constants.LIKES].take();
-            }
-=======
->>>>>>> 5ff111fcd530b2a197b71460310b13f47f2360f1
 
         while(true){
 
@@ -112,7 +94,6 @@ public class OrderedEventSenderThread extends Thread {
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-<<<<<<< HEAD
 
                 long tsFriendship;
                 long tsComment;
@@ -137,32 +118,6 @@ public class OrderedEventSenderThread extends Thread {
                     tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
                 }
 
-=======
-
-                long tsFriendship;
-                long tsComment;
-                long tsLike;
-
-                //handling the instance where the stream of a buffer has no more events
-                if (friendshipEvent == null){
-                    tsFriendship = Long.MAX_VALUE;
-                }else{
-                    tsFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
-                }
-
-                if (commentEvent == null){
-                    tsComment = Long.MAX_VALUE;
-                }else{
-                    tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
-                }
-
-                if (likeEvent == null){
-                    tsLike = Long.MAX_VALUE;
-                }else{
-                    tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
-                }
-
->>>>>>> 5ff111fcd530b2a197b71460310b13f47f2360f1
                 if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
