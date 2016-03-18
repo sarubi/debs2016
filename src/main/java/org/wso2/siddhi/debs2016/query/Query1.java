@@ -5,6 +5,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.EventSenderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
@@ -35,17 +36,17 @@ public class Query1 {
 
         String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string);";
         inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user string, comment_replied long, post_commented long);";
-        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, isPostFlag bool );";
+        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, user_id long, user string, isPostFlag bool );";
 
         String query = ("@info(name = 'query1') from postsStream " +
-                "select iij_timestamp, ts, post_id, -1l as comment_id, -1l as comment_replied_id, true as isPostFlag " +
+                "select iij_timestamp, ts, post_id, -1l as comment_id, -1l as comment_replied_id, user_id, user, true as isPostFlag " +
                 "insert into postCommentsStream;");
 
         query += ("@info(name = 'query2') from commentsStream  " +
-                "select iij_timestamp, ts, post_commented as post_id, comment_id, comment_replied as comment_replied_id, false as isPostFlag " +
+                "select iij_timestamp, ts, post_commented as post_id, comment_id, comment_replied as comment_replied_id, user_id, user, false as isPostFlag " +
                 "insert into postCommentsStream;");
 
-        query += ("@info(name = 'query3') from postCommentsStream#debs2016:rankerQuery1(iij_timestamp, ts, post_id, comment_id, comment_replied_id, isPostFlag)  " +
+        query += ("@info(name = 'query3') from postCommentsStream#debs2016:rankerQuery1(iij_timestamp, ts, post_id, comment_id, comment_replied_id, user_id, user, isPostFlag)  " +
                 "select iij_timestamp, ts, post_id, comment_id, comment_replied_id " +
                 "insert into query1OutputStream;");
 
@@ -56,7 +57,7 @@ public class Query1 {
 
             @Override
             public void receive(Event[] events) {
-                //EventPrinter.print(events);
+                EventPrinter.print(events);
             }
         });
 

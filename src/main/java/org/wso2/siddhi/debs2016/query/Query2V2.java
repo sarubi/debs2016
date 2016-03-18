@@ -6,11 +6,13 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
+import org.wso2.siddhi.core.util.timestamp.SystemCurrentTimeMillisTimestampGenerator;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
 import org.wso2.siddhi.debs2016.util.Constants;
 
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 /**
  Query 2
@@ -52,12 +54,19 @@ import java.util.concurrent.LinkedBlockingQueue;
  2010-10-28T05:01:31.027+0000,I love strawberries,what a day!,well done
  2010-10-28T05:01:31.032+0000,what a day!,I love strawberries,well done
  **/
-public class Query2V2 {
-    private String dataSetFolder;
+public class Query2V2 extends Thread{
+    private String friendshipFile;
+    private String postsFile;
+    private String commentsFile;
+    private String likesFile;
 
     public static void main(String[] args){
-        if(args.length != 1){
-            System.err.println("Usage java org.wso2.siddhi.debs2016.query.Query2 <full path to data set folder>");
+
+        File q2 = new File("q2.txt");
+        q2.delete();
+
+        if(args.length == 0){
+            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
         }
 
@@ -66,7 +75,10 @@ public class Query2V2 {
     }
 
     public Query2V2(String[] args){
-        dataSetFolder = args[0];
+        friendshipFile = args[0];
+        postsFile = args[1];
+        commentsFile = args[2];
+        likesFile = args[3];
     }
 
     public void run(){
@@ -106,17 +118,17 @@ public class Query2V2 {
 
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Friendships
-        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(dataSetFolder + "/friendships.dat", eventBufferListPosts, FileType.FRIENDSHIPS);
+        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, eventBufferListPosts, FileType.FRIENDSHIPS);
         InputHandler inputHandlerFriendships = executionPlanRuntime.getInputHandler("friendshipsStream");
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
+        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
 
         //Likes
         LinkedBlockingQueue<Object[]> eventBufferListLikes = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(dataSetFolder + "/likes.dat", eventBufferListLikes, FileType.LIKES);
+        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, eventBufferListLikes, FileType.LIKES);
         InputHandler inputHandlerLikes = executionPlanRuntime.getInputHandler("likesStream");
 
         eventBufferList[0] = dataLoaderThreadFriendships.getEventBuffer();
@@ -147,6 +159,9 @@ public class Query2V2 {
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+                if (orderedEventSenderThread.doneFlag){
+                    System.exit(0);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -9,14 +9,20 @@ import org.wso2.siddhi.debs2016.input.PostRecord;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.Iterator;
+import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.ArrayList;
 
 
 public class RankerQuery1 extends StreamFunctionProcessor {
-    private HashMap<Long, TreeSet<Long>> commentsForPostMap; //Key is a post_id, values is the list of comments posted to that post
-    private HashMap<Long, TreeSet<Long>> commentsForCommentMap; //Key is a comment_id, values is the list of comments posted to that comment
-    private TreeMap<Long, TreeSet<Long>> postRankTreeMap; //Key is the total score of the post, value is the list of posts which has that particular total score
-    private TreeMap<Long, TreeSet<Long>> commentRankTreeMap; //Key is the total score of the comment, value is the list of comments which has that particular total score
+    private HashMap<Long, TreeSet<Long>> commentsForPostMap; //Key is a post_id, values is the list of comment ids posted to that post
+    private HashMap<Long, TreeSet<Long>> commentsForCommentMap; //Key is a comment_id, values is the list of comment ids posted to that comment
+    private TreeMap<Long, TreeSet<Long>> postRankTreeMap; //Key is the total score of the post, value is the list of post ids which has that particular total score
+    private TreeMap<Long, TreeSet<Long>> commentRankTreeMap; //Key is the total score of the comment, value is the list of comment ids which has that particular total score
     //private LinkedList<PostRecord> posts;
     //private LinkedList<CommentRecord> comments;
 
@@ -39,9 +45,11 @@ public class RankerQuery1 extends StreamFunctionProcessor {
         long iij_timestamp = (Long)objects[0];
         long ts = (Long)objects[1];
         long post_id = (Long)objects[2];
-        long comment_id = (Long)objects[3];
+        long comment_id = (Long)objects[3]; //In the case of a post this field becomes user_id
         long comment_replied_id = (Long)objects[4];
-        boolean isPostFlag = (Boolean)objects[5];
+        long user_id = (Long)objects[5];
+        String user = (String)objects[6];
+        boolean isPostFlag = (Boolean)objects[7];
         //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
         if(isPostFlag){ //This is a new post
             //By default we know that all the post ids are new ones
@@ -50,43 +58,47 @@ public class RankerQuery1 extends StreamFunctionProcessor {
             treeSet = postRankTreeMap.get(10l);
             treeSet.add(post_id);//Initially the total score of the new post is 10.
 
-            posts.put(post_id, new PostRecord(post_id, ts, 10));
+            posts.put(post_id, new PostRecord(post_id, ts, user_id, 10, user)); //In this case comment_id carries the user_id
         } else {
             TreeSet<Long> treeSet = null;
 
             if(comment_replied_id == -1){ //This is a comment posted to an existing post
                 treeSet = commentsForPostMap.get(post_id);
+
+                if(treeSet == null){
+                    treeSet = new TreeSet<Long>();
+                }
+
                 treeSet.add(comment_id);
             } else if(comment_replied_id != -1) { //This is a comment posted to an existing comment
                 treeSet = commentsForCommentMap.get(comment_replied_id);
+
+                if(treeSet == null){
+                    treeSet = new TreeSet<Long>();
+                }
+
                 treeSet.add(comment_id);
             }
             treeSet = commentRankTreeMap.get(10l);
             treeSet.add(comment_id);//Initially the total score of the new comment is 10.
-            comments.put(comment_id, new CommentRecord(comment_id, ts, 10));
+            comments.put(comment_id, new CommentRecord(comment_id, ts, 10, user_id));
         }
 
-        //Next, based on the timestamp value of this event object, we have to reduce the scores of the posts and the comments which are already stored in the
+        //Next, based on the timestamp value of this event object, we have to reduce the scores of the posts and the
+        // comments which are already stored in the
         //two linked lists
         Iterator<Map.Entry<Long, PostRecord>> postsIterator = posts.entrySet().iterator();
         PostRecord pst = null;
-
-        while(postsIterator.hasNext()){
-            pst = postsIterator.next().getValue();
-            int scoreReduction = (int)((ts - pst.ts)/MILISECONDS_FOR_DAY);
-            if(scoreReduction < 10){
-                pst.score = (10 - scoreReduction);
-            }
-        }
 
         Iterator<Map.Entry<Long, CommentRecord>> commentsIterator = comments.entrySet().iterator();
         CommentRecord comment = null;
 
         while(commentsIterator.hasNext()){
             comment = commentsIterator.next().getValue();
+            //Per each day we need to reduce the score by one. After passing ten days the score becomes negative value
             int scoreReduction = (int)((ts - comment.ts)/MILISECONDS_FOR_DAY);
             if(scoreReduction < 10){
-                comment.score = (10 - scoreReduction);
+                comment.score = 10 - scoreReduction;
             }
         }
 
@@ -96,33 +108,52 @@ public class RankerQuery1 extends StreamFunctionProcessor {
 
         while(postsIterator.hasNext()) {
             pst = postsIterator.next().getValue();
-            long totalScore = pst.score;
-            TreeSet<Long> commentsForPost = commentsForPostMap.get(pst.post_id);
-            Iterator<Long> itr = commentsForPost.iterator();
+            int scoreReduction = (int)((ts - pst.ts)/MILISECONDS_FOR_DAY);
 
-            while(itr.hasNext()){
-                long commentID = itr.next();
-                Iterator<Long> itr2 = commentsForCommentMap.get(commentID).iterator();
-                while(itr2.hasNext()){
-                    long commentForCommetID = itr2.next();
-                    totalScore += comments.get(commentForCommetID).score;
-                }
-                totalScore += comments.get(commentID).score;
+            if(scoreReduction < 10) {
+                pst.score = 10 - scoreReduction;
             }
 
-            if(pst.score != totalScore) {
-                //First, we need to remove the Post object from the existing list
-                TreeSet<Long> treeSet = postRankTreeMap.get(pst.score);
-                treeSet.remove(pst);
+            //That means the event which triggered this process() method is a comment and the post we are at the moment
+            //is the post for which the comment has been posted to.
+            //This way we are only updating the total score of the relevant post.
+            if(!isPostFlag && (post_id == pst.post_id)) {
+                TreeSet<Long> commentorUsersList = new TreeSet<Long>();
+                long totalScore = pst.score;
+                TreeSet<Long> commentsForPost = commentsForPostMap.get(pst.post_id);
+                Iterator<Long> itr = commentsForPost.iterator();
 
-                //Next, we need to add the new score along with the post to the tree
-                treeSet = postRankTreeMap.get(totalScore);
-                treeSet.add(totalScore);
-                postRankTreeMap.put(totalScore, treeSet);
+                while (itr.hasNext()) {
+                    long commentID = itr.next();
+                    commentorUsersList.add(comments.get(commentID).user_id);
+                    Iterator<Long> itr2 = commentsForCommentMap.get(commentID).iterator();
+                    while (itr2.hasNext()) {
+                        long commentForCommetID = itr2.next();
+                        commentorUsersList.add(comments.get(commentForCommetID).user_id);
+                        totalScore += comments.get(commentForCommetID).score;
+                    }
+                    totalScore += comments.get(commentID).score;
+                }
+
+                if (pst.totalScore != totalScore) {
+                    //First, we need to remove the Post object from the existing list
+                    TreeSet<Long> treeSet = postRankTreeMap.get(pst.totalScore);
+                    treeSet.remove(pst);
+
+                    //Next, we need to add the new score along with the post to the tree
+                    treeSet = postRankTreeMap.get(totalScore);
+                    if(treeSet == null){
+                        treeSet = new TreeSet<Long>();
+                    }
+                    treeSet.add(totalScore);
+                    postRankTreeMap.put(totalScore, treeSet);
+                }
+
+                pst.numberOfCOmmentors = commentorUsersList.size();
             }
         }
 
-        if(updateRanks()){
+        if (updateRanks()){
 //            <ts,top1_post_id,top1_post_user,top1_post_score,top1_post_commenters,
 //                    top2_post_id,top2_post_user,top2_post_score,top2_post_commenters,
 //                    top3_post_id,top3_post_user,top3_post_score,top3_post_commenters>
@@ -130,6 +161,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
             result[0] = ts;
             Iterator<Map.Entry<Long, TreeSet<Long>>> itr = postRankTreeMap.entrySet().iterator();
             int counter = 0;
+
             while(itr.hasNext()){
                 Map.Entry<Long, TreeSet<Long>> item = itr.next();
                 Iterator<Long> itr2 = item.getValue().iterator();
@@ -137,10 +169,21 @@ public class RankerQuery1 extends StreamFunctionProcessor {
                 while(itr2.hasNext()) {
                     long postID = itr2.next();
                     result[1 + (counter * 4)] = postID;
-                    result[2 + (counter * 4)] = posts.get(postID);//this should be topn_post_user
-
+                    PostRecord currentPostRecord = posts.get(postID);
+                    result[2 + (counter * 4)] = currentPostRecord.user;//this should be topn_post_user
+                    result[3 + (counter * 4)] = currentPostRecord.score;
+                    result[4 + (counter * 4)] = currentPostRecord.numberOfCOmmentors;
                 }
+
+                //We need only top three scoring posts
+                if(counter > 1){
+                    break;
+                }
+
+                counter++;
             }
+
+            return result;
         }
 
         return null;
@@ -172,7 +215,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
 
     @Override
     protected List<Attribute> init(AbstractDefinition abstractDefinition, ExpressionExecutor[] expressionExecutors, ExecutionPlanContext executionPlanContext) {
-        if (expressionExecutors.length != 6) {
+        if (expressionExecutors.length != 8) {
             System.err.println("Required Parameters : Six");
             return null;
         }
