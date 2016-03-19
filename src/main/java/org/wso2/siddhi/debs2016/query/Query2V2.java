@@ -83,26 +83,14 @@ public class Query2V2 extends Thread{
 
     public void run(){
         SiddhiManager siddhiManager = new SiddhiManager();
+        String inStreamDefinition = "@config(async = 'true')define stream eventsStream (iij_timestamp long, ts long, attribute_1 long, attribute_2 long, attribute_3 string, attribute_4 string, attribute_5 long, attribute_6 long, eventType int);";
+        inStreamDefinition += "@config(async = 'true')define stream likesFriendshipsCommentsStream (iij_timestamp long, ts long, attribute_1 long, attribute_2 long, attribute_3 string, attribute_4 string, attribute_5 long, attribute_6 long, eventType int );";
 
-        String inStreamDefinition = "@config(async = 'true')define stream friendshipsStream (iij_timestamp long, ts long, user_id_1 long, user_id_2 long);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long," +
-                " comment string, user string, comment_replied long, post_commented long);";
-        inStreamDefinition += "@config(async = 'true')define stream likesStream (iij_timestamp long, ts long, user_id long, comment_id long);";
-        inStreamDefinition += "@config(async = 'true')define stream likesFriendshipsCommentsStream (iij_timestamp long, ts long, user_id_1 long, field_1 long, comment string, user string, comment_replied long, post_commented long, eventType int );";
-
-        String query = ("@info(name = 'query1') from friendshipsStream " +
-                "select iij_timestamp, ts, user_id_1, user_id_2 as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 0 as eventType  " +
+        String query = ("@info(name = 'query1') from eventsStream " +
+                "select iij_timestamp, ts, attribute_1, attribute_2, attribute_3, attribute_4, attribute_5, attribute_6, eventType " +
                 "insert into likesFriendshipsCommentsStream;");
 
-        query += ("@info(name = 'query2') from commentsStream  " +
-                "select iij_timestamp, ts, user_id as user_id_1, comment_id  as field_1, comment, user, comment_replied, post_commented, 1 as eventType " +
-                "insert into likesFriendshipsCommentsStream;");
-
-        query += ("@info(name = 'query3') from likesStream  " +
-                "select iij_timestamp, ts, user_id as user_id_1, comment_id as field_1, '' as comment, '' as user, 0l as comment_replied, 0l as post_commented, 2 as eventType " +
-                "insert into likesFriendshipsCommentsStream;");
-
-        query += ("@info(name = 'query4') from likesFriendshipsCommentsStream#debs2016:rankerQuery2(iij_timestamp, ts, user_id_1, field_1, comment, user, comment_replied, post_commented, eventType)  " +
+        query += ("@info(name = 'query4') from likesFriendshipsCommentsStream#debs2016:rankerQuery2(iij_timestamp, ts, attribute_1, attribute_2, attribute_3, attribute_4, attribute_5, attribute_6, eventType)  " +
                 "select iij_timestamp " +
                 "insert into query2OutputStream;");
 
@@ -114,31 +102,25 @@ public class Query2V2 extends Thread{
         System.out.println("Incremental data loading is performed.");
 
         LinkedBlockingQueue<Object[]> eventBufferList [] = new LinkedBlockingQueue[3];
-        InputHandler inputHandler [] = new InputHandler[3];
+        InputHandler inputHandlerNew = executionPlanRuntime.getInputHandler("eventsStream");
 
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Friendships
         DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, eventBufferListPosts, FileType.FRIENDSHIPS);
-        InputHandler inputHandlerFriendships = executionPlanRuntime.getInputHandler("friendshipsStream");
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, eventBufferListComments, FileType.COMMENTS);
-        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
 
         //Likes
         LinkedBlockingQueue<Object[]> eventBufferListLikes = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, eventBufferListLikes, FileType.LIKES);
-        InputHandler inputHandlerLikes = executionPlanRuntime.getInputHandler("likesStream");
 
         eventBufferList[0] = dataLoaderThreadFriendships.getEventBuffer();
         eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
         eventBufferList[2] = dataLoaderThreadLikes.getEventBuffer();
-        inputHandler[0] = inputHandlerFriendships;
-        inputHandler[1] = inputHandlerComments;
-        inputHandler[2] = inputHandlerLikes;
 
-        OrderedEventSenderThread orderedEventSenderThread = new OrderedEventSenderThread(eventBufferList, inputHandler, Integer.MAX_VALUE);
+        OrderedEventSenderThread orderedEventSenderThread = new OrderedEventSenderThread(eventBufferList, inputHandlerNew);
 
         executionPlanRuntime.start();
 

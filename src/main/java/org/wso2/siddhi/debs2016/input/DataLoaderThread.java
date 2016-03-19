@@ -70,7 +70,10 @@ public class DataLoaderThread extends Thread {
                                 postID,
                                 userID,
                                 post,
-                                user
+                                user,
+                                0L,
+                                0L,
+                                3
                         };
                         //System.out.println(count++);
                         eventBufferList.put(eventData);
@@ -110,7 +113,8 @@ public class DataLoaderThread extends Thread {
                                 comment,
                                 user,
                                 comment_replied,
-                                post_commented
+                                post_commented,
+                                1
                         };
                         eventBufferList.put(eventData);
                         break;
@@ -130,6 +134,11 @@ public class DataLoaderThread extends Thread {
                                 friendshipTimeStampLong,
                                 user1ID,
                                 user2ID,
+                                0L,
+                                0L,
+                                0L,
+                                0L,
+                                0
                         };
                         eventBufferList.put(eventData);
                         break;
@@ -149,6 +158,11 @@ public class DataLoaderThread extends Thread {
                                 likeTimeStampLong,
                                 userID,
                                 commentID,
+                                0L,
+                                0L,
+                                0L,
+                                0L,
+                                2,
                         };
                         eventBufferList.put(eventData);
 

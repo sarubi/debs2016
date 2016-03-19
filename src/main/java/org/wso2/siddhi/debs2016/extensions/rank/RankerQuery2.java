@@ -22,7 +22,6 @@ import java.util.List;
  *
  */
 public class RankerQuery2 extends StreamFunctionProcessor {
-    private Graph friendsGraph;
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
@@ -42,18 +41,15 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         try{
 
         long ts = (Long) objects[1];
-        long user_id_1 = (Long) objects[2]; //Note that user_id_1 is common for both friendship_user_id_1 and like_user_id
         //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
         int streamType = (Integer) objects[8];
             commentStore.updateCommentStore(ts);
-
             count++;
 
 //                System.out.println(ts);
 
         switch (streamType) {
             case Constants.COMMENTS:
-                user_id_1 = (Long) objects[2];
                 long comment_id = (Long) objects[3];
                 String comment = (String) objects[4];
                 commentStore.registerComment(comment_id, ts, comment, false);
@@ -68,14 +64,14 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                     startiij_timestamp = (Long) objects[0];
                     break;
                 }else{
-                    user_id_1 = (Long) objects[2];
+                    long user_id_1 = (Long) objects[2];
                     long friendship_user_id_2 = (Long) objects[3];
                     friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
                     commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
                     break;
                 }
             case Constants.LIKES:
-                user_id_1 = (Long) objects[2];
+                long user_id_1 = (Long) objects[2];
                 long like_comment_id = (Long) objects[3];
                 commentStore.registerLike(like_comment_id, user_id_1);
                 break;
@@ -106,22 +102,15 @@ public class RankerQuery2 extends StreamFunctionProcessor {
      */
     private void showFinalStatistics()
     {
-
         timeDifference = endiij_timestamp - startiij_timestamp;
-
-//       currentTime = System.currentTimeMillis();
-//            timeDifferenceFromStart = (currentTime - startTime);
-//            timeDifference = currentTime - prevTime;
 
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
             System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
-//            timeDifferenceFromStart = dNow.getTime() - startDateTime.getTime();
             System.out.println("Total run time : " + timeDifference);
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.flush();
-
     }
 
 

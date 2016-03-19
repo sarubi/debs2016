@@ -2,6 +2,7 @@ package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
+import scala.collection.immutable.Stream;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,9 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThread extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
-    private InputHandler inputHandler [];
+    private InputHandler inputHandler;
     private Date startDateTime;
-    private long EVENT_COUNT;
     public boolean doneFlag = false;
 
 
@@ -25,13 +25,11 @@ public class OrderedEventSenderThread extends Thread {
      *
      * @param eventBuffer the event buffer array
      * @param inputHandler the input handler array
-     * @param eventCount the event count
      */
-    public OrderedEventSenderThread(LinkedBlockingQueue<Object[]> eventBuffer [], InputHandler inputHandler [], long eventCount){
+    public OrderedEventSenderThread(LinkedBlockingQueue<Object[]> eventBuffer [], InputHandler inputHandler){
         super("Event Sender");
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;
-        this.EVENT_COUNT = eventCount;
     }
 
 
@@ -40,12 +38,6 @@ public class OrderedEventSenderThread extends Thread {
         Object[] commentEvent = null;
         Object[] likeEvent = null;
 
-        long count = 1;
-        long timeDifferenceFromStart = 0;
-        long timeDifference = 0; //This is the time difference for this time window.
-        long currentTime = 0;
-        long prevTime = 0;
-        //long startTime = System.currentTimeMillis();
         long startTime = 0;
         long cTime = 0;
         //Special note : Originally we need not subtract 1. However, due to some reason if there are n events in the input data set that are
@@ -53,7 +45,6 @@ public class OrderedEventSenderThread extends Thread {
         //final int EVENT_COUNT = Integer.parseInt(Config.getConfigurationInfo("org.wso2.siddhi.debs2015.dataset.size")) - 1;
 
         boolean firstEvent = true;
-        float percentageCompleted = 0;
         int flag = 3;
 
         while(true){
@@ -64,11 +55,17 @@ public class OrderedEventSenderThread extends Thread {
                     Object[] finalFriendshipEvent = new Object[]{
                             0L,
                             -1L,
-                            0L
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0,
                     };
                     cTime = System.currentTimeMillis();
                     finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
-                    inputHandler[Constants.FRIENDSHIPS].send(cTime, finalFriendshipEvent);
+                    inputHandler.send(cTime, finalFriendshipEvent);
 
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
                     startDateTime = new Date();
@@ -121,48 +118,42 @@ public class OrderedEventSenderThread extends Thread {
                 if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                    inputHandler[Constants.FRIENDSHIPS].send(cTime, friendshipEvent);
+                    inputHandler.send(cTime, friendshipEvent);
                     flag = Constants.FRIENDSHIPS;
                 }else if (tsComment <= tsFriendship && tsComment <= tsLike && tsComment != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                    inputHandler[Constants.COMMENTS].send(cTime, commentEvent);
+                    inputHandler.send(cTime, commentEvent);
                     flag = Constants.COMMENTS;
                 }else if (tsLike != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     likeEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                    inputHandler[Constants.LIKES].send(cTime, likeEvent);
+                    inputHandler.send(cTime, likeEvent);
                     flag = Constants.LIKES;
                 }
 
-                count++;
-
                 //When all buffers are empty
                 if (friendshipEvent == null && commentEvent == null && likeEvent == null){
-
-//                    Thread.sleep(5000);
-
-//                    friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll();
-//                    commentEvent = eventBufferList[Constants.COMMENTS].poll();
-//                    likeEvent = eventBufferList[Constants.LIKES].poll();
-
-                    //Sending second dummy event to signal end of streams
-                    if (friendshipEvent == null && commentEvent == null && likeEvent == null){
                         cTime = System.currentTimeMillis();
-
+                    //Send dummy event to signal end of all streams
                         Object[] finalFriendshipEvent = new Object[]{
                                 0L,
                                 -2L,
-                                0L
+                                0L,
+                                0L,
+                                0L,
+                                0L,
+                                0L,
+                                0L,
+                                0,
                         };
 
                         finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
-                        inputHandler[Constants.FRIENDSHIPS].send(cTime, finalFriendshipEvent);
+                        inputHandler.send(cTime, finalFriendshipEvent);
 
                         doneFlag = true;
                         break;
                     }
-                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
