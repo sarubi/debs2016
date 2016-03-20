@@ -50,12 +50,13 @@ public class Graph {
      * Prints the graph information
      *
      */
-    public void printGraphInfo()
+    public String toString()
     {
-        System.out.println(graph.toString()); /*Print the Graph itself*/
-        System.out.println("Vertices: " + getNumberOfVertices()); /*Print number of vertices*/
-        System.out.println("Edges: " + getNumberOfEdges()); /*Print the number of edges*/
-
+        StringBuilder builder = new StringBuilder();
+        builder.append(graph.toString()); /*Print the Graph itself*/
+        builder.append("Vertices: " + getNumberOfVertices()); /*Print number of vertices*/
+        builder.append("Edges: " + getNumberOfEdges()); /*Print the number of edges*/
+        return builder.toString();
     }
 
 
@@ -129,11 +130,7 @@ public class Graph {
      */
     public boolean hasEdge(long uId1, long uId2){
         List<Long> adjacentVertices = graph.get(uId1);
-        if (adjacentVertices == null){
-            return false;
-        }else{
-            return adjacentVertices.contains(uId2);
-        }
+        return adjacentVertices == null? false : adjacentVertices.contains(uId2);
     }
 
 
@@ -214,25 +211,5 @@ public class Graph {
         /*End Calculate Largest Component*/
     }
 }
-/*Component Object to hold UserID and NodeID*/
-class Component{
-    private long uId;
-    private long nId;
-    public void setUId(long uId){
-        this.uId=uId;
-    }
-    public void setNId(long nId){
-        this.nId=nId;
-    }
-    public long getUId(){
-        return uId;
-    }
-    public long getNId(){
-        return nId;
-    }
-    public Component(long userId,long nodeId){
-        setUId(userId);
-        setNId(nodeId);
-    }
-}
+
 
