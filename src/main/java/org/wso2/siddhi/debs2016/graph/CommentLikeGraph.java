@@ -10,7 +10,10 @@ public class CommentLikeGraph {
     private long ts;
     private Graph graph = new Graph();
 	private String comment;
+    private long sizeOfLargestConnectedComponent;
     private Graph friendshipGraph ;
+    private boolean dirty = true;
+
 
     /**
      *
@@ -31,7 +34,20 @@ public class CommentLikeGraph {
      */
     public long getArrivalTime() {
         return ts;
+    }
 
+    /**
+     * Gets the size of the largest connected component
+     *
+     * @return the size of the largest connected component
+     */
+    public long getSizeOfLargestConnetedComponent()
+    {
+        if(dirty) {
+            dirty = false;
+            return sizeOfLargestConnectedComponent = Graph.getLargestConnectedComponent(graph);
+        }
+        return sizeOfLargestConnectedComponent;
     }
 
     /**
@@ -45,6 +61,7 @@ public class CommentLikeGraph {
         for (long vertex: verticesList) {
             if (friendshipGraph.hasEdge(uId, vertex)){
                     graph.addEdge(uId, vertex);
+                    dirty = true;
             }
         }
     }
@@ -58,8 +75,11 @@ public class CommentLikeGraph {
     public void handleNewFriendship(long uId1, long uId2) {
         if (graph.hasVertex(uId1) && graph.hasVertex(uId2)){
             graph.addEdge(uId1, uId2);
+            dirty = true;
         }
     }
+
+
 
     /**
      * Getter method for comment variable

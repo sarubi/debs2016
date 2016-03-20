@@ -46,8 +46,6 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             commentStore.updateCommentStore(ts);
             count++;
 
-//                System.out.println(ts);
-
         switch (streamType) {
             case Constants.COMMENTS:
                 long comment_id = (Long) objects[3];
