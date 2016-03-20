@@ -84,7 +84,7 @@ public class CommentStore {
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
-    public void computeKLargestComments(int k, String delimiter, boolean printKComments) {
+    public void computeKLargestComments(int k, String delimiter, boolean printKComments, boolean writeToFile) {
         BufferedWriter writer = null;
         File q2 = new File("q2.txt");
 
@@ -94,21 +94,27 @@ public class CommentStore {
                 if (printKComments){
                     System.out.print(tsTriggeredChange);
                 }
-                writer.write(Long.toString(tsTriggeredChange));
+                if (writeToFile)
+                {
+                    writer.write(Long.toString(tsTriggeredChange));
+                }
 
                 for (String print : previousKcomments) {
                     if (printKComments){
                         System.out.print(delimiter + print);
                     }
 
-                    writer.write(delimiter + print);
+                    if(writeToFile) {
+                        writer.write(delimiter + print);
+                    }
                 }
                 if (printKComments){
                     System.out.println();
                 }
-
-                writer.write("\n");
-                writer.flush();
+                if(writeToFile) {
+                    writer.write("\n");
+                    writer.flush();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,7 +134,7 @@ public class CommentStore {
      * @param k the number of comments
      */
     public void computeKLargestComments(int k) {
-        computeKLargestComments(k, ",", false);
+        computeKLargestComments(k, ",", false , false);
     }
 
     /**
@@ -238,7 +244,6 @@ public class CommentStore {
         if (printComment) {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
-
         if (!commentExists(commentID)) {
 
             graph.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
