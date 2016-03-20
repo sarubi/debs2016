@@ -22,7 +22,7 @@ public class GraphAnalyzer {
     org.graphstream.graph.Graph graph = new SingleGraph("Tutorial 1");
 
     /**
-     * Display the friendship graph
+     * Displays the friendship graph
      *
      */
     public void loadFriendshipGraph(boolean displayWhileLoading, int numberOfEventsToLoad, int updateRate) {
@@ -32,6 +32,7 @@ public class GraphAnalyzer {
         }
 
         int count = 0;
+
         try {
             Splitter splitter = Splitter.on('|');
             BufferedReader br = new BufferedReader(new FileReader("/Users/malithjayasinghe/debs2016/DataSet/data" + "/friendships.dat"), 10 * 1024 * 1024);
