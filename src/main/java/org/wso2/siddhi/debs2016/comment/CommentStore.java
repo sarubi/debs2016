@@ -52,9 +52,11 @@ public class CommentStore {
             long arrivalTime = this.commentStore.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
 
+
             if (duration < lifetime) {
                 it.remove();
             }
+
         }
 //
     }
@@ -79,6 +81,7 @@ public class CommentStore {
     /**
      * print the k largest comments if there is change in the order
      *
+     
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
@@ -139,8 +142,11 @@ public class CommentStore {
     /**
      * Update the K Largest comment arrays
      *
+    
      */
+   
 
+    
 
     private void updateKLargestComments() {
 
@@ -225,6 +231,8 @@ public class CommentStore {
         return flagChange;
     }
 
+
+    
 
 
     /**

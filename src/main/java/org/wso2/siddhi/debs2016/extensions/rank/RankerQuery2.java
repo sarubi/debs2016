@@ -20,6 +20,7 @@ import java.util.List;
  *
  */
 public class RankerQuery2 extends StreamFunctionProcessor {
+    private Graph friendsGraph;
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
