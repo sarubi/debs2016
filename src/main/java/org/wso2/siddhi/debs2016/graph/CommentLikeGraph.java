@@ -45,7 +45,8 @@ public class CommentLikeGraph {
     {
         if(dirty) {
             dirty = false;
-            sizeOfLargestConnectedComponent = Graph.getLargestConnectedComponent(graph);
+            sizeOfLargestConnectedComponent = graph.getLargestConnectedComponent();
+
         }
         return sizeOfLargestConnectedComponent;
     }
@@ -65,6 +66,7 @@ public class CommentLikeGraph {
         }
         dirty = true;
     }
+
 
     /**
      * Handle event of a new friendship in CommentLikeGraph

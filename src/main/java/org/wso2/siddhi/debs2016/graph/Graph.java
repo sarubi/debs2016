@@ -145,23 +145,14 @@ public class Graph {
     }
 
     /**
-     * Get set of vertices
-     *
-     *
-     * @return set of vertices
-     */
-    public Set<Long> getVerticesList(){
-        return graph.keySet();
-    }
-
-    /**
      * Gets the number of vertices of the largest connected component of the graph
      *
      * @return the number of vertices in the largest connected component
      */
-    public static long getLargestConnectedComponent(Graph graph){
+    public long getLargestConnectedComponent(){
         /*Creating the Pegasus Data Structure*/
-        List<Long> list = new ArrayList<Long>(graph.getVerticesList());
+        Set<Long> keySet = graph.keySet();
+        List<Long> list = new ArrayList<Long>(keySet);
         List<Component> componentList = new ArrayList<Component>();
 
         for (int i = 0; i < list.size(); i++) {
@@ -173,7 +164,7 @@ public class Graph {
             changes = 0;
             for(int k = 0;k < componentList.size();k++) {
                 for (int j = 0; j < componentList.size(); j++) {
-                    if (graph.hasEdge(componentList.get(k).getUId(), componentList.get(j).getUId())) {
+                    if (hasEdge(componentList.get(k).getUId(), componentList.get(j).getUId())) {
 
                         if (componentList.get(k).getNId() > componentList.get(j).getNId()) {
                             componentList.get(k).setNId(componentList.get(j).getNId());
@@ -209,6 +200,15 @@ public class Graph {
 
         return largeComponent;
         /*End Calculate Largest Component*/
+    }
+
+    /**
+     * Gets set of verticies
+     *
+     * @return the verticies set
+     */
+    public Set<Long> getVerticesList(){
+        return graph.keySet();
     }
 }
 

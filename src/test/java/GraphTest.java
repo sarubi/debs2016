@@ -103,7 +103,7 @@ public class GraphTest {
         commentLikeGraph.handleNewFriendship(109, 108);
 
 
-        assertEquals(5, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
+        assertEquals(5, commentLikeGraph.getGraph().getLargestConnectedComponent());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class GraphTest {
         commentLikeGraph.handleNewFriendship(112, 108);
         commentLikeGraph.handleNewFriendship(116, 120);
 
-        assertEquals(8, Graph.getLargestConnectedComponent(commentLikeGraph.getGraph()));
+        assertEquals(8, commentLikeGraph.getGraph().getLargestConnectedComponent());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class GraphTest {
         Graph friendshipGraph = new Graph("/usr/wso2/DEBS/data/friendships.dat");
 //        assertEquals(4139,Graph.friendshipGraph.getNumberOfVertices());
 //        assertEquals(63409,Graph.friendshipGraph.getNumberOfEdges());
-        assertEquals(4139,Graph.getLargestConnectedComponent(friendshipGraph));
+        assertEquals(4139, friendshipGraph.getLargestConnectedComponent());
     }
 
 }
