@@ -14,7 +14,7 @@ import java.util.*;
 public class CommentStore {
 
     private long duration;
-    private HashMap<Long, CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
+    private HashMap<Long, CommentLikeGraph> commentStore = new HashMap<Long, CommentLikeGraph>();
     String[] previousKcomments;
     private boolean debug = false;
     private long tsTriggeredChange;
@@ -31,10 +31,11 @@ public class CommentStore {
      */
     public CommentStore(long duration, Graph friendshipGraph, int k) {
         System.out.println("Query 2: version 2");
-        duration = duration;
+        this.duration = duration;
         this.friendshipGraph = friendshipGraph;
         this.k = k;
         kComments = new String[k];
+        previousKcomments = new String[k];
     }
 
     /**
@@ -55,26 +56,7 @@ public class CommentStore {
                 it.remove();
             }
         }
-//        ArrayList<Long> keyListToDelete = new ArrayList<Long>();
 //
-//        for (Long key : this.commentStore.keySet()) {
-//            long arrivalTime = this.commentStore.get(key).getArrivalTime();
-//            long lifetime = time - arrivalTime;
-//
-//            if (debug) {
-//
-//                System.out.println("comment_id = " + commentStore.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
-//            }
-//
-//            if (duration < lifetime) {
-//                keyListToDelete.add(key);
-//            }
-//
-//        }
-//        for (int i = 0; i < keyListToDelete.size(); i++) {
-//            commentStore.remove(keyListToDelete.get(i));
-//        }
-
     }
 
     /**
@@ -97,7 +79,6 @@ public class CommentStore {
     /**
      * print the k largest comments if there is change in the order
      *
-     * @param k the number of comments
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
@@ -107,6 +88,7 @@ public class CommentStore {
 
         try {
             writer = new BufferedWriter(new FileWriter(q2, true));
+            updateKLargestComments();
             if (hasKLargestCommentsChanged()) {
                 if (printKComments){
                     System.out.print(tsTriggeredChange);
@@ -153,7 +135,7 @@ public class CommentStore {
 
         list.clear();
         commentsList.clear();
-        for (CommentLikeGraph commentLikeGraph : graph.values()) {
+        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
             String comment = commentLikeGraph.getComment();
 
@@ -204,7 +186,7 @@ public class CommentStore {
     {
          /*Check if a change has taken place in K largest comments*/
         boolean flagChange = false;
-
+        kComments = new String[k];
         if (list.size() != 0) {
             int limit = (k <= commentsList.size() ? k : commentsList.size());
             for (int i = 0; i < limit; i++) {
@@ -245,7 +227,7 @@ public class CommentStore {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
 
-        graph.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
+        commentStore.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
 
     }
 

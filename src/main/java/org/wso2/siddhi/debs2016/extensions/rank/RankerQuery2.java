@@ -74,7 +74,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
 
             if (ts != -2 && ts != -1){
-                commentStore.computeKLargestComments(k, " : " , false, true);
+                commentStore.computeKLargestComments(" : " , false, true);
                 endiij_timestamp = System.currentTimeMillis();
             }
 
