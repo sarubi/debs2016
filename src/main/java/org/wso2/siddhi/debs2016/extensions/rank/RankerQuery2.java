@@ -25,10 +25,10 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 1000000;
+    private long duration= 900000;
     public  Graph friendshipGraph ;
     private CommentStore commentStore ;
-    private int k = 2;
+    private int k = 1;
     private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
