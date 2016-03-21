@@ -15,7 +15,6 @@ public class CommentLikeGraph {
     private boolean dirty = true;
 
 
-
     /**
      *
      * The constructor
@@ -45,9 +44,8 @@ public class CommentLikeGraph {
     public long getSizeOfLargestConnectedComponent()
     {
         if(dirty) {
-            dirty = true;
+            dirty = false;
             sizeOfLargestConnectedComponent = Graph.getLargestConnectedComponent(graph);
-            return sizeOfLargestConnectedComponent;
         }
         return sizeOfLargestConnectedComponent;
     }
