@@ -45,7 +45,8 @@ public class CommentLikeGraph {
     {
         if(dirty) {
             dirty = false;
-            return sizeOfLargestConnectedComponent = Graph.getLargestConnectedComponent(graph);
+            sizeOfLargestConnectedComponent = Graph.getLargestConnectedComponent(graph);
+            return sizeOfLargestConnectedComponent;
         }
         return sizeOfLargestConnectedComponent;
     }
