@@ -15,6 +15,7 @@ public class CommentLikeGraph {
     private boolean dirty = true;
 
 
+
     /**
      *
      * The constructor
@@ -99,7 +100,6 @@ public class CommentLikeGraph {
      * @return the graph
      */
     public Graph getGraph() {
-
         return graph;
     }
 }

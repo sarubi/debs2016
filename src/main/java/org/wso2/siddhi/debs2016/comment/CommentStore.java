@@ -24,11 +24,11 @@ public class CommentStore {
     /**
      * The constructor
      *
-     * @param d the duration
+     * @param duration the duration
      */
-    public CommentStore(long d, Graph friendshipGraph) {
+    public CommentStore(long duration, Graph friendshipGraph) {
         System.out.println("Query 2: version 2");
-        duration = d;
+        duration = duration;
         this.friendshipGraph = friendshipGraph;
     }
 
@@ -43,16 +43,12 @@ public class CommentStore {
         for (Long key : this.graph.keySet()) {
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
-
             if (debug) {
-
                 System.out.println("comment_id = " + graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
             }
-
             if (duration < lifetime) {
                 keyListToDelete.add(key);
             }
-
         }
         for (int i = 0; i < keyListToDelete.size(); i++) {
             graph.remove(keyListToDelete.get(i));
@@ -198,9 +194,9 @@ public class CommentStore {
             for (int i = 0; i < limit; i++) {
                 kComments[i] = commentsList.get(i);
 
-                if (this.previousKcomments == null) {
+                if (previousKcomments == null) {
                     flagChange = true;
-                } else if (!(kComments[i].equals(this.previousKcomments[i]))) {
+                } else if (!(kComments[i].equals(previousKcomments[i]))) {
                     flagChange = true;
                 }
             }
@@ -219,18 +215,6 @@ public class CommentStore {
     }
 
 
-    /**
-     * Check if the vertex exists
-     *
-     * @param uId the user id
-     * @return true if vertex exists, false otherwise
-     */
-
-    private boolean commentExists(long uId) { /*Check if vertex already present*/
-        boolean flag = false;
-        return graph.containsKey(uId) || flag;
-    }
-
 
     /**
      * Registers a comment in the comment store
@@ -244,10 +228,9 @@ public class CommentStore {
         if (printComment) {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
-        if (!commentExists(commentID)) {
 
-            graph.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
-        }
+        graph.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
+
     }
 
 
