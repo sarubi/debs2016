@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class CommentStoreTest {
     @Test
     public void testUpdateCommentStoreData1(){
-        CommentStore comment = new CommentStore(10, new Graph());
+        CommentStore comment = new CommentStore(10, new Graph(), 1);
         comment.registerComment(101,100,"hi");
         comment.registerComment(102,101,"hi");
         comment.registerComment(103,102,"hi");
@@ -31,7 +31,7 @@ public class CommentStoreTest {
 
     @Test
     public void testUpdateCommentStoreData2(){
-        CommentStore comment = new CommentStore(1, new Graph());
+        CommentStore comment = new CommentStore(1, new Graph() , 1);
         comment.registerComment(101,100,"hi");
         comment.registerComment(102,101,"hi");
         comment.registerComment(103,102,"hi");
@@ -51,7 +51,7 @@ public class CommentStoreTest {
 
 @Test
     public void testGetKLargestComments(){
-        CommentStore theStore = new CommentStore(100, new Graph());
+        CommentStore theStore = new CommentStore(100, new Graph(), 8);
 
         theStore.registerComment(1,100,"Comment One");
         theStore.registerComment(2,101,"Comment Two");
@@ -103,7 +103,7 @@ public class CommentStoreTest {
         theStore.handleNewFriendship(100,105);
         theStore.handleNewFriendship(8,110);
 //        theStore.handleNewFriendship(200,24);
-        theStore.computeKLargestComments(8);
+        theStore.computeKLargestComments(",", false, false);
 //        System.out.println(Arrays.toString(theStore.getKLargestComments(8)));
     }
 }

@@ -75,7 +75,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 break;
         }
 
-            commentStore.computeKLargestComments(k, " : " , false, false);
+            commentStore.computeKLargestComments(" : " , false, false);
             if (ts != -2){
                 endiij_timestamp = System.currentTimeMillis();
             }
@@ -119,7 +119,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
         List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
-        commentStore = new CommentStore(duration, friendshipGraph);
+        commentStore = new CommentStore(duration, friendshipGraph, k);
 
             //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();

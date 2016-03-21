@@ -20,16 +20,22 @@ public class CommentStore {
     private boolean debug = false;
     private long tsTriggeredChange;
     private Graph friendshipGraph;
+    private ArrayList<String> commentsList = new ArrayList<String>();
+    private ArrayList<Long> list = new ArrayList<Long>();
+    private String[] kComments;
+    private int k ;
 
     /**
      * The constructor
      *
      * @param duration the duration
      */
-    public CommentStore(long duration, Graph friendshipGraph) {
+    public CommentStore(long duration, Graph friendshipGraph, int k) {
         System.out.println("Query 2: version 2");
         duration = duration;
         this.friendshipGraph = friendshipGraph;
+        this.k = k;
+        kComments = new String[k];
     }
 
     /**
@@ -76,17 +82,16 @@ public class CommentStore {
     /**
      * print the k largest comments if there is change in the order
      *
-     * @param k the number of comments
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
-    public void computeKLargestComments(int k, String delimiter, boolean printKComments, boolean writeToFile) {
+    public void computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
         BufferedWriter writer = null;
         File q2 = new File("q2.txt");
 
         try {
             writer = new BufferedWriter(new FileWriter(q2, true));
-            if (updateKLargestComments(k)) {
+            if (hasKLargestCommentsChanged()) {
                 if (printKComments){
                     System.out.print(tsTriggeredChange);
                 }
@@ -125,31 +130,16 @@ public class CommentStore {
 
 
     /**
-     * compute the k largest comments if there is change in the order
+     * Update the K Largest comment arrays
      *
-     * @param k the number of comments
      */
-    public void computeKLargestComments(int k) {
-        computeKLargestComments(k, ",", false , false);
-    }
+    private void updateKLargestComments() {
 
-    /**
-     * Update the K Largest Comments
-     *
-     * @param k the number of comments
-     * @return true if K Largest Comments has changed
-     */
-    //TODO Change into two methods
-    private boolean updateKLargestComments(int k) {
-        ArrayList<String> commentsList = new ArrayList<String>();
-        ArrayList<Long> list = new ArrayList<Long>();
-
-        String[] kComments = new String[k];
-
+        list.clear();
+        commentsList.clear();
         for (CommentLikeGraph commentLikeGraph : graph.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnetedComponent();
             String comment = commentLikeGraph.getComment();
-
             /*If this is the first comment, add it to the list*/
             if (list.size() == 0) {
                 list.add(sizeOfComponent);
@@ -169,7 +159,6 @@ public class CommentStore {
                     continue;
                 }
             }
-
             /*Check each element to find correct position*/
             for (int i = 0; i < list.size(); i++) {
                 if (sizeOfComponent == list.get(i)) {
@@ -186,7 +175,16 @@ public class CommentStore {
             }
         }
 
-        /*Check if a change has taken place in K largest comments*/
+    }
+
+    /**
+     * Check if the k largest comments have changed
+     *
+     * @return true if if it has changed false otherwise
+     */
+    private boolean hasKLargestCommentsChanged()
+    {
+         /*Check if a change has taken place in K largest comments*/
         boolean flagChange = false;
 
         if (list.size() != 0) {
