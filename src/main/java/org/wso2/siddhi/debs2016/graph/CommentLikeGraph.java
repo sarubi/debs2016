@@ -63,9 +63,9 @@ public class CommentLikeGraph {
         for (long vertex: verticesList) {
             if (friendshipGraph.hasEdge(uId, vertex)){
                     graph.addEdge(uId, vertex);
-                    dirty = true;
             }
         }
+        dirty = true;
     }
 
     /**

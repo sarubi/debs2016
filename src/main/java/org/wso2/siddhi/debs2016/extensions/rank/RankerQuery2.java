@@ -3,14 +3,12 @@ package org.wso2.siddhi.debs2016.extensions.rank;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
-import org.wso2.siddhi.core.util.timestamp.SystemCurrentTimeMillisTimestampGenerator;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,8 +73,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 break;
         }
 
-            commentStore.computeKLargestComments(" : " , false, false);
-            if (ts != -2){
+            if (ts != -2 && ts != -1){
+                commentStore.computeKLargestComments(k, " : " , false, true);
                 endiij_timestamp = System.currentTimeMillis();
             }
 

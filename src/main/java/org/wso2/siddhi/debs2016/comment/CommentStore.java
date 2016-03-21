@@ -45,10 +45,10 @@ public class CommentStore {
     public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
 
-        for(Iterator<Map.Entry<Long, CommentLikeGraph>> it = this.graph.entrySet().iterator(); it.hasNext(); ) {
+        for(Iterator<Map.Entry<Long, CommentLikeGraph>> it = this.commentStore.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Long, CommentLikeGraph> entry = it.next();
             long key = entry.getKey();
-            long arrivalTime = this.graph.get(key).getArrivalTime();
+            long arrivalTime = this.commentStore.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
 
             if (duration < lifetime) {
@@ -57,13 +57,13 @@ public class CommentStore {
         }
 //        ArrayList<Long> keyListToDelete = new ArrayList<Long>();
 //
-//        for (Long key : this.graph.keySet()) {
-//            long arrivalTime = this.graph.get(key).getArrivalTime();
+//        for (Long key : this.commentStore.keySet()) {
+//            long arrivalTime = this.commentStore.get(key).getArrivalTime();
 //            long lifetime = time - arrivalTime;
 //
 //            if (debug) {
 //
-//                System.out.println("comment_id = " + graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
+//                System.out.println("comment_id = " + commentStore.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
 //            }
 //
 //            if (duration < lifetime) {
@@ -72,7 +72,7 @@ public class CommentStore {
 //
 //        }
 //        for (int i = 0; i < keyListToDelete.size(); i++) {
-//            graph.remove(keyListToDelete.get(i));
+//            commentStore.remove(keyListToDelete.get(i));
 //        }
 
     }
@@ -85,9 +85,9 @@ public class CommentStore {
     public void printCommentStore(Long time) {
 
         System.out.println("number of comments " + getNumberOfComments());
-        for (Long key : graph.keySet()) {
-            String comment = graph.get(key).getComment();
-            Long arrivalTime = graph.get(key).getArrivalTime();
+        for (Long key : commentStore.keySet()) {
+            String comment = commentStore.get(key).getComment();
+            Long arrivalTime = commentStore.get(key).getArrivalTime();
             Long lifeTime = (time - (Long) arrivalTime);
             System.out.println("   comment_id = " + key + ", comment = " + comment + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifeTime + ", Remaining life= " + (duration - lifeTime));
         }
@@ -268,7 +268,7 @@ public class CommentStore {
      * @param commentID the comment id
      */
     public void registerLike(long commentID, long userID) {
-        CommentLikeGraph commentLikeGraph = graph.get(commentID);
+        CommentLikeGraph commentLikeGraph = commentStore.get(commentID);
         if (commentLikeGraph != null) {
             commentLikeGraph.registerLike(userID);
         }
@@ -282,7 +282,7 @@ public class CommentStore {
      * @param uId2 the userID of friend two
      */
     public void handleNewFriendship(long uId1, long uId2) {
-        for (CommentLikeGraph commentLikeGraph : graph.values()) {
+        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             commentLikeGraph.handleNewFriendship(uId1, uId2);
         }
 
@@ -295,7 +295,7 @@ public class CommentStore {
      */
     public long getNumberOfComments() {
 
-        return graph.size();
+        return commentStore.size();
     }
 
 }
