@@ -22,7 +22,6 @@ import java.util.List;
  *
  */
 public class RankerQuery2 extends StreamFunctionProcessor {
-    private Graph friendsGraph;
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
@@ -44,7 +43,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         long ts = (Long) objects[1];
         //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
         int streamType = (Integer) objects[8];
-            commentStore.updateCommentStore(ts);
+            commentStore.cleanCommentStore(ts);
             count++;
 
         switch (streamType) {

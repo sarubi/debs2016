@@ -24,7 +24,7 @@ public class CommentStoreTest {
         comment.registerComment(111,110,"hi");
 
 
-        comment.updateCommentStore(111);
+        comment.cleanCommentStore(111);
         assertEquals(9,comment.getNumberOfComments());
 
     }
@@ -44,7 +44,7 @@ public class CommentStoreTest {
         comment.registerComment(110,109,"hi");
 
 
-        comment.updateCommentStore(111);
+        comment.cleanCommentStore(111);
         assertEquals(0,comment.getNumberOfComments());
 
     }

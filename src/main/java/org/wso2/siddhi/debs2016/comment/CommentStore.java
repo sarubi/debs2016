@@ -4,8 +4,7 @@ import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by malithjayasinghe on 3/8/16.
@@ -15,7 +14,7 @@ import java.util.TreeMap;
 public class CommentStore {
 
     private long duration;
-    private TreeMap<Long, CommentLikeGraph> graph = new TreeMap<Long, CommentLikeGraph>();
+    private HashMap<Long, CommentLikeGraph> graph = new HashMap<Long, CommentLikeGraph>();
     String[] previousKcomments;
     private boolean debug = false;
     private long tsTriggeredChange;
@@ -43,26 +42,38 @@ public class CommentStore {
      *
      * @param time logical time of the new event
      */
-    public void updateCommentStore(long time) {
+    public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
-        ArrayList<Long> keyListToDelete = new ArrayList<Long>();
-        for (Long key : this.graph.keySet()) {
+
+        for(Iterator<Map.Entry<Long, CommentLikeGraph>> it = this.graph.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, CommentLikeGraph> entry = it.next();
+            long key = entry.getKey();
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
 
-            if (debug) {
-
-                System.out.println("comment_id = " + graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
-            }
-
             if (duration < lifetime) {
-                keyListToDelete.add(key);
+                it.remove();
             }
-
         }
-        for (int i = 0; i < keyListToDelete.size(); i++) {
-            graph.remove(keyListToDelete.get(i));
-        }
+//        ArrayList<Long> keyListToDelete = new ArrayList<Long>();
+//
+//        for (Long key : this.graph.keySet()) {
+//            long arrivalTime = this.graph.get(key).getArrivalTime();
+//            long lifetime = time - arrivalTime;
+//
+//            if (debug) {
+//
+//                System.out.println("comment_id = " + graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
+//            }
+//
+//            if (duration < lifetime) {
+//                keyListToDelete.add(key);
+//            }
+//
+//        }
+//        for (int i = 0; i < keyListToDelete.size(); i++) {
+//            graph.remove(keyListToDelete.get(i));
+//        }
 
     }
 
@@ -143,7 +154,7 @@ public class CommentStore {
         list.clear();
         commentsList.clear();
         for (CommentLikeGraph commentLikeGraph : graph.values()) {
-            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnetedComponent();
+            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
             String comment = commentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
