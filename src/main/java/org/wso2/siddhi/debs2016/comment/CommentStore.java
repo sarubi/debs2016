@@ -84,10 +84,17 @@ public class CommentStore {
      */
     public void computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
         BufferedWriter writer = null;
-        File q2 = new File("q2.txt");
+        File q2 = null;
+        if(writeToFile) {
+            q2 = new File("q2.txt");
+        }
 
         try {
-            writer = new BufferedWriter(new FileWriter(q2, true));
+
+
+            if(writeToFile){
+                writer = new BufferedWriter(new FileWriter(q2, true));
+            }
             updateKLargestComments();
             if (hasKLargestCommentsChanged()) {
                 if (printKComments){
@@ -119,9 +126,11 @@ public class CommentStore {
             e.printStackTrace();
         } finally {
             try {
-                writer.close();
+                if(writeToFile) {
+                    writer.close();
+                }
             } catch (IOException e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -131,6 +140,8 @@ public class CommentStore {
      * Update the K Largest comment arrays
      *
      */
+
+
     private void updateKLargestComments() {
 
         list.clear();
@@ -185,6 +196,8 @@ public class CommentStore {
     private boolean hasKLargestCommentsChanged()
     {
          /*Check if a change has taken place in K largest comments*/
+        boolean debug = true;
+
         boolean flagChange = false;
         kComments = new String[k];
         if (list.size() != 0) {

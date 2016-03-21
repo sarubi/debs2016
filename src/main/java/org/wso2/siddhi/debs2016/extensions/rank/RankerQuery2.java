@@ -62,8 +62,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 }else{
                     long user_id_1 = (Long) objects[2];
                     long friendship_user_id_2 = (Long) objects[3];
-                    friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
-                    commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
+                     friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
+                     commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
                     break;
                 }
             case Constants.LIKES:
@@ -74,7 +74,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
 
             if (ts != -2 && ts != -1){
-                commentStore.computeKLargestComments(" : " , false, true);
+               commentStore.computeKLargestComments(" : " , false, false);
                 endiij_timestamp = System.currentTimeMillis();
             }
 
