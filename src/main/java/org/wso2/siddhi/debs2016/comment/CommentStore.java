@@ -27,7 +27,7 @@ public class CommentStore {
      * @param d the duration
      */
     public CommentStore(long d, Graph friendshipGraph) {
-
+        System.out.println("Query 2: version 2");
         duration = d;
         this.friendshipGraph = friendshipGraph;
     }
@@ -151,7 +151,7 @@ public class CommentStore {
         String[] kComments = new String[k];
 
         for (CommentLikeGraph commentLikeGraph : graph.values()) {
-            long sizeOfComponent = Graph.getLargestConnectedComponent(commentLikeGraph.getGraph());
+            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnetedComponent();
             String comment = commentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
