@@ -49,12 +49,16 @@ public class CommentStore {
         for (Long key : this.graph.keySet()) {
             long arrivalTime = this.graph.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
+
             if (debug) {
+
                 System.out.println("comment_id = " + graph.get(key).getComment() + ", time = " + time + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifetime + ", Duration = " + duration);
             }
+
             if (duration < lifetime) {
                 keyListToDelete.add(key);
             }
+
         }
         for (int i = 0; i < keyListToDelete.size(); i++) {
             graph.remove(keyListToDelete.get(i));
@@ -82,6 +86,7 @@ public class CommentStore {
     /**
      * print the k largest comments if there is change in the order
      *
+     * @param k the number of comments
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
@@ -140,6 +145,7 @@ public class CommentStore {
         for (CommentLikeGraph commentLikeGraph : graph.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnetedComponent();
             String comment = commentLikeGraph.getComment();
+
             /*If this is the first comment, add it to the list*/
             if (list.size() == 0) {
                 list.add(sizeOfComponent);
@@ -159,6 +165,7 @@ public class CommentStore {
                     continue;
                 }
             }
+
             /*Check each element to find correct position*/
             for (int i = 0; i < list.size(); i++) {
                 if (sizeOfComponent == list.get(i)) {
