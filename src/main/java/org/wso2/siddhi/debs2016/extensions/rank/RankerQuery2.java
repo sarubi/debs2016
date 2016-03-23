@@ -32,6 +32,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
+    private Long latency = 0L;
+    private Long numberOfOutputs = 0L;
     /**
      * Process the merge stream
      */
@@ -75,7 +77,14 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
 
             if (ts != -2 && ts != -1){
-               commentStore.computeKLargestComments(" : " , false, false);
+                Long endTime = commentStore.computeKLargestComments(" : " , false, false);
+
+                if (endTime != -1L){
+                    latency += (endTime - (Long) objects[0]);
+                    numberOfOutputs++;
+                }
+
+
                 endiij_timestamp = System.currentTimeMillis();
             }
 
@@ -107,6 +116,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             System.out.println("Event count : " + count);
             System.out.println("Total run time : " + timeDifference);
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
+            System.out.println("Total Latency " + latency);
+            System.out.println("Total Outputs " + numberOfOutputs);
+            System.out.println("Average Latency " + latency/numberOfOutputs);
             System.out.flush();
     }
 
