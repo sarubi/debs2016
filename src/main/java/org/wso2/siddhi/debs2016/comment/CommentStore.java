@@ -1,5 +1,7 @@
 package org.wso2.siddhi.debs2016.comment;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
@@ -153,6 +155,9 @@ public class CommentStore {
         commentsList.clear();
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
+            if (sizeOfComponent == 0 ){
+                continue;
+            }
             String comment = commentLikeGraph.getComment();
 
             /*If this is the first comment, add it to the list*/
@@ -230,6 +235,65 @@ public class CommentStore {
         return flagChange;
     }
 
+//    Multimap<Long, String> treeMultimapGlobal = TreeMultimap.create(Comparator.<Long>naturalOrder(), Comparator.<String>naturalOrder());
+//    private void updateKLargestComments() {
+////        list.clear();
+////        commentsList.clear();
+//        Multimap<Long, String> treeMultimap = TreeMultimap.create(Comparator.<Long>naturalOrder(), Comparator.<String>naturalOrder());
+//
+//        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
+//            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
+//            if (sizeOfComponent == 0){
+//                continue;
+//            }
+//            String comment = commentLikeGraph.getComment();
+//
+//            treeMultimap.put(sizeOfComponent, comment);
+//        }
+//        treeMultimapGlobal = treeMultimap;
+//    }
+//
+//    /**
+//     * Check if the k largest comments have changed
+//     *
+//     * @return true if if it has changed false otherwise
+//     */
+//    private boolean hasKLargestCommentsChanged()
+//    {
+//         /*Check if a change has taken place in K largest comments*/
+//        boolean debug = true;
+//
+//        boolean flagChange = false;
+//        kComments = new String[k];
+//        if (treeMultimapGlobal != null) {
+//            int limit = (k <= treeMultimapGlobal.size() ? k : treeMultimapGlobal.size());
+//            int i = 0;
+//            for (String comment: treeMultimapGlobal.values()) {
+//                kComments[i] = comment;
+//
+//                if (previousKcomments == null) {
+//                    flagChange = true;
+//                } else if (!(kComments[i].equals(previousKcomments[i]))) {
+//                    flagChange = true;
+//                }
+//                i++;
+//                if (i == limit){
+//                    break;
+//                }
+//            }
+//
+//            if (limit == treeMultimapGlobal.size()) {
+//                for (int j = treeMultimapGlobal.size(); j < k; j++) {
+//                    kComments[j] = "-";
+//                }
+//            }
+//
+//            if (flagChange) {
+//                previousKcomments = kComments;
+//            }
+//        }
+//        return flagChange;
+//    }
 
     
 

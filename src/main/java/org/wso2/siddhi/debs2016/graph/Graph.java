@@ -151,6 +151,11 @@ public class Graph {
      */
     public long getLargestConnectedComponent(){
         /*Creating the Pegasus Data Structure*/
+
+        if (graph.size() ==  0){
+            return 0L;
+        }
+
         Set<Long> keySet = graph.keySet();
         List<Long> list = new ArrayList<Long>(keySet);
         List<Component> componentList = new ArrayList<Component>();
