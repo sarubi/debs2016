@@ -164,6 +164,10 @@ public class Graph {
      */
     public static long getLargestConnectedComponent(Graph graph){
         /*Creating the Pegasus Data Structure*/
+
+        if (graph.getNumberOfVertices() == 0){
+            return 0L;
+        }
         List<Long> list = new ArrayList<Long>(graph.getVerticesList());
         List<Component> componentList = new ArrayList<Component>();
 

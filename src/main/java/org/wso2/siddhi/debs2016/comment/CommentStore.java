@@ -155,7 +155,9 @@ public class CommentStore {
         for (CommentLikeGraph commentLikeGraph : graph.values()) {
             long sizeOfComponent = Graph.getLargestConnectedComponent(commentLikeGraph.getGraph());
             String comment = commentLikeGraph.getComment();
-
+            if (sizeOfComponent == 0 ){
+                continue;
+            }
             /*If this is the first comment, add it to the list*/
             if (list.size() == 0) {
                 list.add(sizeOfComponent);
