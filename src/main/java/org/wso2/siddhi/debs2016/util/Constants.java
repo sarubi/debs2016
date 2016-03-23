@@ -10,5 +10,7 @@ public class Constants {
     public static final int FRIENDSHIPS = 0;
     public static final int COMMENTS = 1;
     public static final int LIKES = 2;
+    public static final int POSTS = 3;
+    public static final int NOEVENT = 4;
     public static final int EVENT_TIMESTAMP_FIELD = 1;
 }

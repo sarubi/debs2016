@@ -53,7 +53,7 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
 
         boolean firstEvent = true;
         float percentageCompleted = 0;
-        int flag = 3;
+        int flag = Constants.NOEVENT;
 
         while(true){
 

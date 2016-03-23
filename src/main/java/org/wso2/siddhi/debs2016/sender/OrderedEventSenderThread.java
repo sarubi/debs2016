@@ -45,7 +45,7 @@ public class OrderedEventSenderThread extends Thread {
         //final int EVENT_COUNT = Integer.parseInt(Config.getConfigurationInfo("org.wso2.siddhi.debs2015.dataset.size")) - 1;
 
         boolean firstEvent = true;
-        int flag = 3;
+        int flag = Constants.NOEVENT;
 
         while(true){
 
