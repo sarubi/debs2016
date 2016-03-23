@@ -26,9 +26,9 @@ public class CommentStore {
     private String[] kComments;
     private int k ;
     private File q2 ;
-    StringBuilder builder = new StringBuilder();
-    BufferedWriter writer;
-    Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
+    private StringBuilder builder = new StringBuilder();
+    private BufferedWriter writer;
+    private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
 
 
 
@@ -144,98 +144,6 @@ public class CommentStore {
     }
 
 
-//Old Implementation Has been commented
-//    /**
-//     * Update the K Largest comment arrays
-//     *
-//
-//     */
-//
-//    private void updateKLargestComments() {
-//
-//        list.clear();
-//        commentsList.clear();
-//        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-//            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
-//            if (sizeOfComponent == 0 ){
-//                continue;
-//            }
-//            String comment = commentLikeGraph.getComment();
-//
-//            /*If this is the first comment, add it to the list*/
-//            if (list.size() == 0) {
-//                list.add(sizeOfComponent);
-//                commentsList.add(comment);
-//                continue;
-//            }
-//
-//            /*If the element is the smallest, add it to the end*/
-//            if (sizeOfComponent < list.get(list.size() - 1)) {
-//                list.add(list.size(), sizeOfComponent);
-//                commentsList.add(commentsList.size(), comment);
-//                continue;
-//            } else if (sizeOfComponent == list.get(list.size() - 1)) {
-//                if (commentsList.get(commentsList.size() - 1).compareTo(comment) <= 0) { //Lexicographical Ordering of last element
-//                    list.add(list.size(), sizeOfComponent);
-//                    commentsList.add(commentsList.size(), comment);
-//                    continue;
-//                }
-//            }
-//
-//            /*Check each element to find correct position*/
-//            for (int i = 0; i < list.size(); i++) {
-//                if (sizeOfComponent == list.get(i)) {
-//                    if (commentsList.get(i).compareTo(comment) > 0) { //Lexicographical Ordering
-//                        list.add(i, sizeOfComponent);
-//                        commentsList.add(i, comment);
-//                        break;
-//                    }
-//                } else if (sizeOfComponent > list.get(i)) {
-//                    list.add(i, sizeOfComponent);
-//                    commentsList.add(i, comment);
-//                    break;
-//                }
-//            }
-//        }
-//
-//    }
-//
-//    /**
-//     * Check if the k largest comments have changed
-//     *
-//     * @return true if if it has changed false otherwise
-//     */
-//    private boolean hasKLargestCommentsChanged()
-//    {
-//         /*Check if a change has taken place in K largest comments*/
-//        boolean debug = true;
-//
-//        boolean flagChange = false;
-//        kComments = new String[k];
-//        if (list.size() != 0) {
-//            int limit = (k <= commentsList.size() ? k : commentsList.size());
-//            for (int i = 0; i < limit; i++) {
-//                kComments[i] = commentsList.get(i);
-//
-//                if (previousKcomments == null) {
-//                    flagChange = true;
-//                } else if (!(kComments[i].equals(previousKcomments[i]))) {
-//                    flagChange = true;
-//                }
-//            }
-//
-//            if (limit == commentsList.size()) {
-//                for (int i = commentsList.size(); i < k; i++) {
-//                    kComments[i] = "-";
-//                }
-//            }
-//
-//            if (flagChange) {
-//                previousKcomments = kComments;
-//            }
-//        }
-//        return flagChange;
-//    }
 
     /**
      * Update the K Largest comment arrays
@@ -252,6 +160,7 @@ public class CommentStore {
             String comment = commentLikeGraph.getComment();
 
             componentSizeCommentMap.put(sizeOfComponent, comment);
+            componentSizeCommentMap.hashCode();
         }
     }
 

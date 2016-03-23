@@ -89,9 +89,7 @@ public class CommentLikeGraph {
      * @return the comment
      */
     public String getComment() {
-
         return comment;
-
     }
 
     /**
