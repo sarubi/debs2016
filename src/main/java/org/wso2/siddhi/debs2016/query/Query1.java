@@ -5,10 +5,9 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
-import org.wso2.siddhi.debs2016.input.EventSenderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
+import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQuery1;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,7 +46,7 @@ public class Query1 {
                 "insert into postCommentsStream;");
 
         query += ("@info(name = 'query3') from postCommentsStream#debs2016:rankerQuery1(iij_timestamp, ts, post_id, comment_id, comment_replied_id, user_id, user, isPostFlag)  " +
-                "select iij_timestamp, ts, post_id, comment_id, comment_replied_id " +
+                "select result " +
                 "insert into query1OutputStream;");
 
         System.out.println(inStreamDefinition+query);
@@ -57,23 +56,34 @@ public class Query1 {
 
             @Override
             public void receive(Event[] events) {
-                EventPrinter.print(events);
+                //EventPrinter.print(events);
+
             }
         });
 
         System.out.println("Incremental data loading is performed.");
 
+        LinkedBlockingQueue<Object[]> eventBufferList [] = new LinkedBlockingQueue[2];
+        InputHandler inputHandler [] = new InputHandler[2];
+
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Posts
         DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
         InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
-        EventSenderThread senderThreadPosts = new EventSenderThread(dataLoaderThreadPosts.getEventBuffer(), inputHandlerPosts, Integer.MAX_VALUE);
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
         InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
-        EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, Integer.MAX_VALUE);
+
+
+        eventBufferList[0] = dataLoaderThreadPosts.getEventBuffer();
+        eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
+        inputHandler[0] = inputHandlerPosts;
+        inputHandler[1] = inputHandlerComments;
+
+        //EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, Integer.MAX_VALUE);
+        OrderedEventSenderThreadQuery1 orderedEventSenderThread = new OrderedEventSenderThreadQuery1(eventBufferList, inputHandler, Integer.MAX_VALUE);
 
         executionPlanRuntime.start();
 
@@ -82,8 +92,7 @@ public class Query1 {
         dataLoaderThreadComments.start();
 
         //from here onwards we start sending the events
-        senderThreadPosts.start();
-        senderThreadComments.start();
+        orderedEventSenderThread.start();
 
         //Just make the main thread sleep infinitely
         //Note that we cannot have an event based mechanism to exit from this infinit loop. It is
@@ -93,7 +102,7 @@ public class Query1 {
         //terminating once we are done sending the data to the CEP engine.
         while(true){
             try {
-                Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+                Thread.currentThread().sleep(Constants.MAIN_THREAD_SLEEP_TIME);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
