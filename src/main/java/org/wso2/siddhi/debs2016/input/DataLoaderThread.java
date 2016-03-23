@@ -118,7 +118,7 @@ public class DataLoaderThread extends Thread {
                                 post_commented,
                                 Constants.COMMENTS
                         };
-                        System.out.println(eventData);
+//                        System.out.println(eventData);
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
