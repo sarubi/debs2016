@@ -23,6 +23,10 @@ public class CommentStore {
     private ArrayList<Long> list = new ArrayList<Long>();
     private String[] kComments;
     private int k ;
+    private File q2 ;
+    StringBuilder builder = new StringBuilder();
+    BufferedWriter writer;
+
 
     /**
      * The constructor
@@ -36,7 +40,14 @@ public class CommentStore {
         this.k = k;
         kComments = new String[k];
         previousKcomments = new String[k];
+        q2 = new File("q2.txt");
+        try{
+            writer = new BufferedWriter(new FileWriter(q2, true));
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     /**
      * Updates the comment store based on the logical time of a new event
@@ -84,8 +95,9 @@ public class CommentStore {
      
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
+     * @deprecated
      */
-    public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
+    public long computeKLargestCommentsVersio1(String delimiter, boolean printKComments, boolean writeToFile) {
         BufferedWriter writer = null;
         File q2 = null;
         if(writeToFile) {
@@ -141,14 +153,50 @@ public class CommentStore {
     }
 
 
+
+
+
+    /**
+     * print the k largest comments if there is change in the order
+     *
+
+     * @param delimiter the delimiter to printed in between outputs
+     * @param printKComments true would print in terminal. False will not print in terminal
+     */
+    public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
+
+            updateKLargestComments();
+            try {
+                if (hasKLargestCommentsChanged()) {
+                    builder.setLength(0);
+                    builder.append(tsTriggeredChange);
+                    for (String print : previousKcomments) {
+                        builder.append(delimiter + print);
+                    }
+                    builder.append("\n");
+                    if (printKComments) {
+                        System.out.println(builder.toString());
+                    }
+
+                    if (writeToFile) {
+                        writer.write(builder.toString());
+                    }
+                    return System.currentTimeMillis();
+                }
+            }catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        return  -1L;
+    }
+
+
+
     /**
      * Update the K Largest comment arrays
      *
     
      */
-   
-
-    
 
     private void updateKLargestComments() {
 
