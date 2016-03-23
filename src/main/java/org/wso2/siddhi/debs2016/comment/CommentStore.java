@@ -89,72 +89,6 @@ public class CommentStore {
 
     }
 
-    /**
-     * print the k largest comments if there is change in the order
-     *
-     
-     * @param delimiter the delimiter to printed in between outputs
-     * @param printKComments true would print in terminal. False will not print in terminal
-     * @deprecated
-     */
-    public long computeKLargestCommentsVersio1(String delimiter, boolean printKComments, boolean writeToFile) {
-        BufferedWriter writer = null;
-        File q2 = null;
-        if(writeToFile) {
-            q2 = new File("q2.txt");
-        }
-
-        try {
-
-
-            if(writeToFile){
-                writer = new BufferedWriter(new FileWriter(q2, true));
-            }
-            updateKLargestComments();
-            if (hasKLargestCommentsChanged()) {
-                if (printKComments){
-                    System.out.print(tsTriggeredChange);
-                }
-                if (writeToFile)
-                {
-                    writer.write(Long.toString(tsTriggeredChange));
-                }
-
-                for (String print : previousKcomments) {
-                    if (printKComments){
-                        System.out.print(delimiter + print);
-                    }
-
-                    if(writeToFile) {
-                        writer.write(delimiter + print);
-                    }
-                }
-                if (printKComments){
-                    System.out.println();
-                }
-                if(writeToFile) {
-                    writer.write("\n");
-                    writer.flush();
-                }
-                return System.currentTimeMillis();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if(writeToFile) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-      return  -1L;
-    }
-
-
-
-
 
     /**
      * print the k largest comments if there is change in the order
@@ -188,6 +122,21 @@ public class CommentStore {
                 e.printStackTrace();
             }
         return  -1L;
+    }
+
+    /**
+     *
+     * De-allocate resources
+     *
+     */
+    public void destroy(){
+
+        try {
+            writer.close();
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 

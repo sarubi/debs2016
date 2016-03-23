@@ -57,6 +57,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                 if (ts == -2){
                     count--;
                     showFinalStatistics();
+                    commentStore.destroy();
                     break;
                 }else if (ts == -1) {
                     count--;
@@ -77,7 +78,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
 
             if (ts != -2 && ts != -1){
-                Long endTime = commentStore.computeKLargestComments(" : " , false, false);
+                Long endTime = commentStore.computeKLargestComments(" : " , false, true);
 
                 if (endTime != -1L){
                     latency += (endTime - (Long) objects[0]);
@@ -121,6 +122,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             System.out.println("Average Latency " + latency/numberOfOutputs);
             System.out.flush();
     }
+
+
 
 
     @Override
