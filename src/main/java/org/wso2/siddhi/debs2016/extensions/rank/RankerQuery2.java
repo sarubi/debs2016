@@ -128,7 +128,8 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
-            System.out.println("Average Latency " + latency/numberOfOutputs);
+            double averageLatency=(double)latency/numberOfOutputs;
+            System.out.println("Average Latency " +averageLatency );
             System.out.flush();
 
     }
