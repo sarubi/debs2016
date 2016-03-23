@@ -84,7 +84,7 @@ public class CommentStore {
      * @param delimiter the delimiter to printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
      */
-    public void computeKLargestComments(int k, String delimiter, boolean printKComments, boolean writeToFile) {
+    public long computeKLargestComments(int k, String delimiter, boolean printKComments, boolean writeToFile) {
         BufferedWriter writer = null;
         File q2 = new File("q2.txt");
 
@@ -115,6 +115,7 @@ public class CommentStore {
                     writer.write("\n");
                     writer.flush();
                 }
+                return System.currentTimeMillis();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -125,6 +126,7 @@ public class CommentStore {
 
             }
         }
+        return -1L;
     }
 
 
