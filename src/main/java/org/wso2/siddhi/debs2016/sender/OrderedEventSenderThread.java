@@ -2,7 +2,6 @@ package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
-import scala.collection.immutable.Stream;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

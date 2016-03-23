@@ -36,6 +36,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
     @Override
     protected Object[] process(Object[] objects) {
         //iij_timestamp, ts, post_id, -1 as comment_id, -1 as comment_replied_id
+        System.out.println("------>");
         try {
             long iij_timestamp = (Long) objects[0];
             endiij_timestamp = iij_timestamp;
@@ -58,7 +59,7 @@ public class RankerQuery1 extends StreamFunctionProcessor {
                 showFinalStatistics();
                 return new Object[]{""};
             }
-
+            System.out.println("------>>>");
             count++;
 
             //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
