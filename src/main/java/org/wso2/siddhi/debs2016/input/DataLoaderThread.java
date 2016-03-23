@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
+import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -63,7 +64,7 @@ public class DataLoaderThread extends Thread {
                         String post = dataStrIterator.next();
                         user = dataStrIterator.next();
                         eventData = new Object[]{
-                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                0L,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
                                 postsTimeStampLong,
@@ -73,10 +74,11 @@ public class DataLoaderThread extends Thread {
                                 user,
                                 0L,
                                 0L,
-                                3
+                                Constants.POSTS
                         };
                         //System.out.println(count++);
                         eventBufferList.put(eventData);
+                        System.out.println(eventData[0] + "," + eventData[1] + "," + eventData[2] + ",");
                         break;
                     case COMMENTS:
                         //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
@@ -104,7 +106,7 @@ public class DataLoaderThread extends Thread {
                         Long post_commented = Long.parseLong(postCommented);
 
                         eventData = new Object[]{
-                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                0L,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
                                 commentTimeStampLong,
@@ -114,8 +116,9 @@ public class DataLoaderThread extends Thread {
                                 user,
                                 comment_replied,
                                 post_commented,
-                                1
+                                Constants.COMMENTS
                         };
+                        System.out.println(eventData);
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
@@ -128,7 +131,7 @@ public class DataLoaderThread extends Thread {
                             System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + friendshipTimeStampLong + ", user_1_ID = " + user1ID + ", user_2_ID = " + user2ID + "\n");
                         }
                         eventData = new Object[]{
-                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                0L,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
                                 friendshipTimeStampLong,
@@ -138,7 +141,7 @@ public class DataLoaderThread extends Thread {
                                 0L,
                                 0L,
                                 0L,
-                                0
+                                Constants.FRIENDSHIPS
                         };
                         eventBufferList.put(eventData);
                         break;
@@ -152,7 +155,7 @@ public class DataLoaderThread extends Thread {
                             System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + likeTimeStampLong + ", user_id = " + userID + ", comment_ID = " + commentID + "\n");
                         }
                         eventData = new Object[]{
-                                0l,//We need to attach the time when we are injecting an event to the query network.
+                                0L,//We need to attach the time when we are injecting an event to the query network.
                                 // For that we have to set a separate field which will be populated when we are
                                 // injecting an event to the input stream.
                                 likeTimeStampLong,
@@ -162,7 +165,7 @@ public class DataLoaderThread extends Thread {
                                 0L,
                                 0L,
                                 0L,
-                                2,
+                                Constants.LIKES
                         };
                         eventBufferList.put(eventData);
 
