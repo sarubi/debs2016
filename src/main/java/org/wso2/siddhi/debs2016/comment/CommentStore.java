@@ -21,8 +21,6 @@ public class CommentStore {
     private boolean debug = false;
     private long tsTriggeredChange;
     private Graph friendshipGraph;
-    private ArrayList<String> commentsList = new ArrayList<String>();
-    private ArrayList<Long> list = new ArrayList<Long>();
     private String[] kComments;
     private int k ;
     private File q2 ;
