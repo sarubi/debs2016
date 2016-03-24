@@ -65,13 +65,10 @@ public class CommentStore {
             long arrivalTime = this.commentStore.get(key).getArrivalTime();
             long lifetime = time - arrivalTime;
 
-
             if (duration < lifetime) {
                 it.remove();
             }
-
         }
-//
     }
 
     /**

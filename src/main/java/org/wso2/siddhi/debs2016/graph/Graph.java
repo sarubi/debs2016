@@ -1,5 +1,8 @@
 package org.wso2.siddhi.debs2016.graph;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -149,33 +152,33 @@ public class Graph {
      *
      * @return the number of vertices in the largest connected component
      */
-    public long getLargestConnectedComponent(){
+    public long getLargestConnectedComponent() {
         /*Creating the Pegasus Data Structure*/
 
-        if (graph.size() ==  0){
+        if (graph.size() == 0) {
             return 0L;
         }
 
-        Set<Long> keySet = graph.keySet();
-        List<Long> list = new ArrayList<Long>(keySet);
-        List<Component> componentList = new ArrayList<Component>();
+        HashMap<Long, Long> pegasusMap = new HashMap<>();
 
-        for (int i = 0; i < list.size(); i++) {
-                componentList.add(new Component(list.get(i),(long)i));
+        long i = 0;
+        for (Long key : graph.keySet()) {
+            pegasusMap.put(key, i);
+            i++;
         }
 
-        int changes = 1;
-        while(changes != 0){
-            changes = 0;
-            for(int k = 0;k < componentList.size();k++) {
-                for (int j = 0; j < componentList.size(); j++) {
-                    if (hasEdge(componentList.get(k).getUId(), componentList.get(j).getUId())) {
+            int changes = 1;
+            while(changes != 0){
+                changes = 0;
+            for(Long userId: pegasusMap.keySet()) {
+                for (Long referUserId: pegasusMap.keySet()) {
+                    if (hasEdge(userId, referUserId)) {
 
-                        if (componentList.get(k).getNId() > componentList.get(j).getNId()) {
-                            componentList.get(k).setNId(componentList.get(j).getNId());
+                        if (pegasusMap.get(userId) > pegasusMap.get(referUserId)) {
+                            pegasusMap.replace(userId, pegasusMap.get(referUserId));
                             changes++;
-                        } else if (componentList.get(k).getNId() < componentList.get(j).getNId()) {
-                            componentList.get(j).setNId(componentList.get(k).getNId());
+                        } else if (pegasusMap.get(userId) < pegasusMap.get(referUserId)) {
+                            pegasusMap.replace(referUserId, pegasusMap.get(userId));
                             changes++;
                         }
                     }
@@ -186,15 +189,10 @@ public class Graph {
 
         /*Calculate Largest Component*/
         long largeComponent = 0;
-            int count;
-
-            for (int m = 0; m < componentList.size(); m++){
-                count = 1;
-                for (int n = 0; n < componentList.size(); n++){
-                    if (m == n){
-                        continue;
-                    }
-                    if (componentList.get(m).getNId() == componentList.get(n).getNId()){
+            for(Long nodeId: pegasusMap.values()){
+                int count = 0;
+                for(Long referNodeId: pegasusMap.values()){
+                    if (nodeId == referNodeId){
                         count++;
                     }
                 }
@@ -202,10 +200,10 @@ public class Graph {
                     largeComponent = count;
                 }
             }
-
         return largeComponent;
-        /*End Calculate Largest Component*/
     }
+
+        /*End Calculate Largest Component*/
 
     /**
      * Gets set of verticies
