@@ -76,9 +76,7 @@ public class DataLoaderThread extends Thread {
                                 0L,
                                 Constants.POSTS
                         };
-                        //System.out.println(count++);
                         eventBufferList.put(eventData);
-                        System.out.println(eventData[0] + "," + eventData[1] + "," + eventData[2] + ",");
                         break;
                     case COMMENTS:
                         //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
@@ -118,7 +116,6 @@ public class DataLoaderThread extends Thread {
                                 post_commented,
                                 Constants.COMMENTS
                         };
-//                        System.out.println(eventData);
                         eventBufferList.put(eventData);
                         break;
                     case FRIENDSHIPS:
@@ -182,7 +179,6 @@ public class DataLoaderThread extends Thread {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
-
     }
 
     /**

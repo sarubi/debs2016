@@ -33,8 +33,8 @@ public class Query1 {
     public void run(){
         SiddhiManager siddhiManager = new SiddhiManager();
 
-        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user string, comment_replied long, post_commented long);";
+        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string, attr1 long, attr2 long, eventType int);";
+        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user string, comment_replied long, post_commented long, eventType int);";
         inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, user_id long, user string, isPostFlag bool );";
 
         String query = ("@info(name = 'query1') from postsStream " +
@@ -49,7 +49,6 @@ public class Query1 {
                 "select result " +
                 "insert into query1OutputStream;");
 
-        System.out.println(inStreamDefinition+query);
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition+query);
 
         executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {

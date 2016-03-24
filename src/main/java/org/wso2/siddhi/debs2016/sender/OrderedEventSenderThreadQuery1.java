@@ -66,7 +66,10 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                             0L,
                             0L,
                             "",
-                            ""
+                            "",
+                            0L,
+                            0L,
+                            Constants.POSTS
                     };
                     cTime = System.currentTimeMillis();
                     finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
@@ -95,8 +98,8 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                     }else if (flag == Constants.COMMENTS){
                         commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
                     }else{
-                        commentEvent = eventBufferList[Constants.COMMENTS].take();
-                        postEvent = eventBufferList[Constants.POSTS].take();
+                        postEvent = eventBufferList[Constants.POSTS].poll(500, TimeUnit.MILLISECONDS);
+                        commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
                     }
 
                 }catch (Exception ex){
@@ -113,14 +116,12 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                     tsComment = Long.MAX_VALUE;
                 }else{
                     tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
-                    System.out.println("------>cc");
                 }
 
                 if (postEvent == null){
                     tsPost = Long.MAX_VALUE;
                 }else{
                     tsPost = (Long) postEvent[Constants.EVENT_TIMESTAMP_FIELD];
-                    System.out.println("------>pp");
                 }
 
                 if (tsComment < tsPost && tsComment != Long.MAX_VALUE){
@@ -128,9 +129,7 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                     commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
                     inputHandler[Constants.COMMENTS].send(cTime, commentEvent);
                     flag = Constants.COMMENTS;
-                    System.out.println("------>c");
                 }else if (tsPost != Long.MAX_VALUE){
-                    System.out.println("------>p");
                     cTime = System.currentTimeMillis();
                     postEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
                     inputHandler[Constants.POSTS].send(cTime, postEvent);
