@@ -29,7 +29,12 @@ public class Post {
     }
 
 
-
+    /**
+     * Gets the total score of the post at time ts
+     *
+     * @param ts time
+     * @return the total score at time ts
+     */
     public int getScore(long ts)
     {
         return getPostScore(ts) + getCommentsScore(ts);
@@ -60,7 +65,13 @@ public class Post {
             Map.Entry<Long, Comment> entry = it.next();
             long key = entry.getKey();
             Comment comment = commentList.get(key);
-            commentsScore = commentsScore + comment.getScore(ts);
+            int commentScore = comment.getScore(ts);
+            if(commentScore <= 0)
+            {
+                commentList.remove(key);
+            }else {
+                commentsScore = commentsScore + comment.getScore(ts);
+            }
         }
 
         return commentsScore;
