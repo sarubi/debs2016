@@ -16,7 +16,7 @@ public class Post {
     private int score;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>();
-    public static long DURATION =  86400000l;
+
     /**
      * Constructor to create new post
      * @param timeStamp the arrival time of the comment
@@ -46,7 +46,7 @@ public class Post {
      */
     private void updatePostScore(long ts)
     {
-        score = score - (int) ((ts - timeStamp)/DURATION);
+        score = score - (int) ((ts - timeStamp)/CommentPostMap.DURATION);
     }
 
     /**
@@ -65,7 +65,6 @@ public class Post {
         }
 
     }
-
 
 
     /**
