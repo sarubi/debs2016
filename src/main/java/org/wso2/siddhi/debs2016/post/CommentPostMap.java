@@ -30,7 +30,7 @@ public class CommentPostMap {
     public long addCommentToComment(Long commentId, Long parentCommentId){
         long parentPostId = commentToPostMap.get(parentCommentId);
         commentToPostMap.put(commentId, parentPostId);
-        return parentCommentId;
+        return parentPostId;
 
     }
 
