@@ -9,6 +9,7 @@ public class CommentPostMap {
 
     private HashMap<Long, Long> commentToPostMap;
     public static long DURATION =  86400000l;
+    private HashMap<Long, Long> commentToPostMap = new HashMap<>();
 
     /**
      * Adding a comment to a post
@@ -22,9 +23,12 @@ public class CommentPostMap {
     /**
      * Adding a comment to a post
      * @param commentId the comment id
-     * @param parentCommentId the pararent comment id
-     */
-    public void addCommentToComment(Long commentId, Long parentCommentId){
+     * @param parentCommentId the parent comment id
+     * @return ID of the parent post 
+	 */
+    public long addCommentToComment(Long commentId, Long parentCommentId){
+
+        return 1;
 
     }
 
