@@ -18,7 +18,7 @@ public class CommentPostMap {
      * @param postId the post id
      */
     public void addCommentToPost(Long commentId, Long postId){
-
+        commentToPostMap.put(commentId, postId);
     }
 
     /**
@@ -28,8 +28,9 @@ public class CommentPostMap {
      * @return ID of the parent post 
 	 */
     public long addCommentToComment(Long commentId, Long parentCommentId){
-
-        return 1;
+        long parentPostId = commentToPostMap.get(parentCommentId);
+        commentToPostMap.put(commentId, parentPostId);
+        return parentCommentId;
 
     }
 

@@ -82,10 +82,9 @@ public class Post {
      * Adds a new comment to a post
      *
      * @param commentID the commentID
-     * @param comment the comment
      * @param arrivalTime the arrival time
      */
-    public void addComment(Long commentID, String comment, Long arrivalTime)
+    public void addComment(Long commentID, Long arrivalTime)
     {
         commentList.put(commentID, new Comment(arrivalTime));
     }
