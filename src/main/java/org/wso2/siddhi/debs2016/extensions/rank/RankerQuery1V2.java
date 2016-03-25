@@ -5,6 +5,10 @@ import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
 import org.wso2.siddhi.debs2016.input.CommentRecord;
 import org.wso2.siddhi.debs2016.input.PostRecord;
+import org.wso2.siddhi.debs2016.post.CommentPostMap;
+import org.wso2.siddhi.debs2016.post.Post;
+import org.wso2.siddhi.debs2016.post.PostStore;
+import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -21,6 +25,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
     private long count;
     private Date startDateTime;
     long startTime = 0;
+
+    private PostStore postStore;
+    private CommentPostMap commentPostMap;
 
     @Override
     protected Object[] process(Object[] objects) {
@@ -46,19 +53,32 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             }
             count++;
             //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
-            if (isPostFlag == 0) { //This is a new post
-                long post_id = (Long) objects[2];
-                long user_id = (Long) objects[3];
 
-                return new Object[]{""};
+            switch (isPostFlag){
+                case Constants.POSTS:
+                    long post_id = (Long) objects[2];
+                    postStore.addPost(post_id, ts, user_name);
+                    break;
 
-            } else {
-                long user_id = (Long) objects[2];
-                long comment_id = (Long) objects[3];
-                long comment_replied_id = (Long) objects[6];
-                long post_replied_id = (Long) objects[7];
-                return new Object[]{""};
+                case Constants.COMMENTS:
+                    long user_id = (Long) objects[2];
+                    long comment_id = (Long) objects[3];
+                    long comment_replied_id = (Long) objects[6];
+                    long post_replied_id = (Long) objects[7];
+
+                    if (post_replied_id != -1 && comment_replied_id == -1){
+                        Post post = postStore.getPost(post_replied_id);
+                        //TODO: Add the comment to the post object
+                        commentPostMap.addCommentToPost(comment_id, post_replied_id);
+                    } else if (comment_replied_id != -1 && post_replied_id == -1){
+                        long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
+                        Post post = postStore.getPost(parent_post_id);
+                        //TODO: Add the comment to the post object
+                    }
+
+                    break;
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,6 +99,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             System.err.println("Required Parameters : Nine");
             return null;
         }
+
+        postStore = new PostStore();
+        commentPostMap = new CommentPostMap();
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();

@@ -7,7 +7,7 @@ import java.util.HashMap;
  */
 public class PostStore {
 
-    private HashMap<Long, Post> postList;
+    private HashMap<Long, Post> postList = new HashMap<>();
 
     /**
      * Adds a new post to the Store
@@ -17,6 +17,17 @@ public class PostStore {
      */
     public void addPost(Long postId, Long ts, String user_name){
         postList.put(postId, new Post(ts, user_name));
+    }
+
+
+    /**
+     * Get the post details relating to a post ID
+     *
+     * @param postId of post required
+     * @return the Post object related to postId
+     */
+    public Post getPost(Long postId){
+        return postList.get(postId);
     }
 
 }

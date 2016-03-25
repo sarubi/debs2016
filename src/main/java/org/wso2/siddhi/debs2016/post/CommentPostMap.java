@@ -7,7 +7,7 @@ import java.util.HashMap;
  */
 public class CommentPostMap {
 
-    private HashMap<Long, Long> commentToPostMap;
+    private HashMap<Long, Long> commentToPostMap = new HashMap<>();
 
 
     /**
@@ -22,9 +22,12 @@ public class CommentPostMap {
     /**
      * Adding a comment to a post
      * @param commentId the comment id
-     * @param parentCommentId the pararent comment id
-     */
-    public void addCommentToComment(Long commentId, Long parentCommentId){
+     * @param parentCommentId the parent comment id
+     * @return ID of the parent post 
+	 */
+    public long addCommentToComment(Long commentId, Long parentCommentId){
+
+        return 1;
 
     }
 
