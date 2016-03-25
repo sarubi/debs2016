@@ -12,7 +12,7 @@ import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Query1 {
+public class Query1V2 {
     private static LinkedBlockingQueue<Object[]> eventBufferList = null;
     private String dataSetFolder;
 
@@ -22,34 +22,30 @@ public class Query1 {
             return;
         }
 
-        Query1 query1 = new Query1(args);
+        Query1V2 query1 = new Query1V2(args);
         query1.run();
     }
 
-    public Query1(String[] args){
+    public Query1V2(String[] args){
         dataSetFolder = args[0];
     }
 
     public void run(){
         SiddhiManager siddhiManager = new SiddhiManager();
 
-        String inStreamDefinition = "@config(async = 'true')define stream postsStream (iij_timestamp long, ts long, post_id long, user_id long, post string, user string, attr1 long, attr2 long, eventType int);";
-        inStreamDefinition += "@config(async = 'true')define stream commentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user string, comment_replied long, post_commented long, eventType int);";
-        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, post_id long, comment_id long, comment_replied_id long, user_id long, user string, isPostFlag bool );";
+        String inStreamDefinition = "@config(async = 'true')define stream inStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user_name string, comment_replied_id long, post_replied_id long, isPostFlag int);";
+        inStreamDefinition += "@config(async = 'true')define stream postCommentsStream (iij_timestamp long, ts long, user_id long, comment_id long, comment string, user_name string, comment_replied_id long, post_replied_id long, isPostFlag int );";
 
-        String query = ("@info(name = 'query1') from postsStream " +
-                "select iij_timestamp, ts, post_id, -1l as comment_id, -1l as comment_replied_id, user_id, user, true as isPostFlag " +
+        String query = ("@info(name = 'query1') from inStream " +
+                "select iij_timestamp, ts, user_id, comment_id, comment, user_name, comment_replied_id, post_replied_id, isPostFlag " +
                 "insert into postCommentsStream;");
 
-        query += ("@info(name = 'query2') from commentsStream  " +
-                "select iij_timestamp, ts, post_commented as post_id, comment_id, comment_replied as comment_replied_id, user_id, user, false as isPostFlag " +
-                "insert into postCommentsStream;");
-
-        query += ("@info(name = 'query3') from postCommentsStream#debs2016:rankerQuery1(iij_timestamp, ts, post_id, comment_id, comment_replied_id, user_id, user, isPostFlag)  " +
+        query += ("@info(name = 'query2') from postCommentsStream#debs2016:rankerQuery1V2(iij_timestamp, ts, user_id, comment_id, comment, user_name, comment_replied_id, post_replied_id, isPostFlag)  " +
                 "select result " +
                 "insert into query1OutputStream;");
 
-        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition+query);
+        System.out.println(inStreamDefinition + query);
+        ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
 
         executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
 
@@ -63,26 +59,27 @@ public class Query1 {
         System.out.println("Incremental data loading is performed.");
 
         LinkedBlockingQueue<Object[]> eventBufferList [] = new LinkedBlockingQueue[2];
-        InputHandler inputHandler [] = new InputHandler[2];
+        InputHandler inputHandler = executionPlanRuntime.getInputHandler("inStream");
+
 
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Posts
         DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
-        InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
+//        InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
-        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
+//        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
 
 
         eventBufferList[0] = dataLoaderThreadPosts.getEventBuffer();
         eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
-        inputHandler[0] = inputHandlerPosts;
-        inputHandler[1] = inputHandlerComments;
+//        inputHandler[0] = inputHandlerPosts;
+//        inputHandler[1] = inputHandlerComments;
 
         //EventSenderThread senderThreadComments = new EventSenderThread(dataLoaderThreadComments.getEventBuffer(), inputHandlerComments, Integer.MAX_VALUE);
-//        OrderedEventSenderThreadQuery1 orderedEventSenderThread = new OrderedEventSenderThreadQuery1(eventBufferList, inputHandler, Integer.MAX_VALUE);
+        OrderedEventSenderThreadQuery1 orderedEventSenderThread = new OrderedEventSenderThreadQuery1(eventBufferList, inputHandler);
 
         executionPlanRuntime.start();
 
@@ -91,7 +88,7 @@ public class Query1 {
         dataLoaderThreadComments.start();
 
         //from here onwards we start sending the events
-//        orderedEventSenderThread.start();
+        orderedEventSenderThread.start();
 
         //Just make the main thread sleep infinitely
         //Note that we cannot have an event based mechanism to exit from this infinit loop. It is
@@ -102,6 +99,9 @@ public class Query1 {
         while(true){
             try {
                 Thread.currentThread().sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+                if (orderedEventSenderThread.doneFlag){
+                    System.exit(0);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
