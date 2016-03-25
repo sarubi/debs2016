@@ -8,15 +8,7 @@ import org.wso2.siddhi.debs2016.post.CommentPostMap;
 public class Comment {
 
     private long timeStamp;
-    private int score;
 
-    /**
-     * Update score of comment based on current time
-     * @param ts is timestamp of latest event
-     */
-    public void updateScore(Long ts){
-        score = score - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
-    }
 
     /**
      * Constructor to create new comment
@@ -24,25 +16,24 @@ public class Comment {
      */
     public Comment(long ts) {
         this.timeStamp = timeStamp;
-        this.score = 10;
     }
 
     /**
-     * Gets score of the comment
+     * Gets score of the comment at time ts
      *
      * @return the comment score
      */
-    public long getScore()
+    public int getScore(long ts)
     {
-        return score;
+        return CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
     }
 
     /**
      *
      * @return true if the score is zero, false otherwise
      */
-    public boolean isZero()
+    public boolean isLessThanOrEqualToZero(long ts)
     {
-        return score==0;
+        return getScore(ts)<=0;
     }
 }

@@ -29,14 +29,10 @@ public class Post {
     }
 
 
-    /**
-     * Update score of post based on current time
-     * @param ts the time stamp
-     */
-    public void updateScore(Long ts){
-        updatePostScore(ts);
-        updateComments(ts);
 
+    public int getScore(long ts)
+    {
+        return getPostScore(ts) + getCommentsScore(ts);
     }
 
     /**
@@ -44,26 +40,30 @@ public class Post {
      *
      * @param ts the update time
      */
-    private void updatePostScore(long ts)
+    private int getPostScore(long ts)
     {
-        score = score - (int) ((ts - timeStamp)/CommentPostMap.DURATION);
+        return CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/CommentPostMap.DURATION);
     }
 
+
     /**
-     * Update post comment
+     * Gets to score of all comments at time ts
      *
-     * @param ts the updat time
+     * @param ts the time
+     * @return the score of all comments at time ts
      */
-    private void updateComments(long ts)
+    private int getCommentsScore(long ts)
     {
+        int commentsScore = 0;
+
         for(Iterator<Map.Entry<Long, Comment>> it = commentList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Comment> entry = it.next();
             long key = entry.getKey();
             Comment comment = commentList.get(key);
-            comment.updateScore(ts);
-            //TODO: if score is 0 then delete the comment from post
+            commentsScore = commentsScore + comment.getScore(ts);
         }
 
+        return commentsScore;
     }
 
 
