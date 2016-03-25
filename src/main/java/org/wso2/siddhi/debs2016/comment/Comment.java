@@ -28,12 +28,5 @@ public class Comment {
         return CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
     }
 
-    /**
-     *
-     * @return true if the score is zero, false otherwise
-     */
-    public boolean isLessThanOrEqualToZero(long ts)
-    {
-        return getScore(ts)<=0;
-    }
+
 }

@@ -70,7 +70,7 @@ public class Post {
             {
                 commentList.remove(key);
             }else {
-                commentsScore = commentsScore + comment.getScore(ts);
+                commentsScore = commentsScore + commentScore;
             }
         }
 
