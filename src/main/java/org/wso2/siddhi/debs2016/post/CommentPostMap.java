@@ -12,8 +12,8 @@ public class CommentPostMap {
 
     /**
      * Adding a comment to a post
-     * @param commentId
-     * @param postId
+     * @param commentId the comment id
+     * @param postId the post id
      */
     public void addCommentToPost(Long commentId, Long postId){
 
@@ -21,8 +21,8 @@ public class CommentPostMap {
 
     /**
      * Adding a comment to a post
-     * @param commentId
-     * @param parentCommentId
+     * @param commentId the comment id
+     * @param parentCommentId the pararent comment id
      */
     public void addCommentToComment(Long commentId, Long parentCommentId){
 
