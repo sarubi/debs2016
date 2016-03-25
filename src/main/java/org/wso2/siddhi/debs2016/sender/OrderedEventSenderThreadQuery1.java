@@ -14,9 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQuery1 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
-    private InputHandler inputHandler [];
+    private InputHandler inputHandler;
     private Date startDateTime;
-    private long EVENT_COUNT;
     public boolean doneFlag = false;
 
 
@@ -25,13 +24,11 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
      *
      * @param eventBuffer the event buffer array
      * @param inputHandler the input handler array
-     * @param eventCount the event count
      */
-    public OrderedEventSenderThreadQuery1(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler[], long eventCount){
+    public OrderedEventSenderThreadQuery1(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler){
         super("Event Sender");
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;
-        this.EVENT_COUNT = eventCount;
     }
 
 
@@ -60,7 +57,7 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
             try {
                 //Send dummy event to mark the commencement of processing
                 if(firstEvent){
-                    Object[] finalPostEvent = new Object[]{
+                    Object[] firstPostEvent = new Object[]{
                             0L,
                             -1L,
                             0L,
@@ -72,8 +69,8 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                             Constants.POSTS
                     };
                     cTime = System.currentTimeMillis();
-                    finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
-                    inputHandler[Constants.POSTS].send(cTime, finalPostEvent);
+                    firstPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
+                    inputHandler.send(cTime, firstPostEvent);
 
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
                     startDateTime = new Date();
@@ -94,21 +91,19 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
 //                    }
 
                     if (flag == Constants.POSTS){
-                        postEvent = eventBufferList[Constants.POSTS].poll(500, TimeUnit.MILLISECONDS);
+                        postEvent = eventBufferList[Constants.POSTS].poll(1000, TimeUnit.MILLISECONDS);
                     }else if (flag == Constants.COMMENTS){
-                        commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
+                        commentEvent = eventBufferList[Constants.COMMENTS].poll(1000, TimeUnit.MILLISECONDS);
                     }else{
-                        postEvent = eventBufferList[Constants.POSTS].poll(500, TimeUnit.MILLISECONDS);
-                        commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
+                        postEvent = eventBufferList[Constants.POSTS].poll(1000, TimeUnit.MILLISECONDS);
+                        commentEvent = eventBufferList[Constants.COMMENTS].poll(1000, TimeUnit.MILLISECONDS);
                     }
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
 
-                long tsFriendship;
                 long tsComment;
-                long tsLike;
                 long tsPost;
 
                 //handling the instance where the stream of a buffer has no more events
@@ -127,12 +122,12 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                 if (tsComment < tsPost && tsComment != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                    inputHandler[Constants.COMMENTS].send(cTime, commentEvent);
+                    inputHandler.send(cTime, commentEvent);
                     flag = Constants.COMMENTS;
                 }else if (tsPost != Long.MAX_VALUE){
                     cTime = System.currentTimeMillis();
                     postEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                    inputHandler[Constants.POSTS].send(cTime, postEvent);
+                    inputHandler.send(cTime, postEvent);
                     flag = Constants.POSTS;
                 }
 
@@ -149,12 +144,15 @@ public class OrderedEventSenderThreadQuery1 extends Thread {
                                 0L,
                                 0L,
                                 "",
-                                ""
+                                "",
+                                0L,
+                                0L,
+                                Constants.POSTS
                         };
 
                         finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
                         Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
-                        inputHandler[Constants.POSTS].send(cTime, finalPostEvent);
+                        inputHandler.send(cTime, finalPostEvent);
 
                         doneFlag = true;
                         break;
