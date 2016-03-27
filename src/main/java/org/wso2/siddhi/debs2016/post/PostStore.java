@@ -33,6 +33,8 @@ public class PostStore {
      */
     public void addComment(long postID, long commentID, long ts)
     {
+
+        //TODO Do we need to check if the post exists before adding the comment to it?
         getPost(postID).addComment(commentID, ts);
     }
 
@@ -69,12 +71,12 @@ public class PostStore {
     }
 
     /**
-     * print the top 3 posts
+     * Gets the post store map (written to support unit testing)
      *
      */
-    public void printTop3Posts()
+    public TreeMultimap<Long, Post>   PostStoreMap()
     {
-
+        return postList;
     }
 
     /**
@@ -85,18 +87,31 @@ public class PostStore {
     {
 
         @Override
-        public int compare(Post s1, Post s2) {
-            int score1 =  s1.getScore();
-            int score2 = s2.getScore();
-            if (score1 >= score2) {
-                return score1;
-            } else {
-                return score2;
-            }
+        public int compare(Post post1, Post post2) {
+            int score1 = post1.getScore();
+            int score2 = post2.getScore();
+            if (score1 > score2) {
+                return 1;
 
+            } else if (score2 > score1) {
+                return -1;
+
+            } else {
+
+                if(post1.getArrivalTime() < post2.getArrivalTime())
+                {
+                    return 1;
+                }else if (post2.getArrivalTime() < post1.getArrivalTime())
+                {
+                    return -1;
+                }else
+                {
+                    //TODO: check the arrival time of comments
+                    return 0;
+
+                }
+            }
         }
     }
-
-
 
 }

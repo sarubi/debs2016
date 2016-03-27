@@ -1,9 +1,7 @@
 package org.wso2.siddhi.debs2016.post;
 
 import org.wso2.siddhi.debs2016.comment.Comment;
-import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,7 +11,7 @@ import java.util.Map;
  */
 public class Post {
 
-    private long timeStamp ;
+    private long arrivalTime;
     private int score;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>();
@@ -24,15 +22,19 @@ public class Post {
      * @param userName the name of the user you created the comment
      */
     public Post(long timeStamp, String userName) {
-        this.timeStamp = timeStamp;
+        this.arrivalTime = timeStamp;
         this.userName = userName;
         this.score = 10;
     }
 
 
-
-    public int update (long ts)
-    {
+    /**
+     * Update the post store
+     *
+     * @param ts the update time
+     * @return the total score of the post at time ts
+     */
+    public int update (long ts) {
         score = getPostScore(ts) + getCommentsScore(ts);
         return score;
     }
@@ -43,9 +45,9 @@ public class Post {
      *
      * @return the total score at time ts
      */
-    public int getScore()
-    {
+    public int getScore() {
         return score;
+
     }
 
     /**
@@ -53,9 +55,8 @@ public class Post {
      *
      * @param ts the update time
      */
-    private int getPostScore(long ts)
-    {
-        return CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/CommentPostMap.DURATION);
+    private int getPostScore(long ts) {
+        return CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/CommentPostMap.DURATION);
     }
 
 
@@ -75,7 +76,6 @@ public class Post {
             Comment comment = commentList.get(key);
             int commentScore = comment.getScore(ts);
             commentsScore = commentsScore + comment.getScore(ts);
-
         }
 
         return commentsScore;
@@ -94,17 +94,18 @@ public class Post {
         score = score + 10;
     }
 
+
     /**
      *
-     * @param obj1
-     * @param obj2
-     * @return
+     * The arrival time of the post
+     *
      */
-    public int compare(Post obj1, Post obj2) {
+    public long getArrivalTime()
+    {
 
-        int post1Score = obj1.getScore();
-        int post2Score = obj2.getScore();
-
-        return 0;
+        return arrivalTime;
     }
+
+
+
 }
