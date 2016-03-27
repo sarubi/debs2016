@@ -3,6 +3,7 @@ package org.wso2.siddhi.debs2016.post;
 import org.wso2.siddhi.debs2016.comment.Comment;
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,15 +30,22 @@ public class Post {
     }
 
 
+
+    public int update (long ts)
+    {
+        score = getPostScore(ts) + getCommentsScore(ts);
+        return score;
+    }
+
+
     /**
      * Gets the total score of the post at time ts
      *
-     * @param ts time
      * @return the total score at time ts
      */
-    public int getScore(long ts)
+    public int getScore()
     {
-        return getPostScore(ts) + getCommentsScore(ts);
+        return score;
     }
 
     /**
@@ -66,12 +74,8 @@ public class Post {
             long key = entry.getKey();
             Comment comment = commentList.get(key);
             int commentScore = comment.getScore(ts);
-            if(commentScore <= 0)
-            {
-                commentList.remove(key);
-            }else {
-                commentsScore = commentsScore + commentScore;
-            }
+            commentsScore = commentsScore + comment.getScore(ts);
+
         }
 
         return commentsScore;
@@ -87,5 +91,20 @@ public class Post {
     public void addComment(Long commentID, Long arrivalTime)
     {
         commentList.put(commentID, new Comment(arrivalTime));
+        score = score + 10;
+    }
+
+    /**
+     *
+     * @param obj1
+     * @param obj2
+     * @return
+     */
+    public int compare(Post obj1, Post obj2) {
+
+        int post1Score = obj1.getScore();
+        int post2Score = obj2.getScore();
+
+        return 0;
     }
 }

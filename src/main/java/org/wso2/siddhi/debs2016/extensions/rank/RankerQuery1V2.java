@@ -54,7 +54,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             count++;
             //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
 
-
+            postStore.update(ts);
             switch (isPostFlag){
                 case Constants.POSTS:
                     long post_id = (Long) objects[2];
@@ -67,12 +67,11 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     long post_replied_id = (Long) objects[7];
 
                     if (post_replied_id != -1 && comment_replied_id == -1){
-                        postStore.getPost(post_replied_id).addComment(comment_id, ts);
+                        postStore.addComment(post_replied_id, comment_id, ts);
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
                         long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
-                        postStore.getPost(parent_post_id).addComment(comment_id,ts);
-
+                        postStore.addComment(parent_post_id, comment_id, ts);
                     }
 
                     break;

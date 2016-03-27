@@ -25,7 +25,9 @@ public class Comment {
      */
     public int getScore(long ts)
     {
-        return CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
+
+        int score = CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
+        return score> 0 ? score: 0;
     }
 
 
