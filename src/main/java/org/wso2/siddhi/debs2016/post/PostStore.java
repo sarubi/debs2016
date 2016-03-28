@@ -1,10 +1,8 @@
 package org.wso2.siddhi.debs2016.post;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.*;
 import org.wso2.siddhi.debs2016.comment.Comment;
+import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 
 import java.util.*;
 
@@ -13,7 +11,8 @@ import java.util.*;
  */
 public class PostStore {
 
-    private TreeMultimap<Long, Post> postList  = TreeMultimap.create(Ordering.arbitrary(), new PostScoreComparator());;
+    private HashMap<Long, Post> postList  = new HashMap<Long, Post> ();
+
 
     /**
      * Adds a new post to the Store
@@ -45,7 +44,7 @@ public class PostStore {
      * @return the Post object related to postId
      */
     public Post getPost(Long postId){
-        return postList.get(postId).first();
+        return postList.get(postId);
     }
 
     /**
@@ -59,9 +58,11 @@ public class PostStore {
         long key ;
         Post post ;
         int score ;
-        for(Map.Entry<Long, Post> e : postList.entries()) {
-            key = e.getKey();
-            post = e.getValue();
+
+        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, Post> entry = it.next();
+            key = entry.getKey();
+            post = entry.getValue();
             score = post.update(ts);
             if (score <= 0)
             {
@@ -70,48 +71,14 @@ public class PostStore {
         }
     }
 
-    /**
-     * Gets the post store map (written to support unit testing)
-     *
-     */
-    public TreeMultimap<Long, Post>   PostStoreMap()
-    {
-        return postList;
-    }
 
-    /**
-     * The comparator for comparing post scores
-     *
-     */
-    public class PostScoreComparator implements Comparator<Post>
+    public void printTopPosts ()
     {
 
-        @Override
-        public int compare(Post post1, Post post2) {
-            int score1 = post1.getScore();
-            int score2 = post2.getScore();
-            if (score1 > score2) {
-                return 1;
 
-            } else if (score2 > score1) {
-                return -1;
-
-            } else {
-
-                if(post1.getArrivalTime() < post2.getArrivalTime())
-                {
-                    return 1;
-                }else if (post2.getArrivalTime() < post1.getArrivalTime())
-                {
-                    return -1;
-                }else
-                {
-                    //TODO: check the arrival time of comments
-                    return 0;
-
-                }
-            }
-        }
     }
+
+
+
 
 }

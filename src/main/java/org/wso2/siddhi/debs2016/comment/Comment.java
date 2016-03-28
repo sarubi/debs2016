@@ -7,7 +7,7 @@ import org.wso2.siddhi.debs2016.post.CommentPostMap;
  */
 public class Comment {
 
-    private long timeStamp;
+    private long arrivalTime;
 
 
     /**
@@ -15,7 +15,7 @@ public class Comment {
      * @param ts is timestamp of comment
      */
     public Comment(long ts) {
-        this.timeStamp = timeStamp;
+        this.arrivalTime = arrivalTime;
     }
 
     /**
@@ -26,8 +26,18 @@ public class Comment {
     public int getScore(long ts)
     {
 
-        int score = CommentPostMap.INITIAL_SCORE - (int) ((ts - timeStamp)/ CommentPostMap.DURATION);
+        int score = CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/ CommentPostMap.DURATION);
         return score> 0 ? score: 0;
+    }
+
+    /**
+     * Gets the arrival time of the comment
+     *
+     * @return the arrival time
+     */
+    public long getArrivalTime()
+    {
+        return arrivalTime;
     }
 
 

@@ -2,9 +2,11 @@ package org.wso2.siddhi.debs2016.post;
 
 import org.wso2.siddhi.debs2016.comment.Comment;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Created by malithjayasinghe on 3/25/16.
@@ -27,6 +29,15 @@ public class Post {
         this.score = 10;
     }
 
+    /**
+     * Get the name of the user who created the post
+     *
+     * @return the user name
+     */
+    public String getUserName()
+    {
+        return userName;
+    }
 
     /**
      * Update the post store
@@ -102,8 +113,21 @@ public class Post {
      */
     public long getArrivalTime()
     {
-
         return arrivalTime;
+    }
+
+
+
+    /**
+     * Gets the comment from the comment id (added to support unit testing)
+     *
+     * @param commentID the comment id
+     * @return the comment whose comment id = commentID
+     */
+    public Comment getComment(long commentID)
+    {
+        return commentList.get(commentID);
+
     }
 
 
