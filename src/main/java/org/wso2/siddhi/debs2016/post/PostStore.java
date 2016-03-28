@@ -85,7 +85,7 @@ public class PostStore {
         int i = 0;
         boolean changeFlag = false;
         for (Long topPosts: postRanking.values()) {
-            if (topThree == null || topThree[i] != topPosts){
+            if (topThree[i] == null || !((topThree[i]).equals(topPosts))){
                 changeFlag = true;
                 topThree[i] = topPosts;
             }
@@ -96,7 +96,7 @@ public class PostStore {
             }
         }
         for (int j = i; j < 3; j++){
-            if (topThree[j] == null || topThree[j] != 0L){
+            if (topThree[j] == null || !(topThree[j]).equals(0L)){
                 changeFlag = true;
                 topThree[j] = 0L;
             }

@@ -71,6 +71,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         Post post = postStore.getPost(post_replied_id);
                         if (post != null){
                             post.addComment(comment_id, ts, commenter_id);
+                            int postScore = post.getScore();
+//                            postRanking.remove(postScore - 10, post_replied_id);
+//                            postRanking.put(((long) postScore), post_replied_id);
                         }
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
@@ -78,6 +81,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         Post post = postStore.getPost(parent_post_id);
                         if (post != null){
                             post.addComment(comment_id, ts, commenter_id);
+                            int postScore = post.getScore();
+//                            postRanking.remove(postScore - 10, parent_post_id);
+//                            postRanking.put(((long) postScore), parent_post_id);
                         }
                     }
 
