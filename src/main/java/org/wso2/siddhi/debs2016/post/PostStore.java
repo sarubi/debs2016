@@ -13,8 +13,8 @@ import java.util.*;
  */
 public class PostStore {
 
-    private HashMap<Long, Post> postList  = new HashMap<Long, Post> ();
-    private TreeMultimap<Long, Long> postRanking = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder());
+    private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
+    private TreeMultimap<Long, Post> postRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
     private Long[] topThree = new Long[3];
 
     /**
@@ -24,7 +24,7 @@ public class PostStore {
      * @param userName of person who posted
      */
     public void addPost(Long postId, Long ts, String userName){
-        postList.put(postId, new Post(ts, userName));
+        postList.put(postId, new Post(ts, userName, postId));
     }
 
     /**
@@ -37,29 +37,29 @@ public class PostStore {
         return postList.get(postId);
     }
 
-    /**
-     * Update post store
-     *
-     * @param ts time ts
-     */
-    public void update(long ts) {
-
-        int commentsScore = 0;
-        long key ;
-        Post post ;
-        int score ;
-
-        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Long, Post> entry = it.next();
-            key = entry.getKey();
-            post = entry.getValue();
-            score = post.update(ts);
-            if (score <= 0)
-            {
-                it.remove();
-            }
-        }
-    }
+//    /**
+//     * Update post store
+//     *
+//     * @param ts time ts
+//     */
+//    public void update(long ts) {
+//
+//        int commentsScore = 0;
+//        long key ;
+//        Post post ;
+//        int score ;
+//
+//        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext(); ) {
+//            Map.Entry<Long, Post> entry = it.next();
+//            key = entry.getKey();
+//            post = entry.getValue();
+//            score = post.update(ts);
+//            if (score < 0)
+//            {
+//                it.remove();
+//            }
+//        }
+//    }
 
 
     public void printTopPosts ()
@@ -77,20 +77,25 @@ public class PostStore {
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
             long postId = entry.getKey();
-            long postScore = entry.getValue().getScore();
-                postRanking.put(postScore, postId);
+            Post post = postList.get(postId);
+            long postScore = post.update(ts);
+            if (postScore <= 0){
+                it.remove();
+            }else{
+                postRanking.put(postScore, post);
+            }
         }
 
 
         int i = 0;
         boolean changeFlag = false;
-        for (Long topPosts: postRanking.values()) {
-            if (topThree[i] == null || !((topThree[i]).equals(topPosts))){
+        for (Post topPosts: postRanking.values()) {
+            long postId = topPosts.getPostId();
+            if (topThree[i] == null || !((topThree[i]).equals(postId))){
                 changeFlag = true;
-                topThree[i] = topPosts;
+                topThree[i] = postId;
             }
             i++;
-//                System.out.print(postStore.getPost(topPosts).getUserName() + " | ");
             if (i == 3){
                 break;
             }
@@ -101,7 +106,7 @@ public class PostStore {
                 topThree[j] = 0L;
             }
         }
-//            System.out.println();
+
         if (changeFlag){
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             df.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -126,4 +131,30 @@ public class PostStore {
     }
 
 
+}
+
+class PostComparator implements Comparator<Post>{
+
+    @Override
+    public int compare(Post post_1, Post post_2) {
+        Long ts_1 = post_1.getArrivalTime();
+        Long ts_2 = post_2.getArrivalTime();
+
+        if (ts_1 > ts_2){
+            return 1;
+        } else if (ts_1 < ts_2){
+            return -1;
+        } else {
+
+            Long ts_comment_1 = post_1.getLatestCommentTime();
+            Long ts_comment_2 = post_2.getLatestCommentTime();
+
+            if (ts_comment_1 > ts_comment_2){
+                return 1;
+            }else if (ts_comment_1 < ts_comment_2){
+                return -1;
+            }
+        }
+        return 1;
+    }
 }

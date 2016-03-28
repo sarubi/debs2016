@@ -15,10 +15,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Query1V2 {
     private static LinkedBlockingQueue<Object[]> eventBufferList = null;
     private String dataSetFolder;
+    private String postsFile;
+    private String commentsFile;
 
     public static void main(String[] args){
-        if(args.length != 1){
-            System.err.println("Usage java org.wso2.siddhi.debs2016.query.Query1 <full path to data set folder>");
+        if(args.length != 2){
+            System.err.println("Usage java org.wso2.siddhi.debs2016.query.Query1V2 Expected Args: <Path to posts.dat, Path to comments.dat>");
             return;
         }
 
@@ -27,7 +29,9 @@ public class Query1V2 {
     }
 
     public Query1V2(String[] args){
-        dataSetFolder = args[0];
+//        dataSetFolder = args[0];
+        postsFile = args[0];
+        commentsFile = args[1];
     }
 
     public void run(){
@@ -47,14 +51,14 @@ public class Query1V2 {
         System.out.println(inStreamDefinition + query);
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
 
-        executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
-
-            @Override
-            public void receive(Event[] events) {
-                //EventPrinter.print(events);
-
-            }
-        });
+//        executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
+//
+//            @Override
+//            public void receive(Event[] events) {
+//                //EventPrinter.print(events);
+//
+//            }
+//        });
 
         System.out.println("Incremental data loading is performed.");
 
@@ -64,12 +68,12 @@ public class Query1V2 {
 
         LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Posts
-        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(dataSetFolder + "/posts.dat", eventBufferListPosts, FileType.POSTS);
+        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, eventBufferListPosts, FileType.POSTS);
 //        InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
 
         //Comments
         LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(dataSetFolder + "/comments.dat", eventBufferListComments, FileType.COMMENTS);
+        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, eventBufferListComments, FileType.COMMENTS);
 //        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
 
 

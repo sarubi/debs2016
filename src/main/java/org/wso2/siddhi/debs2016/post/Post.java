@@ -4,6 +4,7 @@ import org.wso2.siddhi.debs2016.comment.Comment;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by malithjayasinghe on 3/25/16.
@@ -11,6 +12,13 @@ import java.util.concurrent.Callable;
 public class Post {
 
     private long arrivalTime;
+    private long latestCommentTime;
+    private long postId;
+
+    public long getPostId() {
+        return postId;
+    }
+
     private int score;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
@@ -21,10 +29,11 @@ public class Post {
      * @param timeStamp the arrival time of the comment
      * @param userName the name of the user you created the comment
      */
-    public Post(long timeStamp, String userName) {
+    public Post(long timeStamp, String userName, Long postId) {
         this.arrivalTime = timeStamp;
         this.userName = userName;
         this.score = 10;
+        this.postId = postId;
     }
 
     /**
@@ -101,6 +110,7 @@ public class Post {
     {
         commentList.put(commentID, new Comment(arrivalTime));
         commenters.add(userID);
+        latestCommentTime = arrivalTime;
         score = score + 10;
     }
 
@@ -129,8 +139,22 @@ public class Post {
 
     }
 
+    /**
+     * Calculate number of users who have commented on a post
+     *
+     * @return number of commenters
+     */
     public int getNumberOfCommenters(){
         return  commenters.size();
+    }
+
+    /**
+     * Return the timestamp of the latest comment that arrived
+     *
+     * @return
+     */
+    public long getLatestCommentTime() {
+        return latestCommentTime;
     }
 
 }
