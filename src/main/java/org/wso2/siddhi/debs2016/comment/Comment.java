@@ -15,7 +15,7 @@ public class Comment {
      * @param ts is timestamp of comment
      */
     public Comment(long ts) {
-        this.arrivalTime = arrivalTime;
+        this.arrivalTime = ts;
     }
 
     /**
