@@ -65,18 +65,26 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     long comment_id = (Long) objects[3];
                     long comment_replied_id = (Long) objects[6];
                     long post_replied_id = (Long) objects[7];
+                    long commenter_id = (Long) objects[2];
 
                     if (post_replied_id != -1 && comment_replied_id == -1){
-                        postStore.addComment(post_replied_id, comment_id, ts);
+                        Post post = postStore.getPost(post_replied_id);
+                        if (post != null){
+                            post.addComment(comment_id, ts, commenter_id);
+                        }
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
                         long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
-                        postStore.addComment(parent_post_id, comment_id, ts);
+                        Post post = postStore.getPost(parent_post_id);
+                        if (post != null){
+                            post.addComment(comment_id, ts, commenter_id);
+                        }
                     }
 
                     break;
             }
 
+            postStore.printTopThreePosts(ts);
 
         } catch (Exception e) {
             e.printStackTrace();

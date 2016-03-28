@@ -2,10 +2,7 @@ package org.wso2.siddhi.debs2016.post;
 
 import org.wso2.siddhi.debs2016.comment.Comment;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -16,7 +13,8 @@ public class Post {
     private long arrivalTime;
     private int score;
     private String userName;
-    private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>();
+    private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
+    private Set<Long> commenters = new HashSet<Long>();
 
     /**
      * Constructor to create new post
@@ -99,9 +97,10 @@ public class Post {
      * @param commentID the commentID
      * @param arrivalTime the arrival time
      */
-    public void addComment(Long commentID, Long arrivalTime)
+    public void addComment(Long commentID, Long arrivalTime, Long userID)
     {
         commentList.put(commentID, new Comment(arrivalTime));
+        commenters.add(userID);
         score = score + 10;
     }
 
@@ -130,6 +129,8 @@ public class Post {
 
     }
 
-
+    public int getNumberOfCommenters(){
+        return  commenters.size();
+    }
 
 }
