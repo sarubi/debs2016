@@ -23,7 +23,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 1000000;
+    private long duration= 7200000;
     public  Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 2;

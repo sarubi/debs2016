@@ -6,6 +6,8 @@ import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -102,7 +104,10 @@ public class CommentStore {
             try {
                 if (hasKLargestCommentsChanged()) {
                     builder.setLength(0);
-                    builder.append(tsTriggeredChange);
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    String fmm = df.format(new java.util.Date(tsTriggeredChange));
+                    builder.append(fmm);
                     for (String print : previousKcomments) {
                         builder.append(delimiter + print);
                     }
