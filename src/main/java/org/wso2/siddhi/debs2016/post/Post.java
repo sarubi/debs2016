@@ -15,10 +15,6 @@ public class Post {
     private long latestCommentTime;
     private long postId;
 
-    public long getPostId() {
-        return postId;
-    }
-
     private int score;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
@@ -156,4 +152,11 @@ public class Post {
         return latestCommentTime;
     }
 
+    /**
+     * Get the post ID of the post
+     * @return postId
+     */
+    public long getPostId() {
+        return postId;
+    }
 }
