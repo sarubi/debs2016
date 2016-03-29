@@ -90,7 +90,7 @@ public class PostStore {
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
             long postId = entry.getKey();
-            Post post = postList.get(postId);
+            Post post = entry.getValue();
             long postScore = post.update(ts);
             if (postScore <= 0){
                 it.remove();

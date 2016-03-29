@@ -15,10 +15,6 @@ public class Post {
     private long latestCommentTime;
     private long postId;
 
-    public long getPostId() {
-        return postId;
-    }
-
     private int score;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
@@ -91,8 +87,7 @@ public class Post {
         for(Iterator<Map.Entry<Long, Comment>> it = commentList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Comment> entry = it.next();
             long key = entry.getKey();
-            Comment comment = commentList.get(key);
-            int commentScore = comment.getScore(ts);
+            Comment comment = entry.getValue();
             commentsScore = commentsScore + comment.getScore(ts);
         }
 
@@ -157,4 +152,11 @@ public class Post {
         return latestCommentTime;
     }
 
+    /**
+     * Get the post ID of the post
+     * @return postId
+     */
+    public long getPostId() {
+        return postId;
+    }
 }

@@ -25,9 +25,8 @@ public class Comment {
      */
     public int getScore(long ts)
     {
-
         int score = CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/ CommentPostMap.DURATION);
-        return score> 0 ? score: 0;
+        return score > 0 ? score: 0;
     }
 
     /**
