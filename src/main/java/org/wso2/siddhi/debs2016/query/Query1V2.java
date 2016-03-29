@@ -10,6 +10,7 @@ import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQuery1;
 import org.wso2.siddhi.debs2016.util.Constants;
 
+import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Query1V2 {
@@ -19,6 +20,8 @@ public class Query1V2 {
     private String commentsFile;
 
     public static void main(String[] args){
+        File q1 = new File("q1.txt");
+        q1.delete();
         if(args.length != 2){
             System.err.println("Usage java org.wso2.siddhi.debs2016.query.Query1V2 Expected Args: <Path to posts.dat, Path to comments.dat>");
             return;

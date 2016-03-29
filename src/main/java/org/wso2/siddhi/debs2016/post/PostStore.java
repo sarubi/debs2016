@@ -155,7 +155,7 @@ public class PostStore {
                 }
                 builder.append("\n");
                 if (printComments) {
-                    System.out.println(builder.toString());
+                    System.out.print(builder.toString());
                 }
 
                 if (writeToFile) {
