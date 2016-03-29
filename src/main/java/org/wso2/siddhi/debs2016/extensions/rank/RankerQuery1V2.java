@@ -28,6 +28,8 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
     private PostStore postStore;
     private CommentPostMap commentPostMap;
+    private Long latency = 0L;
+    private Long numberOfOutputs = 0L;
 
     @Override
     protected Object[] process(Object[] objects) {
@@ -49,7 +51,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             if (ts == -2L) {
                 //This is the place where time measuring ends.
                 showFinalStatistics();
+//                postStore.destroy();
                 return new Object[]{""};
+
             }
             count++;
             //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
@@ -84,7 +88,11 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     break;
             }
 
-            postStore.printTopThreePosts(ts);
+            Long endTime= postStore.writeTopThreeComments(",", true, true,ts);
+            if (endTime != -1L){
+                latency += (endTime - (Long) objects[0]);
+                numberOfOutputs++;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,6 +156,12 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
         System.out.println("Event count : " + count);
         System.out.println("Total run time : " + timeDifference);
         System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
+        System.out.println("Total Latency " + latency);
+        System.out.println("Total Outputs " + numberOfOutputs);
+        if(numberOfOutputs!=0){
+            System.out.println("Average Latency " + latency/numberOfOutputs);
+        }
+
         System.out.flush();
     }
 }
