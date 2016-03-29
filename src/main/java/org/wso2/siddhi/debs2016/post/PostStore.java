@@ -23,6 +23,15 @@ public class PostStore {
     private BufferedWriter writer;
     private File q1;
 
+
+    public PostStore(){
+        q1= new File("q1.txt");
+        try{
+            writer = new BufferedWriter(new FileWriter(q1, true));
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * Adds a new post to the Store
      * @param postId of new post
@@ -80,17 +89,12 @@ public class PostStore {
      */
 
     public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
-        q1 = new File("q1.txt");
-        try{
-            writer = new BufferedWriter(new FileWriter(q1, true));
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+
         postRanking.clear();
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
             long postId = entry.getKey();
-            Post post = postList.get(postId);
+            Post post = entry.getValue();
             long postScore = post.update(ts);
             if (postScore <= 0){
                 it.remove();

@@ -51,6 +51,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             if (ts == -2L) {
                 //This is the place where time measuring ends.
                 showFinalStatistics();
+                postStore.destroy();
                 return new Object[]{""};
 
             }
@@ -87,8 +88,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     break;
             }
 
-            Long endTime= postStore.writeTopThreeComments(",", true, true,ts);
-            postStore.destroy();
+            Long endTime= postStore.writeTopThreeComments(",", false, true,ts);
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;
