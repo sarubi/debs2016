@@ -14,7 +14,8 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
-    private TreeMultimap<Long, Post> postRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
+    private TreeMultimap<Long, Long> postRanking = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder()); //Score, PostId
+    private TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
     private Long[] topThree = new Long[3];
 
     /**
@@ -82,18 +83,33 @@ public class PostStore {
             if (postScore <= 0){
                 it.remove();
             }else{
-                postRanking.put(postScore, post);
+                postRanking.put(postScore, postId);
+            }
+        }
+
+        sortedPostRanking.clear();
+        int loopCounter = 0;
+        for(Iterator<Map.Entry<Long, Collection<Long>>> it = postRanking.asMap().entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Long, Collection<Long>> entry = it.next();
+            long score = entry.getKey();
+            Collection<Long> postIdList = entry.getValue();
+
+            for (Long postId: postIdList) {
+                sortedPostRanking.put(score, postList.get(postId));
+            }
+            loopCounter++;
+            if (loopCounter == 3){
+                break;
             }
         }
 
 
         int i = 0;
         boolean changeFlag = false;
-        for (Post topPosts: postRanking.values()) {
-            long postId = topPosts.getPostId();
-            if (topThree[i] == null || !((topThree[i]).equals(postId))){
+        for (Post topPosts: sortedPostRanking.values()) {
+            if (topThree[i] == null || !((topThree[i]).equals(topPosts.getPostId()))){
                 changeFlag = true;
-                topThree[i] = postId;
+                topThree[i] = topPosts.getPostId();
             }
             i++;
             if (i == 3){
@@ -155,6 +171,6 @@ class PostComparator implements Comparator<Post>{
                 return -1;
             }
         }
-        return 1;
+        return -1;
     }
 }
