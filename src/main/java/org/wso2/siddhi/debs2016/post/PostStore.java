@@ -1,9 +1,11 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
-import org.wso2.siddhi.debs2016.comment.Comment;
-import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,6 +19,9 @@ public class PostStore {
     private TreeMultimap<Long, Long> postRanking = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder()); //Score, PostId
     private TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
     private Long[] topThree = new Long[3];
+    StringBuilder builder=new StringBuilder();
+    private BufferedWriter writer;
+    private File q1;
 
     /**
      * Adds a new post to the Store
@@ -73,7 +78,14 @@ public class PostStore {
      *
      * @param ts is the timestamp of event that might trigger a change
      */
-    public void printTopThreePosts(Long ts){
+
+    public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
+        q1 = new File("q1.txt");
+        try{
+            writer = new BufferedWriter(new FileWriter(q1, true));
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
         postRanking.clear();
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
@@ -102,8 +114,6 @@ public class PostStore {
                 break;
             }
         }
-
-
         int i = 0;
         boolean changeFlag = false;
         for (Post topPosts: sortedPostRanking.values()) {
@@ -122,31 +132,58 @@ public class PostStore {
                 topThree[j] = 0L;
             }
         }
+        try {
+            if (changeFlag){
+                builder.setLength(0);
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                String fmm = df.format(new java.util.Date(ts));
+                builder.append(fmm + delimiter);
+                for (int k = 0; k < 3 ; k++){
+                    if (topThree[k] != 0){
+                        Post post = postList.get(topThree[k]);
+                        builder.append(topThree[k] + delimiter);
+                        builder.append(postList.get(topThree[k]).getUserName() + delimiter);
+                        builder.append(post.getScore() + delimiter);
+                        builder.append(post.getNumberOfCommenters());
+                    }else{
+                        builder.append("-, -, -, -");
+                    }
+                    if(k != 2){
+                        builder.append(delimiter);
+                    }
+                }
+                builder.append("\n");
+                if (printComments) {
+                    System.out.println(builder.toString());
+                }
 
-        if (changeFlag){
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            df.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String fmm = df.format(new java.util.Date(ts));
-            System.out.print(fmm + ", ");
-            for (int k = 0; k < 3 ; k++){
-                if (topThree[k] != 0){
-                    Post post = postList.get(topThree[k]);
-                    System.out.print(topThree[k] + ", ");
-                    System.out.print(postList.get(topThree[k]).getUserName() + ", ");
-                    System.out.print(post.getScore() + ", ");
-                    System.out.print(post.getNumberOfCommenters());
-                }else{
-                    System.out.print("-, -, -, -");
+                if (writeToFile) {
+                    writer.write(builder.toString());
                 }
-                if(k != 2){
-                    System.out.print(", ");
-                }
+                return System.currentTimeMillis();
             }
-            System.out.println();
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        return  -1L;
+    }
+    /**
+     *
+     * De-allocate resources
+     *
+     */
+
+    public void destroy(){
+
+        try {
+            writer.close();
+        }catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
-
-
 }
 
 class PostComparator implements Comparator<Post>{
@@ -173,4 +210,5 @@ class PostComparator implements Comparator<Post>{
         }
         return -1;
     }
+
 }
