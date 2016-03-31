@@ -90,11 +90,10 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                             timeWindow.addComment(post, ts);
                         }
                     }
-
                     break;
             }
 
-            Long endTime= postStore.writeTopThreeComments(",", false, false,ts);
+            Long endTime= postStore.writeTopThreeComments(",", true, false,ts);
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;

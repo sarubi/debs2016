@@ -59,25 +59,25 @@ public class Post {
     }
 
 
-    /**
-     * Gets to score of all comments at time ts
-     *
-     * @param ts the time
-     * @return the score of all comments at time ts
-     */
-    private int getCommentsScore(long ts)
-    {
-        int commentsScore = 0;
-
-        for(Iterator<Map.Entry<Long, Comment>> it = commentList.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Long, Comment> entry = it.next();
-            long key = entry.getKey();
-            Comment comment = entry.getValue();
-            commentsScore = commentsScore + comment.getScore(ts);
-        }
-
-        return commentsScore;
-    }
+//    /**
+//     * Gets to score of all comments at time ts
+//     *
+//     * @param ts the time
+//     * @return the score of all comments at time ts
+//     */
+//    private int getCommentsScore(long ts)
+//    {
+//        int commentsScore = 0;
+//
+//        for(Iterator<Map.Entry<Long, Comment>> it = commentList.entrySet().iterator(); it.hasNext();) {
+//            Map.Entry<Long, Comment> entry = it.next();
+//            long key = entry.getKey();
+//            Comment comment = entry.getValue();
+//            commentsScore = commentsScore + comment.getScore(ts);
+//        }
+//
+//        return commentsScore;
+//    }
 
 
     /**

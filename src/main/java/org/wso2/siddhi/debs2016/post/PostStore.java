@@ -1,7 +1,6 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
-import org.wso2.siddhi.debs2016.comment.TimeWindow;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,8 +16,7 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
-    private TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
-    private Long[] topThree = new Long[3];
+    private Long[] previousOrderedTopThree = new Long[3];
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
     private File q1;
@@ -60,54 +58,24 @@ public class PostStore {
 
     public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
 
-        long[][] topThreeTemp = {{0L,0L}, {0L,0L}, {0L,0L}};
-        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Long, Post> entry = it.next();
-            long postId = entry.getKey();
-            Post post = entry.getValue();
-            long postScore = post.getScore(ts);
-            if (postScore <= 0){
-                it.remove();
-            }else{
-                for (int i = 0; i < 3 ; i++){
-                    if (postScore >= topThreeTemp[i][1]){
-                        long tempId = topThreeTemp[i][0];
-                        long tempScore = topThreeTemp[i][1];
+        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}};
+        TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
 
-                        topThreeTemp[i][0] = postId;
-                        topThreeTemp[i][1] = postScore;
+        topThree = updateTopThree(ts);
 
-                        if (i != 2){
-                            long tempNextId = topThreeTemp[i+1][0];
-                            long tempNextScore = topThreeTemp[i+1][1];
 
-                        if (i == 0){
-                            topThreeTemp[i+1][0] = tempId;
-                            topThreeTemp[i+1][1] = tempScore;
-                        }
-                            postId = tempNextId;
-                            postScore = tempNextScore;
-                            i++;
-                        }
-                    }
-                }
-            }
-        }
-
-        sortedPostRanking.clear();
-
-        for (int i = 0; i < topThreeTemp.length; i++){
-            if (topThreeTemp[i][0] != 0){
-                sortedPostRanking.put(topThreeTemp[i][1], postList.get(topThreeTemp[i][0]));
+        for (int i = 0; i < 3; i++){
+            if (topThree[i][0] != 0){
+                sortedPostRanking.put(topThree[i][1], postList.get(topThree[i][0]));
             }
         }
 
         int i = 0;
         boolean changeFlag = false;
         for (Post topPosts: sortedPostRanking.values()) {
-            if (topThree[i] == null || !((topThree[i]).equals(topPosts.getPostId()))){
+            if (this.previousOrderedTopThree[i] == null || !((this.previousOrderedTopThree[i]).equals(topPosts.getPostId()))){
                 changeFlag = true;
-                topThree[i] = topPosts.getPostId();
+                this.previousOrderedTopThree[i] = topPosts.getPostId();
             }
             i++;
             if (i == 3){
@@ -115,9 +83,9 @@ public class PostStore {
             }
         }
         for (int j = i; j < 3; j++){
-            if (topThree[j] == null || !(topThree[j]).equals(0L)){
+            if (this.previousOrderedTopThree[j] == null || !(this.previousOrderedTopThree[j]).equals(0L)){
                 changeFlag = true;
-                topThree[j] = 0L;
+                this.previousOrderedTopThree[j] = 0L;
             }
         }
         try {
@@ -128,10 +96,10 @@ public class PostStore {
                 String fmm = df.format(new java.util.Date(ts));
                 builder.append(fmm + delimiter);
                 for (int k = 0; k < 3 ; k++){
-                    if (topThree[k] != 0){
-                        Post post = postList.get(topThree[k]);
-                        builder.append(topThree[k] + delimiter);
-                        builder.append(postList.get(topThree[k]).getUserName() + delimiter);
+                    if (this.previousOrderedTopThree[k] != 0){
+                        Post post = postList.get(this.previousOrderedTopThree[k]);
+                        builder.append(this.previousOrderedTopThree[k] + delimiter);
+                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
                         builder.append(post.getScore(ts) + delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
@@ -171,6 +139,46 @@ public class PostStore {
         {
             e.printStackTrace();
         }
+    }
+
+    private long[][] updateTopThree(long ts){
+
+        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}};
+
+
+        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Long, Post> entry = it.next();
+            long postId = entry.getKey();
+            Post post = entry.getValue();
+            long postScore = post.getScore(ts);
+            if (postScore <= 0){
+                it.remove();
+            }else{
+                for (int i = 0; i < 3 ; i++){
+                    if (postScore >= topThree[i][1]){
+                        long tempId = topThree[i][0];
+                        long tempScore = topThree[i][1];
+
+                        topThree[i][0] = postId;
+                        topThree[i][1] = postScore;
+
+                        if (i != 2){
+                            long tempNextId = topThree[i+1][0];
+                            long tempNextScore = topThree[i+1][1];
+
+                            if (i == 0){
+                                topThree[i+1][0] = tempId;
+                                topThree[i+1][1] = tempScore;
+                            }
+                            postId = tempNextId;
+                            postScore = tempNextScore;
+                            i++;
+                        }
+                    }
+                }
+            }
+        }
+        return topThree;
     }
 }
 
