@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Created by malithjayasinghe on 3/8/16.
  * <p/>
- * Stores a list of active comments (i.e. comments arrived < d time)
+ * Stores a commentComponentlist of active comments (i.e. comments arrived < d time)
  */
 public class CommentStore {
 
@@ -27,6 +27,7 @@ public class CommentStore {
     private StringBuilder builder = new StringBuilder();
     private BufferedWriter writer;
     private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
+    LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>();
 
 
 
@@ -58,17 +59,22 @@ public class CommentStore {
      */
     public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
+        int removals=0;
 
-        for(Iterator<Map.Entry<Long, CommentLikeGraph>> it = this.commentStore.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Long, CommentLikeGraph> entry = it.next();
-            long key = entry.getKey();
-            long arrivalTime = this.commentStore.get(key).getArrivalTime();
-            long lifetime = time - arrivalTime;
+       for(Iterator<CommentComponent> iter = commentComponentlist.iterator(); iter.hasNext();){
+           CommentComponent commentComponent=iter.next();
+           long arrivalTime=commentComponent.getTs();
+           long lifeTime=time-arrivalTime;
+           long commentId=commentComponent.getCommentId();
+           if(duration<lifeTime){
+               iter.remove();
+               commentStore.remove(commentId);
+           }
+           else {
+               break;
+           }
+       }
 
-            if (duration < lifetime) {
-                it.remove();
-            }
-        }
     }
 
     /**
@@ -212,11 +218,14 @@ public class CommentStore {
      */
     public void registerComment(long commentID, long ts, String comment, boolean printComment) {
 
+
         if (printComment) {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
 
         commentStore.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
+        commentComponentlist.add(new CommentComponent( ts , commentID));
+
 
     }
 
