@@ -33,26 +33,23 @@ public class OrderedEventSenderThread extends Thread {
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;
         manager.run();
-        //System.exit(0);
-
-
     }
+
+    /**
+     *
+     * Start the data reader thread
+     *
+     */
     public void run(){
         Object[] friendshipEvent = null;
         Object[] commentEvent = null;
         Object[] likeEvent = null;
-
         long startTime = 0;
         long cTime = 0;
-        //Special note : Originally we need not subtract 1. However, due to some reason if there are n events in the input data set that are
-        //pumped to the eventBufferList queue, only (n-1) is read. Therefore, we have -1 here.
-        //final int EVENT_COUNT = Integer.parseInt(Config.getConfigurationInfo("org.wso2.siddhi.debs2015.dataset.size")) - 1;
-
         boolean firstEvent = true;
         int flag = Constants.NOEVENT;
 
         while(true){
-
             //Send dummy event to mark the commencement of processing
             if(firstEvent){
                 Object[] finalFriendshipEvent = new Object[]{
@@ -69,7 +66,7 @@ public class OrderedEventSenderThread extends Thread {
                 cTime = System.currentTimeMillis();
                 DEBSEvent event = manager.getNextDebsEvent();
                 event.setObjectArray(finalFriendshipEvent);
-                event.setIij_timestamp(cTime);
+                event.setSystemArrivalTime(cTime);
                 manager.publish();
 
                 //We print the start and the end times of the experiment even if the performance logging is disabled.
@@ -122,31 +119,23 @@ public class OrderedEventSenderThread extends Thread {
 
             if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
                 cTime = System.currentTimeMillis();
-                //friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-
                  DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(friendshipEvent);
-                debsEvent.setIij_timestamp(cTime);
+                debsEvent.setSystemArrivalTime(cTime);
                 manager.publish();
-
-                //inputHandler.send(cTime, friendshipEvent);
                 flag = Constants.FRIENDSHIPS;
             }else if (tsComment <= tsFriendship && tsComment <= tsLike && tsComment != Long.MAX_VALUE){
                 cTime = System.currentTimeMillis();
-                //commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-                //inputHandler.send(cTime, commentEvent);
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(commentEvent);
-                debsEvent.setIij_timestamp(cTime);
+                debsEvent.setSystemArrivalTime(cTime);
                 manager.publish();
                 flag = Constants.COMMENTS;
             }else if (tsLike != Long.MAX_VALUE){
                 cTime = System.currentTimeMillis();
-                //likeEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime; //This corresponds to the iij_timestamp
-               // inputHandler.send(cTime, likeEvent);
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(likeEvent);
-                debsEvent.setIij_timestamp(cTime);
+                debsEvent.setSystemArrivalTime(cTime);
                 manager.publish();
                 flag = Constants.LIKES;
             }
@@ -154,7 +143,7 @@ public class OrderedEventSenderThread extends Thread {
             //When all buffers are empty
             if (friendshipEvent == null && commentEvent == null && likeEvent == null){
                     cTime = System.currentTimeMillis();
-                //Send dummy event to signal end of all streams
+                   //Send dummy event to signal end of all streams
                     Object[] finalFriendshipEvent = new Object[]{
                             0L,
                             -2L,
@@ -167,14 +156,11 @@ public class OrderedEventSenderThread extends Thread {
                             0,
                     };
 
-                    //finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD]	= cTime;
-                    //inputHandler.send(cTime, finalFriendshipEvent);
-                        DEBSEvent debsEvent = manager.getNextDebsEvent();
-                        debsEvent.setObjectArray(finalFriendshipEvent);
-                        debsEvent.setIij_timestamp(cTime);
-                         manager.publish();
-                        manager.getDataReadDisruptor().shutdown();
-
+                    DEBSEvent debsEvent = manager.getNextDebsEvent();
+                    debsEvent.setObjectArray(finalFriendshipEvent);
+                    debsEvent.setSystemArrivalTime(cTime);
+                    manager.publish();
+                    manager.getDataReadDisruptor().shutdown();
                     doneFlag = true;
                     break;
                 }

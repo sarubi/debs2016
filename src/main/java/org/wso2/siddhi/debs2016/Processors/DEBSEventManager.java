@@ -42,6 +42,10 @@ public class DEBSEventManager {
     static int bufferSize = 512;
     private long sequenceNumber;
 
+    /**
+     * The constructor
+     *
+     */
     public DEBSEventManager(){
         List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
@@ -54,6 +58,11 @@ public class DEBSEventManager {
         System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
     }
 
+    /**
+     *
+     * Starts the distrupter
+     *
+     */
     public void run() {
         dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
 
@@ -70,17 +79,22 @@ public class DEBSEventManager {
         dataReadBuffer = dataReadDisruptor.start();
     }
 
+    /**
+     * Gets the reference to next DebsEvent from the ring butter
+     *
+     * @return the DebsEvent
+     */
     public DEBSEvent getNextDebsEvent()
     {
         sequenceNumber = dataReadBuffer.next();
         return dataReadDisruptor.get(sequenceNumber);
     }
 
-//    public long getNextDebsEvent()
-//    {
-//        long sequenceNumber = dataReadBuffer.next();
-//        return sequenceNumber;
-//    }
+
+    /**
+     * Publish the new event
+     *
+     */
     public void publish()
     {
         dataReadBuffer.publish(sequenceNumber);
@@ -109,6 +123,12 @@ public class DEBSEventManager {
         System.out.flush();
     }
 
+
+    /**
+     *
+     * The debs event handler
+     *
+     */
     private class DEBSEventHandler implements EventHandler<DEBSEvent>{
         @Override
         public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
@@ -137,7 +157,7 @@ public class DEBSEventManager {
                             break;
                         }else if (ts == -1) {
                             count--;
-                            startiij_timestamp = (Long) debsEvent.getIij_timestamp();
+                            startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                             break;
                         }else{
                             long user_id_1 = (Long) objects[2];
@@ -157,10 +177,9 @@ public class DEBSEventManager {
                     Long endTime = commentStore.computeKLargestComments(" : " , false, true);
 
                     if (endTime != -1L){
-                        latency += (endTime - (Long) debsEvent.getIij_timestamp());
+                        latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
                         numberOfOutputs++;
                     }
-
 
                     endiij_timestamp = System.currentTimeMillis();
                 }
@@ -172,7 +191,5 @@ public class DEBSEventManager {
 
         }
     }
-
-
 
 }
