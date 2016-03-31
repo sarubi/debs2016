@@ -3,8 +3,6 @@ package org.wso2.siddhi.debs2016.post;
 import org.wso2.siddhi.debs2016.comment.Comment;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by malithjayasinghe on 3/25/16.
@@ -43,25 +41,12 @@ public class Post {
     }
 
     /**
-     * Update the post store
-     *
-     * @param ts the update time
-     * @return the total score of the post at time ts
-     */
-    public int update (long ts) {
-        score = getPostScore(ts) + getCommentsScore(ts);
-        return score;
-    }
-
-
-    /**
      * Gets the total score of the post at time ts
      *
      * @return the total score at time ts
      */
-    public int getScore() {
-        return score;
-
+    public int getScore(long ts) {
+        return score + getPostScore(ts) - 10;
     }
 
     /**
@@ -103,7 +88,7 @@ public class Post {
      */
     public void addComment(Long commentID, Long arrivalTime, Long userID)
     {
-        commentList.put(commentID, new Comment(arrivalTime));
+//        commentList.put(commentID, new Comment(arrivalTime));
         commenters.add(userID);
         latestCommentTime = arrivalTime;
         score = score + 10;
@@ -158,5 +143,12 @@ public class Post {
      */
     public long getPostId() {
         return postId;
+    }
+
+    /**
+     * Decrement Score by one
+     */
+    public void decrementScore(){
+        score = score - 1;
     }
 }

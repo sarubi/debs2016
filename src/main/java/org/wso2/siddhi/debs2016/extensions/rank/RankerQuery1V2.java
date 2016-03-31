@@ -3,6 +3,9 @@ package org.wso2.siddhi.debs2016.extensions.rank;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
+import org.wso2.siddhi.debs2016.comment.TimeWindow;
+import org.wso2.siddhi.debs2016.input.CommentRecord;
+import org.wso2.siddhi.debs2016.input.PostRecord;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -11,9 +14,7 @@ import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by anoukh on 3/25/16.
@@ -28,6 +29,8 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
     private PostStore postStore;
     private CommentPostMap commentPostMap;
+    private TimeWindow timeWindow;
+
     private Long latency = 0L;
     private Long numberOfOutputs = 0L;
 
@@ -63,6 +66,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                 case Constants.POSTS:
                     long post_id = (Long) objects[2];
                     postStore.addPost(post_id, ts, user_name);
+                    timeWindow.updateTime(ts);
                     break;
 
                 case Constants.COMMENTS:
@@ -75,6 +79,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         Post post = postStore.getPost(post_replied_id);
                         if (post != null){
                             post.addComment(comment_id, ts, commenter_id);
+                            timeWindow.addComment(post, ts);
                         }
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
@@ -82,6 +87,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         Post post = postStore.getPost(parent_post_id);
                         if (post != null){
                             post.addComment(comment_id, ts, commenter_id);
+                            timeWindow.addComment(post, ts);
                         }
                     }
 
@@ -116,6 +122,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
         postStore = new PostStore();
         commentPostMap = new CommentPostMap();
+        timeWindow = new TimeWindow();
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();

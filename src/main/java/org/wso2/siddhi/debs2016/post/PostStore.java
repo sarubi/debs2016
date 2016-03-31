@@ -1,6 +1,7 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
+import org.wso2.siddhi.debs2016.comment.TimeWindow;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -52,37 +53,6 @@ public class PostStore {
         return postList.get(postId);
     }
 
-//    /**
-//     * Update post store
-//     *
-//     * @param ts time ts
-//     */
-//    public void update(long ts) {
-//
-//        int commentsScore = 0;
-//        long key ;
-//        Post post ;
-//        int score ;
-//
-//        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext(); ) {
-//            Map.Entry<Long, Post> entry = it.next();
-//            key = entry.getKey();
-//            post = entry.getValue();
-//            score = post.update(ts);
-//            if (score < 0)
-//            {
-//                it.remove();
-//            }
-//        }
-//    }
-
-
-    public void printTopPosts ()
-    {
-
-
-    }
-
     /**
      *
      * @param ts is the timestamp of event that might trigger a change
@@ -95,7 +65,7 @@ public class PostStore {
             Map.Entry<Long, Post> entry = it.next();
             long postId = entry.getKey();
             Post post = entry.getValue();
-            long postScore = post.update(ts);
+            long postScore = post.getScore(ts);
             if (postScore <= 0){
                 it.remove();
             }else{
@@ -148,7 +118,7 @@ public class PostStore {
                         Post post = postList.get(topThree[k]);
                         builder.append(topThree[k] + delimiter);
                         builder.append(postList.get(topThree[k]).getUserName() + delimiter);
-                        builder.append(post.getScore() + delimiter);
+                        builder.append(post.getScore(ts) + delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
                         builder.append("-, -, -, -");
