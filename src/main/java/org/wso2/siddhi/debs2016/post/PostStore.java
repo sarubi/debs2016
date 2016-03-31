@@ -17,7 +17,6 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
-    private TreeMultimap<Long, Long> postRanking = TreeMultimap.create(Comparator.reverseOrder(), Comparator.naturalOrder()); //Score, PostId
     private TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
     private Long[] topThree = new Long[3];
     StringBuilder builder=new StringBuilder();
@@ -58,9 +57,10 @@ public class PostStore {
      * @param ts is the timestamp of event that might trigger a change
      */
 
+
     public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
 
-        postRanking.clear();
+        long[][] topThreeTemp = {{0L,0L}, {0L,0L}, {0L,0L}};
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
             long postId = entry.getKey();
@@ -69,25 +69,39 @@ public class PostStore {
             if (postScore <= 0){
                 it.remove();
             }else{
-                postRanking.put(postScore, postId);
+                for (int i = 0; i < 3 ; i++){
+                    if (postScore >= topThreeTemp[i][1]){
+                        long tempId = topThreeTemp[i][0];
+                        long tempScore = topThreeTemp[i][1];
+
+                        topThreeTemp[i][0] = postId;
+                        topThreeTemp[i][1] = postScore;
+
+                        if (i != 2){
+                            long tempNextId = topThreeTemp[i+1][0];
+                            long tempNextScore = topThreeTemp[i+1][1];
+
+                        if (i == 0){
+                            topThreeTemp[i+1][0] = tempId;
+                            topThreeTemp[i+1][1] = tempScore;
+                        }
+                            postId = tempNextId;
+                            postScore = tempNextScore;
+                            i++;
+                        }
+                    }
+                }
             }
         }
 
         sortedPostRanking.clear();
-        int loopCounter = 0;
-        for(Iterator<Map.Entry<Long, Collection<Long>>> it = postRanking.asMap().entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Long, Collection<Long>> entry = it.next();
-            long score = entry.getKey();
-            Collection<Long> postIdList = entry.getValue();
 
-            for (Long postId: postIdList) {
-                sortedPostRanking.put(score, postList.get(postId));
-            }
-            loopCounter++;
-            if (loopCounter == 3){
-                break;
+        for (int i = 0; i < topThreeTemp.length; i++){
+            if (topThreeTemp[i][0] != 0){
+                sortedPostRanking.put(topThreeTemp[i][1], postList.get(topThreeTemp[i][0]));
             }
         }
+
         int i = 0;
         boolean changeFlag = false;
         for (Post topPosts: sortedPostRanking.values()) {
