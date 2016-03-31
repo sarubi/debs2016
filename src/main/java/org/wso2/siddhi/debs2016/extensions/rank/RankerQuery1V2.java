@@ -3,8 +3,6 @@ package org.wso2.siddhi.debs2016.extensions.rank;
 import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
-import org.wso2.siddhi.debs2016.input.CommentRecord;
-import org.wso2.siddhi.debs2016.input.PostRecord;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -13,7 +11,9 @@ import org.wso2.siddhi.query.api.definition.AbstractDefinition;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by anoukh on 3/25/16.
@@ -88,7 +88,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     break;
             }
 
-            Long endTime= postStore.writeTopThreeComments(",", false, true,ts);
+            Long endTime= postStore.writeTopThreeComments(",", false, false,ts);
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;
