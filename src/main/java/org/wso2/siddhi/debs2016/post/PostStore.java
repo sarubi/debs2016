@@ -58,36 +58,18 @@ public class PostStore {
 
     public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
 
-        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}};
-        TreeMultimap<Long, Post> sortedPostRanking = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator()); //Score, PostObject
+        long[][] topThree;
 
         topThree = updateTopThree(ts);
 
-
-        for (int i = 0; i < 3; i++){
-            if (topThree[i][0] != 0){
-                sortedPostRanking.put(topThree[i][1], postList.get(topThree[i][0]));
-            }
-        }
-
-        int i = 0;
         boolean changeFlag = false;
-        for (Post topPosts: sortedPostRanking.values()) {
-            if (this.previousOrderedTopThree[i] == null || !((this.previousOrderedTopThree[i]).equals(topPosts.getPostId()))){
+        for (int i = 0; i < 3; i++){
+            if (previousOrderedTopThree[i] == null || !((this.previousOrderedTopThree[i]) == (topThree[i][0]))){
                 changeFlag = true;
-                this.previousOrderedTopThree[i] = topPosts.getPostId();
-            }
-            i++;
-            if (i == 3){
-                break;
+                previousOrderedTopThree[i] = topThree[i][0];
             }
         }
-        for (int j = i; j < 3; j++){
-            if (this.previousOrderedTopThree[j] == null || !(this.previousOrderedTopThree[j]).equals(0L)){
-                changeFlag = true;
-                this.previousOrderedTopThree[j] = 0L;
-            }
-        }
+
         try {
             if (changeFlag){
                 builder.setLength(0);
@@ -143,8 +125,8 @@ public class PostStore {
 
     private long[][] updateTopThree(long ts){
 
-        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}};
-
+        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}}; //{postId, Score}
+        PostComparator postComparator = new PostComparator();
 
         for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
             Map.Entry<Long, Post> entry = it.next();
@@ -155,7 +137,30 @@ public class PostStore {
                 it.remove();
             }else{
                 for (int i = 0; i < 3 ; i++){
-                    if (postScore >= topThree[i][1]){
+                    if (postScore == topThree[i][1]){
+                        if (postComparator.compare(post, postList.get(topThree[i][0])) == 1){
+                            long tempId = topThree[i][0];
+                            long tempScore = topThree[i][1];
+
+                            topThree[i][0] = postId;
+                            topThree[i][1] = postScore;
+
+                            if (i != 2){
+                                long tempNextId = topThree[i+1][0];
+                                long tempNextScore = topThree[i+1][1];
+                                topThree[i+1][0] = tempId;
+                                topThree[i+1][1] = tempScore;
+
+                                if (i == 0){
+                                    topThree[i+2][0] = tempNextId;
+                                    topThree[i+2][1] = tempNextScore;
+                                }
+                            }
+                            break;
+                        }else {
+                            continue;
+                        }
+                    }else if (postScore > topThree[i][1]){
                         long tempId = topThree[i][0];
                         long tempScore = topThree[i][1];
 
@@ -165,15 +170,15 @@ public class PostStore {
                         if (i != 2){
                             long tempNextId = topThree[i+1][0];
                             long tempNextScore = topThree[i+1][1];
+                            topThree[i+1][0] = tempId;
+                            topThree[i+1][1] = tempScore;
 
                             if (i == 0){
-                                topThree[i+1][0] = tempId;
-                                topThree[i+1][1] = tempScore;
+                                topThree[i+2][0] = tempNextId;
+                                topThree[i+2][1] = tempNextScore;
                             }
-                            postId = tempNextId;
-                            postScore = tempNextScore;
-                            i++;
                         }
+                        break;
                     }
                 }
             }

@@ -26,7 +26,7 @@ public class Post {
     public Post(long timeStamp, String userName, Long postId) {
         this.arrivalTime = timeStamp;
         this.userName = userName;
-        this.score = 10;
+        this.score = 0;
         this.postId = postId;
     }
 
@@ -46,7 +46,7 @@ public class Post {
      * @return the total score at time ts
      */
     public int getScore(long ts) {
-        return score + getPostScore(ts) - 10;
+        return score + getPostScore(ts);
     }
 
     /**
