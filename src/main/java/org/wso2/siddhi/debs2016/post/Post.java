@@ -58,37 +58,14 @@ public class Post {
         return CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/CommentPostMap.DURATION);
     }
 
-
-//    /**
-//     * Gets to score of all comments at time ts
-//     *
-//     * @param ts the time
-//     * @return the score of all comments at time ts
-//     */
-//    private int getCommentsScore(long ts)
-//    {
-//        int commentsScore = 0;
-//
-//        for(Iterator<Map.Entry<Long, Comment>> it = commentList.entrySet().iterator(); it.hasNext();) {
-//            Map.Entry<Long, Comment> entry = it.next();
-//            long key = entry.getKey();
-//            Comment comment = entry.getValue();
-//            commentsScore = commentsScore + comment.getScore(ts);
-//        }
-//
-//        return commentsScore;
-//    }
-
-
     /**
      * Adds a new comment to a post
      *
      * @param commentID the commentID
      * @param arrivalTime the arrival time
      */
-    public void addComment(Long commentID, Long arrivalTime, Long userID)
+    public void addComment(Long arrivalTime, Long userID)
     {
-//        commentList.put(commentID, new Comment(arrivalTime));
         commenters.add(userID);
         latestCommentTime = arrivalTime;
         score = score + 10;
