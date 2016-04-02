@@ -74,25 +74,5 @@ public class TimeWindow {
             }
         }
     }
-}
-/**
- * An Object to record the timestamp of the comment of a post
- */
-class CommentForPost{
-    private long ts;
 
-    public Post getPost() {
-        return post;
-    }
-
-    public long getTs() {
-        return ts;
-    }
-
-    private Post post;
-
-    public CommentForPost(Post post, long ts) {
-        this.ts = ts;
-        this.post = post;
-    }
 }
