@@ -73,7 +73,7 @@ public class PostStore {
      * Gets the postScoreMap
      *
      */
-    public SortedMultiMap<Long, Long> getPostScoreMap()
+    public BoundedSortedMultiMap<Long, Long> getPostScoreMap()
     {
         return postScoreMap;
     }
@@ -86,17 +86,27 @@ public class PostStore {
 
     public void printTopThreeComments(Long ts) {
 
-        SortedMultiMap<Long, Long> map = new TreeMultiMap<Long, Long>();
-        TreeMultimap<Long, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
-        map = postScoreMap;
-        int uniqueScoreCount = 0;
-        int size = map.size();
 
-        System.out.println(" post map size " + map.size());
-        for (Iterator<Map.Entry<Long, Long>> it = postScoreMap.entrySet().iterator(); it.hasNext(); ) {
+        TreeMultimap<Long, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
+
+        int uniqueScoreCount = 0;
+
+
+        System.out.println(" post map size " + postScoreMap.size());
+        Iterator itr =  postScoreMap.entrySet().iterator();
+        for (Iterator<Map.Entry<Long, Long>> it = itr; it.hasNext();) {
             Map.Entry<Long, Long> entry = it.next();
             long score = entry.getKey();
             long id = entry.getValue();
+           // System.out.println("Score ID " + score + "  "  + id);
+            topScoreMap.put(score, postList.get(id));
+        }
+
+        Iterator itr2 = topScoreMap.entries().iterator();
+        for (Iterator<Map.Entry<Long, Post>> it = itr2 ; it.hasNext(); ) {
+            Map.Entry<Long, Post> entry = it.next();
+            long score = entry.getKey();
+            long id = entry.getValue().getPostId();
             System.out.println("Score ID " + score + "  "  + id);
         }
 

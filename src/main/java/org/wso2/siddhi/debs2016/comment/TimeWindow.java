@@ -1,5 +1,6 @@
 package org.wso2.siddhi.debs2016.comment;
 
+import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import edu.ucla.sspace.util.SortedMultiMap;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
@@ -77,8 +78,7 @@ public class TimeWindow {
 
         try {
 
-
-            SortedMultiMap<Long, Long> postScoreMap = postStore.getPostScoreMap();
+            BoundedSortedMultiMap<Long, Long> postScoreMap = postStore.getPostScoreMap();
             Iterator<CommentForPost> iterator = queue.iterator();
             HashMap<Long, Post> postMap = postStore.getPostList();
 
@@ -103,7 +103,7 @@ public class TimeWindow {
 
                     iterator.remove();
 
-                    if(newScore <= 0)
+                    if(newScore < 0)
                     {
                         postMap.remove(postID);
                     }
