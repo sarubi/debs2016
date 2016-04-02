@@ -1,6 +1,7 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
+import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import edu.ucla.sspace.util.SortedMultiMap;
 import edu.ucla.sspace.util.TreeMultiMap;
 import org.wso2.siddhi.debs2016.comment.MyLong;
@@ -19,7 +20,7 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
-    private SortedMultiMap<Long, Long> postScoreMap = new TreeMultiMap<Long, Long>();
+    private BoundedSortedMultiMap<Long, Long> postScoreMap = new BoundedSortedMultiMap<Long, Long>(3, true, true, true);
     private Long[] previousOrderedTopThree = new Long[3];
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
@@ -83,21 +84,20 @@ public class PostStore {
      * @param ts is the timestamp of event that might trigger a change
      */
 
-
-
-
     public void printTopThreeComments(Long ts) {
 
         SortedMultiMap<Long, Long> map = new TreeMultiMap<Long, Long>();
         TreeMultimap<Long, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
-        map = postScoreMap.tailMap(1L);
+        map = postScoreMap;
         int uniqueScoreCount = 0;
         int size = map.size();
 
-        for (Iterator<Map.Entry<Long, Long>> it = map.entrySet().iterator(); it.hasNext(); ) {
+        System.out.println(" post map size " + map.size());
+        for (Iterator<Map.Entry<Long, Long>> it = postScoreMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Long, Long> entry = it.next();
             long score = entry.getKey();
             long id = entry.getValue();
+            System.out.println("Score ID " + score + "  "  + id);
         }
 
     }
