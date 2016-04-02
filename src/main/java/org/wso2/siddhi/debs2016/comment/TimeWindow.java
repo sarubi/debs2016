@@ -1,5 +1,6 @@
 package org.wso2.siddhi.debs2016.comment;
 
+import edu.ucla.sspace.util.SortedMultiMap;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -22,13 +23,16 @@ public class TimeWindow {
     LinkedBlockingQueue<CommentForPost> eightDays = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> nineDays = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
+    private PostStore postStore;
+
 
     /**
      * Register a new comment in the Time Window
      * @param post is the post object that received the new comment
      * @param ts is the time of arrival of the new comment
      */
-    public void addComment(Post post, long ts){
+    public void addComment(Post post, long ts, PostStore postStore){
+        this.postStore = postStore;
         oneDay.add(new CommentForPost(post, ts));
     }
 
@@ -51,8 +55,6 @@ public class TimeWindow {
 
     }
 
-
-
     /**
      * Processes a given time window
      *
@@ -62,12 +64,17 @@ public class TimeWindow {
      */
     private void process(long ts, Iterator<CommentForPost> iterator, int queueNumber) {
 
+        SortedMultiMap<Long, Long>  postScoreMap = postStore.getPostScoreMap();
         while (iterator.hasNext()){
             CommentForPost commentPostObject = iterator.next();
             long commentTs = commentPostObject.getTs();
             if (commentTs <= (ts - CommentPostMap.DURATION*queueNumber)){
-                commentPostObject.getPost().decrementScore();
-                iterator.remove();
+                Post post = commentPostObject.getPost();
+                long postID = post.getPostId();
+                long postScore = post.getScore(ts);
+                postScoreMap.remove(postScore, postID);
+                postScoreMap.put(post.decrementScore(),post.getPostId());
+
             }else{
                 break;
             }

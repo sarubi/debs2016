@@ -1,6 +1,8 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
+import edu.ucla.sspace.util.SortedMultiMap;
+import edu.ucla.sspace.util.TreeMultiMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +18,7 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
+    private SortedMultiMap<Long, Long> postScoreMap = new TreeMultiMap<Long, Long>();
     private Long[] previousOrderedTopThree = new Long[3];
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
@@ -38,6 +41,7 @@ public class PostStore {
      */
     public void addPost(Long postId, Long ts, String userName){
         postList.put(postId, new Post(ts, userName, postId));
+        postScoreMap.put(10L, postId);
     }
 
     /**
@@ -49,6 +53,17 @@ public class PostStore {
     public Post getPost(Long postId){
         return postList.get(postId);
     }
+
+    /**
+     *
+     * Gets the postScoreMap
+     *
+     */
+    public SortedMultiMap<Long, Long> getPostScoreMap()
+    {
+        return postScoreMap;
+    }
+
 
     /**
      *
@@ -124,6 +139,33 @@ public class PostStore {
     }
 
     private long[][] updateTopThree(long ts){
+
+
+        int removeCount = 0;
+        long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}}; //{postId, Score}
+        PostComparator postComparator = new PostComparator();
+
+        for(Iterator<Map.Entry<Long, Post>> it = postList.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Long, Post> entry = it.next();
+            long postId = entry.getKey();
+            Post post = entry.getValue();
+            long postScore = post.getScore(ts);
+            if (postScore <= 0){
+                it.remove();
+                removeCount++;
+            }
+
+            System.out.println("hihi");
+        }
+
+        if(removeCount> 100) {
+            System.out.println("remove count" + removeCount);
+        }
+            return topThree;
+    }
+
+
+    private long[][] updateTopThreeOLDVersion(long ts){
 
         long[][] topThree = {{0L,0L}, {0L,0L}, {0L,0L}}; //{postId, Score}
         PostComparator postComparator = new PostComparator();

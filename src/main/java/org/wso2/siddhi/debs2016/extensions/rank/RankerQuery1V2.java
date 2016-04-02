@@ -69,7 +69,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
              4) discard posts with 0 score. Such a post would, thus, survive the transient state. However, a post whose score reached 0 at a timestamp earlier than the current input tuple, will not survive, even if the processing of that timeout happens to be triggered by the current input tuple.
              */
 
-            // Does it make different in the final result whether we perform 1) 2) 3) in order or not?
+            // Does it make difference in the final result whether we perform 1) 2) 3) in order this order or not?
+            // What is the plan for commentPostMap?
+            // What aren't we doing timeWindow(ts) at the start?
 
             switch (isPostFlag){
                 case Constants.POSTS:
@@ -103,7 +105,6 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     }
                     break;
             }
-
             Long endTime= postStore.writeTopThreeComments(",", true, false,ts);
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);

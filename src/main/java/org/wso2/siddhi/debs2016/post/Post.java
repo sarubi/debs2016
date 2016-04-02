@@ -126,7 +126,7 @@ public class Post {
     /**
      * Decrement Score by one
      */
-    public void decrementScore(){
-        score = score - 1;
+    public long decrementScore(){
+        return score = score - 1;
     }
 }
