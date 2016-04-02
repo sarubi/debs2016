@@ -35,143 +35,46 @@ public class TimeWindow {
 
     /**
      * Move the comments along the time axis
-     * @param ts
+     * @param ts time stamp
      */
     public void updateTime(long ts){
 
-        Iterator<CommentForPost> iteratorOne = oneDay.iterator();
-        while (iteratorOne.hasNext()){
-            CommentForPost commentPostObject = iteratorOne.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION)){
-                commentPostObject.getPost().decrementScore();
-                twoDays.add(commentPostObject);
-                iteratorOne.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorTwo = twoDays.iterator();
-        while (iteratorTwo.hasNext()){
-            CommentForPost commentPostObject = iteratorTwo.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*2)){
-                commentPostObject.getPost().decrementScore();
-                threeDays.add(commentPostObject);
-                iteratorTwo.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorThree = threeDays.iterator();
-        while (iteratorThree.hasNext()){
-            CommentForPost commentPostObject = iteratorThree.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*3)){
-                commentPostObject.getPost().decrementScore();
-                fourDays.add(commentPostObject);
-                iteratorThree.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorFour = fourDays.iterator();
-        while (iteratorFour.hasNext()){
-            CommentForPost commentPostObject = iteratorFour.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*4)){
-                commentPostObject.getPost().decrementScore();
-                fiveDays.add(commentPostObject);
-                iteratorFour.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorFive = fiveDays.iterator();
-        while (iteratorFive.hasNext()){
-            CommentForPost commentPostObject = iteratorFive.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*5)){
-                commentPostObject.getPost().decrementScore();
-                sixDays.add(commentPostObject);
-                iteratorFive.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorSix = sixDays.iterator();
-        while (iteratorSix.hasNext()){
-            CommentForPost commentPostObject = iteratorSix.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*6)){
-                commentPostObject.getPost().decrementScore();
-                sevenDays.add(commentPostObject);
-                iteratorSix.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorSeven = sevenDays.iterator();
-        while (iteratorSeven.hasNext()){
-            CommentForPost commentPostObject = iteratorSeven.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*7)){
-                commentPostObject.getPost().decrementScore();
-                eightDays.add(commentPostObject);
-                iteratorSeven.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorEight = eightDays.iterator();
-        while (iteratorEight.hasNext()){
-            CommentForPost commentPostObject = iteratorEight.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*8)){
-                commentPostObject.getPost().decrementScore();
-                nineDays.add(commentPostObject);
-                iteratorEight.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorNine = nineDays.iterator();
-        while (iteratorNine.hasNext()){
-            CommentForPost commentPostObject = iteratorNine.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*9)){
-                commentPostObject.getPost().decrementScore();
-                tenDays.add(commentPostObject);
-                iteratorNine.remove();
-            }else{
-                break;
-            }
-        }
-
-        Iterator<CommentForPost> iteratorTen = tenDays.iterator();
-        while (iteratorTen.hasNext()){
-            CommentForPost commentPostObject = iteratorTen.next();
-            long commentTs = commentPostObject.getTs();
-            if (commentTs <= (ts - CommentPostMap.DURATION*10)){
-                commentPostObject.getPost().decrementScore();
-                iteratorTen.remove();
-            }else{
-                break;
-            }
-        }
+        process(ts, oneDay.iterator(), 1);
+        process(ts, twoDays.iterator(), 2);
+        process(ts, threeDays.iterator(), 3);
+        process(ts, fourDays.iterator(), 4);
+        process(ts, fiveDays.iterator(), 5);
+        process(ts, sixDays.iterator(), 6);
+        process(ts, sevenDays.iterator(), 7);
+        process(ts, eightDays.iterator(), 8);
+        process(ts, nineDays.iterator(), 9);
+        process(ts, tenDays.iterator(), 10);
 
     }
+
+
+
+    /**
+     * Processes a given time window
+     *
+     * @param ts the new event time
+     * @param iterator the window iterator
+     * @param queueNumber the window number
+     */
+    private void process(long ts, Iterator<CommentForPost> iterator, int queueNumber) {
+
+        while (iterator.hasNext()){
+            CommentForPost commentPostObject = iterator.next();
+            long commentTs = commentPostObject.getTs();
+            if (commentTs <= (ts - CommentPostMap.DURATION*queueNumber)){
+                commentPostObject.getPost().decrementScore();
+                iterator.remove();
+            }else{
+                break;
+            }
+        }
+    }
 }
-
-
 /**
  * An Object to record the timestamp of the comment of a post
  */
