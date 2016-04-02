@@ -97,8 +97,6 @@ public class TimeWindow {
 
                     long newScore = post.decrementScore();
 
-                    System.out.println("new score " + newScore + " postID"+ postID );
-
                     if(newScore > 0) {
                         postScoreMap.put(newScore, postID);
                     }
