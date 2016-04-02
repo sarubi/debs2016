@@ -26,6 +26,7 @@ public class Post {
     public Post(long timeStamp, String userName, Long postId) {
         this.arrivalTime = timeStamp;
         this.userName = userName;
+        // This is total score of comments of the post ??
         this.score = 0;
         this.postId = postId;
     }
@@ -61,7 +62,7 @@ public class Post {
     /**
      * Adds a new comment to a post
      *
-     * @param commentID the commentID
+     * @param userID the ID of the user
      * @param arrivalTime the arrival time
      */
     public void addComment(Long arrivalTime, Long userID)

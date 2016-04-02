@@ -30,7 +30,6 @@ public class TimeWindow {
      */
     public void addComment(Post post, long ts){
         oneDay.add(new CommentForPost(post, ts));
-        updateTime(ts);
     }
 
     /**

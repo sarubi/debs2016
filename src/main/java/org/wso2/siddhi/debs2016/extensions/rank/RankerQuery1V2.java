@@ -59,14 +59,23 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
             }
             count++;
-            //For each incoming post or comment we have to add them to the appropriate data structure with their initial scores
 
-//            postStore.update(ts);
+
+
+            /*Answer: When processing a new input tuple, processing steps should be performed in this order:
+             1) decrease the score of all previous posts (given the semantics of the query)
+             2) increase score of post related to the input tuple,
+             3) decrease score of posts expiring precisely on this timestamp, if any,
+             4) discard posts with 0 score. Such a post would, thus, survive the transient state. However, a post whose score reached 0 at a timestamp earlier than the current input tuple, will not survive, even if the processing of that timeout happens to be triggered by the current input tuple.
+             */
+
+            // Does it make different in the final result whether we perform 1) 2) 3) in order or not?
+
             switch (isPostFlag){
                 case Constants.POSTS:
                     long post_id = (Long) objects[2];
-                    postStore.addPost(post_id, ts, user_name);
-                    timeWindow.updateTime(ts);
+                    timeWindow.updateTime(ts); // 1)
+                    postStore.addPost(post_id, ts, user_name); // 2)
                     break;
 
                 case Constants.COMMENTS:
