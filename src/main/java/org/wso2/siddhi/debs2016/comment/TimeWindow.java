@@ -25,13 +25,18 @@ public class TimeWindow {
     LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
     private PostStore postStore;
 
+    public TimeWindow(PostStore postStore)
+    {
+        this.postStore = postStore;
+    }
+
 
     /**
      * Register a new comment in the Time Window
      * @param post is the post object that received the new comment
      * @param ts is the time of arrival of the new comment
      */
-    public void addComment(Post post, long ts, PostStore postStore){
+    public void addComment(Post post, long ts){
         this.postStore = postStore;
         oneDay.add(new CommentForPost(post, ts));
     }

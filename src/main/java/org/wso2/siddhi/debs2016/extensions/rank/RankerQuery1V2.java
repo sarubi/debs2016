@@ -133,7 +133,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
         postStore = new PostStore();
         commentPostMap = new CommentPostMap();
-        timeWindow = new TimeWindow();
+        timeWindow = new TimeWindow(postStore);
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();
