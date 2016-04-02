@@ -76,8 +76,8 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             switch (isPostFlag){
                 case Constants.POSTS:
                     long post_id = (Long) objects[2];
-                    timeWindow.updateTime(ts); // 1)
                     postStore.addPost(post_id, ts, user_name); // 2)
+                    timeWindow.updateTime(ts);
                     break;
 
                 case Constants.COMMENTS:
@@ -105,7 +105,8 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     }
                     break;
             }
-            Long endTime= postStore.writeTopThreeComments(",", true, false,ts);
+            Long endTime= -1L;
+            postStore.printTopThreeComments(ts);
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;

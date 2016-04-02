@@ -3,6 +3,7 @@ package org.wso2.siddhi.debs2016.post;
 import com.google.common.collect.*;
 import edu.ucla.sspace.util.SortedMultiMap;
 import edu.ucla.sspace.util.TreeMultiMap;
+import org.wso2.siddhi.debs2016.comment.MyLong;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,7 +24,19 @@ public class PostStore {
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
     private File q1;
+    private int count = 0;
 
+
+    /**
+     *
+     * Gets the post list hash map
+     *
+     * @return the post list
+     */
+    public HashMap<Long, Post> getPostList()
+    {
+        return postList;
+    }
 
     public PostStore(){
         q1= new File("q1.txt");
@@ -71,56 +84,24 @@ public class PostStore {
      */
 
 
-    public long writeTopThreeComments(String delimiter, boolean printComments, boolean writeToFile, Long ts) {
 
-        long[][] topThree;
 
-        topThree = updateTopThree(ts);
+    public void printTopThreeComments(Long ts) {
 
-        boolean changeFlag = false;
-        for (int i = 0; i < 3; i++){
-            if (previousOrderedTopThree[i] == null || !((this.previousOrderedTopThree[i]) == (topThree[i][0]))){
-                changeFlag = true;
-                previousOrderedTopThree[i] = topThree[i][0];
-            }
+        SortedMultiMap<Long, Long> map = new TreeMultiMap<Long, Long>();
+        TreeMultimap<Long, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
+        map = postScoreMap.tailMap(1L);
+        int uniqueScoreCount = 0;
+        int size = map.size();
+
+        for (Iterator<Map.Entry<Long, Long>> it = map.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Long, Long> entry = it.next();
+            long score = entry.getKey();
+            long id = entry.getValue();
         }
 
-        try {
-            if (changeFlag){
-                builder.setLength(0);
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                df.setTimeZone(TimeZone.getTimeZone("GMT"));
-                String fmm = df.format(new java.util.Date(ts));
-                builder.append(fmm + delimiter);
-                for (int k = 0; k < 3 ; k++){
-                    if (this.previousOrderedTopThree[k] != 0){
-                        Post post = postList.get(this.previousOrderedTopThree[k]);
-                        builder.append(this.previousOrderedTopThree[k] + delimiter);
-                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
-                        builder.append(post.getScore(ts) + delimiter);
-                        builder.append(post.getNumberOfCommenters());
-                    }else{
-                        builder.append("-, -, -, -");
-                    }
-                    if(k != 2){
-                        builder.append(delimiter);
-                    }
-                }
-                builder.append("\n");
-                if (printComments) {
-                    System.out.print(builder.toString());
-                }
 
-                if (writeToFile) {
-                    writer.write(builder.toString());
-                }
-                return System.currentTimeMillis();
-            }
-        }catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-        return  -1L;
+
     }
     /**
      *
@@ -155,12 +136,11 @@ public class PostStore {
                 removeCount++;
             }
 
-            System.out.println("hihi");
         }
 
-        if(removeCount> 100) {
-            System.out.println("remove count" + removeCount);
-        }
+     //   if(removeCount> 100) {
+       //     System.out.println("remove count" + removeCount);
+        //}
             return topThree;
     }
 
@@ -236,6 +216,7 @@ class PostComparator implements Comparator<Post>{
         Long ts_1 = post_1.getArrivalTime();
         Long ts_2 = post_2.getArrivalTime();
 
+
         if (ts_1 > ts_2){
             return 1;
         } else if (ts_1 < ts_2){
@@ -254,4 +235,8 @@ class PostComparator implements Comparator<Post>{
         return -1;
     }
 
+
+
+
 }
+
