@@ -13,8 +13,8 @@ public class Post {
     private long latestCommentTime;
     private long postId;
 
-    private int score;
-    private int oldScore;
+    private int commentScore;
+    private int totalScore;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
     private Set<Long> commenters = new HashSet<Long>();
@@ -28,9 +28,9 @@ public class Post {
     public Post(long timeStamp, String userName, Long postId) {
         this.arrivalTime = timeStamp;
         this.userName = userName;
-        // This is total score of comments of the post ??
-        this.score = 0;
-        oldScore = 10;
+        // This is total commentScore of comments of the post ??
+        this.commentScore = 0;
+        this.totalScore = 10;
         this.postId = postId;
     }
 
@@ -45,27 +45,27 @@ public class Post {
     }
 
     /**
-     * Gets the total score of the post at time ts
+     * Gets the total commentScore of the post at time ts
      *
-     * @return the total score at time ts
+     * @return the total commentScore at time ts
      */
-    public int getScore(long ts) {
-        oldScore =  score + getPostScore(ts);
-        return oldScore;
+    public int updateScore(long ts) {
+        totalScore =  commentScore + getPostScore(ts);
+        return totalScore;
     }
 
     /**
      *
-     * Get the previous total score of a post before before updated for current timestamp
+     * Get the previous total commentScore of a post before before updated for current timestamp
      *
-     * @return Old score of post
+     * @return Old commentScore of post
      */
-    public int getOldScore(){
-        return oldScore;
+    public int getTotalScore(){
+        return totalScore;
     }
 
     /**
-     * Update the post score (i.e. total score)
+     * Update the post commentScore (i.e. total commentScore)
      *
      * @param ts the update time
      */
@@ -83,7 +83,7 @@ public class Post {
     {
         commenters.add(userID);
         latestCommentTime = arrivalTime;
-        score = score + 10;
+        commentScore = commentScore + 10;
     }
 
 
@@ -140,7 +140,7 @@ public class Post {
     /**
      * Decrement Score by one
      */
-    public void decrementScore(){
-        score = score - 1;
+    public void decrementCommentScore(){
+        commentScore = commentScore - 1;
     }
 }

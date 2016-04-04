@@ -1,11 +1,9 @@
 package org.wso2.siddhi.debs2016.comment;
 
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
-import edu.ucla.sspace.util.SortedMultiMap;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
-import scala.util.control.Exception;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,8 +47,8 @@ public class TimeWindow {
         long postId = post.getPostId();
         noComments.remove(post);
         oneDay.add(new CommentForPost(post, ts));
-        postScoreMap.remove(post.getOldScore(), postId);
-        postScoreMap.put(post.getScore(ts), postId);
+        postScoreMap.remove(post.getTotalScore(), postId);
+        postScoreMap.put(post.updateScore(ts), postId);
     }
 
     /**
@@ -103,12 +101,11 @@ public class TimeWindow {
                 if (commentTs <= (ts - CommentPostMap.DURATION * queueNumber)) {
                     Post post = commentPostObject.getPost();
                     long postID = post.getPostId();
-//                    long oldPostScore = post.getScore(ts); //This is not the old score. Check next line
-                    int oldPostScore = post.getOldScore();
-                    post.decrementScore();
-                    postScoreMap.remove(oldPostScore, postID);
-                    int newScore = post.getScore(ts);
-                    if(newScore < 0)
+                    int totalScore = post.getTotalScore();
+                    post.decrementCommentScore();
+                    postScoreMap.remove(totalScore, postID);
+                    int newScore = post.updateScore(ts);
+                    if(newScore <= 0)
                     {
                         postMap.remove(postID);
                     }else{
@@ -128,15 +125,21 @@ public class TimeWindow {
         }
     }
 
+    /**
+     *
+     * Process the post
+     *
+     * @param ts the event time
+     */
     private void processPost(long ts){
         for (Post post: noComments) {
-            int oldScore = post.getOldScore();
-            int newScore = post.getScore(ts);
+            int totalScore = post.getTotalScore();
+            int newScore = post.updateScore(ts);
             if (newScore <= 0){
-                postScoreMap.remove(oldScore, post.getPostId());
+                postScoreMap.remove(totalScore, post.getPostId());
                 postStore.getPostList().remove(post.getPostId());
-            }else if (oldScore != newScore){
-                postScoreMap.remove(oldScore, post.getPostId());
+            }else if (totalScore != newScore){
+                postScoreMap.remove(totalScore, post.getPostId());
                 postScoreMap.put(newScore, post.getPostId());
 
             }

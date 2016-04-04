@@ -2,8 +2,6 @@ package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
-import edu.ucla.sspace.util.SortedMultiMap;
-import edu.ucla.sspace.util.TreeMultiMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -143,7 +141,7 @@ public class PostStore {
                         Post post = postList.get(this.previousOrderedTopThree[k]);
                         builder.append(this.previousOrderedTopThree[k] + delimiter);
                         builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
-                        builder.append(post.getScore(ts) + delimiter);
+                        builder.append(post.updateScore(ts) + delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
                         builder.append("-, -, -, -");
@@ -194,7 +192,7 @@ public class PostStore {
 //            Map.Entry<Long, Post> entry = it.next();
 //            long postId = entry.getKey();
 //            Post post = entry.getValue();
-//            long postScore = post.getScore(ts);
+//            long postScore = post.updateScore(ts);
 //            if (postScore <= 0){
 //                it.remove();
 //                removeCount++;
@@ -218,7 +216,7 @@ public class PostStore {
 //            Map.Entry<Long, Post> entry = it.next();
 //            long postId = entry.getKey();
 //            Post post = entry.getValue();
-//            long postScore = post.getScore(ts);
+//            long postScore = post.updateScore(ts);
 //            if (postScore <= 0){
 //                it.remove();
 //            }else{
