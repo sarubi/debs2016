@@ -20,9 +20,6 @@ public class Post {
     private Set<Long> commenters = new HashSet<Long>();
 
 
-    public Post(){
-
-    }
     /**
      * Constructor to create new post
      * @param timeStamp the arrival time of the comment

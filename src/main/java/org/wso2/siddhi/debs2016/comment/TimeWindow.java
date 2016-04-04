@@ -46,7 +46,6 @@ public class TimeWindow {
      * @param ts is the time of arrival of the new comment
      */
     public void addComment(Post post, long ts){
-//        this.postStore = postStore;
         long postId = post.getPostId();
         noComments.remove(post);
         oneDay.add(new CommentForPost(post, ts));
@@ -106,20 +105,18 @@ public class TimeWindow {
                     long postID = post.getPostId();
 //                    long oldPostScore = post.getScore(ts); //This is not the old score. Check next line
                     int oldPostScore = post.getOldScore();
-                    if (nextQueue != null) {
-                        nextQueue.add(commentPostObject);
-                    }
                     post.decrementScore();
                     postScoreMap.remove(oldPostScore, postID);
                     int newScore = post.getScore(ts);
-                    if(newScore <= 0)
+                    if(newScore < 0)
                     {
                         postMap.remove(postID);
-                    }
-                    if(newScore > 0) {
+                    }else{
                         postScoreMap.put(newScore, postID);
+                        if (nextQueue != null) {
+                            nextQueue.add(commentPostObject);
+                        }
                     }
-
                     iterator.remove();
                 } else {
                     break;
@@ -140,9 +137,8 @@ public class TimeWindow {
                 postStore.getPostList().remove(post.getPostId());
             }else if (oldScore != newScore){
                 postScoreMap.remove(oldScore, post.getPostId());
-                if (newScore > 0){
-                    postScoreMap.put(newScore, post.getPostId());
-                }
+                postScoreMap.put(newScore, post.getPostId());
+
             }
         }
     }
