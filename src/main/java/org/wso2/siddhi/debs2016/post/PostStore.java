@@ -141,7 +141,7 @@ public class PostStore {
                         Post post = postList.get(this.previousOrderedTopThree[k]);
                         builder.append(this.previousOrderedTopThree[k] + delimiter);
                         builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
-                        builder.append(post.updateScore(ts) + delimiter);
+                        builder.append(post.getTotalScore() + delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
                         builder.append("-, -, -, -");

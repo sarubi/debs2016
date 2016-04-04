@@ -50,7 +50,7 @@ public class Post {
      * @return the total commentScore at time ts
      */
     public int updateScore(long ts) {
-        totalScore =  commentScore + getPostScore(ts);
+        totalScore = commentScore + getPostScore(ts);
         return totalScore;
     }
 
