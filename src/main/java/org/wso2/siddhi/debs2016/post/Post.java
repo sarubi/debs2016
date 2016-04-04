@@ -19,6 +19,10 @@ public class Post {
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
     private Set<Long> commenters = new HashSet<Long>();
 
+
+    public Post(){
+
+    }
     /**
      * Constructor to create new post
      * @param timeStamp the arrival time of the comment

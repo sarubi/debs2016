@@ -135,7 +135,10 @@ public class TimeWindow {
         for (Post post: noComments) {
             int oldScore = post.getOldScore();
             int newScore = post.getScore(ts);
-            if (oldScore != newScore){
+            if (newScore <= 0){
+                postScoreMap.remove(oldScore, post.getPostId());
+                postStore.getPostList().remove(post.getPostId());
+            }else if (oldScore != newScore){
                 postScoreMap.remove(oldScore, post.getPostId());
                 if (newScore > 0){
                     postScoreMap.put(newScore, post.getPostId());

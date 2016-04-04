@@ -94,7 +94,6 @@ public class PostStore {
 
 //        System.out.println(postScoreMap.toString());
 //        System.out.println(" post map size " + postScoreMap.size());
-
         Iterator itr =  postScoreMap.entrySet().iterator();
         for (Iterator<Map.Entry<Integer, Long>> it = itr; it.hasNext();) {
             Map.Entry<Integer, Long> entry = it.next();
@@ -125,6 +124,13 @@ public class PostStore {
             i++;
             if (i == 3){
                 break;
+            }
+        }
+
+        for (; i < 3; i++){
+            if (previousOrderedTopThree[i] != null){
+                previousOrderedTopThree[i] = null;
+                changeFlag = true;
             }
         }
 
