@@ -7,6 +7,8 @@ import org.wso2.siddhi.debs2016.post.PostStore;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -14,7 +16,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TimeWindow {
 
-    LinkedBlockingQueue<Post> noComments = new LinkedBlockingQueue<>();
+//    LinkedBlockingQueue<Post> noComments = new LinkedBlockingQueue<>();
+
     LinkedBlockingQueue<CommentForPost> oneDay = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> twoDays = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> threeDays = new LinkedBlockingQueue<>();
@@ -45,7 +48,7 @@ public class TimeWindow {
      */
     public void addComment(Post post, long ts){
         long postId = post.getPostId();
-        noComments.remove(post);
+//        noComments.remove(post);
         oneDay.add(new CommentForPost(post, ts));
         postScoreMap.remove(post.getTotalScore(), postId);
         postScoreMap.put(post.updateScore(ts), postId);
@@ -58,7 +61,7 @@ public class TimeWindow {
      * @param post the new post
      */
     public void addNewPost(Post post){
-        noComments.add(post);
+//        noComments.add(post);
     }
 
     /**
@@ -77,7 +80,7 @@ public class TimeWindow {
         process(ts, eightDays, nineDays, 8);
         process(ts, nineDays, tenDays, 9);
         process(ts, tenDays, null, 10);
-        processPost(ts);
+//        processPost(ts);
 
     }
 
@@ -131,19 +134,23 @@ public class TimeWindow {
      *
      * @param ts the event time
      */
-    private void processPost(long ts){
-        for (Post post: noComments) {
-            int totalScore = post.getTotalScore();
-            int newScore = post.updateScore(ts);
-            if (newScore <= 0){
-                postScoreMap.remove(totalScore, post.getPostId());
-                postStore.getPostList().remove(post.getPostId());
-            }else if (totalScore != newScore){
-                postScoreMap.remove(totalScore, post.getPostId());
-                postScoreMap.put(newScore, post.getPostId());
-
-            }
-        }
-    }
+//    private void processPost(long ts){
+//        System.out.println(noComments.size());
+//        Iterator<Post> iterator= noComments.iterator();
+//        while (iterator.hasNext()){
+//            Post post = iterator.next();
+//            int totalScore = post.getTotalScore();
+//            int newScore = post.updateScore(ts);
+//            if (newScore <= 0){
+//                postScoreMap.remove(totalScore, post.getPostId());
+//                postStore.getPostList().remove(post.getPostId());
+//                iterator.remove();
+//            }else if (totalScore != newScore){
+//                postScoreMap.remove(totalScore, post.getPostId());
+//                postScoreMap.put(newScore, post.getPostId());
+//
+//            }
+//        }
+//    }
 
 }

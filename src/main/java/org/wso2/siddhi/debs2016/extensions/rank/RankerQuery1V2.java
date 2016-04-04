@@ -4,8 +4,6 @@ import org.wso2.siddhi.core.config.ExecutionPlanContext;
 import org.wso2.siddhi.core.executor.ExpressionExecutor;
 import org.wso2.siddhi.core.query.processor.stream.function.StreamFunctionProcessor;
 import org.wso2.siddhi.debs2016.comment.TimeWindow;
-import org.wso2.siddhi.debs2016.input.CommentRecord;
-import org.wso2.siddhi.debs2016.input.PostRecord;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -96,9 +94,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         if (post != null) {
                             post.addComment(ts, commenter_id);
                             timeWindow.updateTime(ts);
-                            if (postStore.getPostList().containsValue(post)){
-                                timeWindow.addComment(post, ts);
-                            }
+                            timeWindow.addComment(post, ts);
                         }else{
                             timeWindow.updateTime(ts);
                         }
@@ -111,9 +107,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                         if (post != null) {
                             post.addComment(ts, commenter_id);
                             timeWindow.updateTime(ts);
-                            if (postStore.getPostList().containsValue(post)){
-                                timeWindow.addComment(post, ts);
-                            }
+                            timeWindow.addComment(post, ts);
                         }else{
                             timeWindow.updateTime(ts);
                         }
