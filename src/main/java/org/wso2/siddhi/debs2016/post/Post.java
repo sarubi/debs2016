@@ -14,6 +14,7 @@ public class Post {
     private long postId;
 
     private int score;
+    private int oldScore;
     private String userName;
     private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
     private Set<Long> commenters = new HashSet<Long>();
@@ -28,6 +29,7 @@ public class Post {
         this.userName = userName;
         // This is total score of comments of the post ??
         this.score = 0;
+        oldScore = 10;
         this.postId = postId;
     }
 
@@ -47,7 +49,18 @@ public class Post {
      * @return the total score at time ts
      */
     public int getScore(long ts) {
-        return score + getPostScore(ts);
+        oldScore =  score + getPostScore(ts);
+        return oldScore;
+    }
+
+    /**
+     *
+     * Get the previous total score of a post before before updated for current timestamp
+     *
+     * @return Old score of post
+     */
+    public int getOldScore(){
+        return oldScore;
     }
 
     /**
@@ -126,7 +139,7 @@ public class Post {
     /**
      * Decrement Score by one
      */
-    public long decrementScore(){
-        return score = score - 1;
+    public void decrementScore(){
+        score = score - 1;
     }
 }

@@ -16,6 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TimeWindow {
 
+    LinkedBlockingQueue<Post> noComments = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> oneDay = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> twoDays = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> threeDays = new LinkedBlockingQueue<>();
@@ -27,7 +28,7 @@ public class TimeWindow {
     LinkedBlockingQueue<CommentForPost> nineDays = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
     private PostStore postStore;
-
+    BoundedSortedMultiMap<Integer, Long> postScoreMap;
     /**
      * The constructor
      * @param postStore the post score object
@@ -35,6 +36,7 @@ public class TimeWindow {
     public TimeWindow(PostStore postStore)
     {
         this.postStore = postStore;
+        this.postScoreMap = postStore.getPostScoreMap();
     }
 
 
@@ -44,8 +46,22 @@ public class TimeWindow {
      * @param ts is the time of arrival of the new comment
      */
     public void addComment(Post post, long ts){
-        this.postStore = postStore;
+//        this.postStore = postStore;
+        long postId = post.getPostId();
+        noComments.remove(post);
         oneDay.add(new CommentForPost(post, ts));
+        postScoreMap.remove(post.getOldScore(), postId);
+        postScoreMap.put(post.getScore(ts), postId);
+    }
+
+    /**
+     *
+     * Add a new post with no comments
+     *
+     * @param post the new post
+     */
+    public void addNewPost(Post post){
+        noComments.add(post);
     }
 
     /**
@@ -64,6 +80,7 @@ public class TimeWindow {
         process(ts, eightDays, nineDays, 8);
         process(ts, nineDays, tenDays, 9);
         process(ts, tenDays, null, 10);
+        processPost(ts);
 
     }
 
@@ -78,36 +95,32 @@ public class TimeWindow {
 
         try {
 
-            BoundedSortedMultiMap<Long, Long> postScoreMap = postStore.getPostScoreMap();
             Iterator<CommentForPost> iterator = queue.iterator();
             HashMap<Long, Post> postMap = postStore.getPostList();
 
-            while (iterator.hasNext()) {
+            while (iterator.hasNext()) { //Iterate over Queue
                 CommentForPost commentPostObject = iterator.next();
                 long commentTs = commentPostObject.getTs();
                 if (commentTs <= (ts - CommentPostMap.DURATION * queueNumber)) {
                     Post post = commentPostObject.getPost();
                     long postID = post.getPostId();
-                    long oldPostScore = post.getScore(ts);
-
-                    postScoreMap.remove(oldPostScore, postID);
+//                    long oldPostScore = post.getScore(ts); //This is not the old score. Check next line
+                    int oldPostScore = post.getOldScore();
                     if (nextQueue != null) {
                         nextQueue.add(commentPostObject);
                     }
-
-                    long newScore = post.decrementScore();
-
+                    post.decrementScore();
+                    postScoreMap.remove(oldPostScore, postID);
+                    int newScore = post.getScore(ts);
+                    if(newScore <= 0)
+                    {
+                        postMap.remove(postID);
+                    }
                     if(newScore > 0) {
                         postScoreMap.put(newScore, postID);
                     }
 
                     iterator.remove();
-
-                    if(newScore < 0)
-                    {
-                        postMap.remove(postID);
-                    }
-
                 } else {
                     break;
                 }
@@ -118,5 +131,17 @@ public class TimeWindow {
         }
     }
 
+    private void processPost(long ts){
+        for (Post post: noComments) {
+            int oldScore = post.getOldScore();
+            int newScore = post.getScore(ts);
+            if (oldScore != newScore){
+                postScoreMap.remove(oldScore, post.getPostId());
+                if (newScore > 0){
+                    postScoreMap.put(newScore, post.getPostId());
+                }
+            }
+        }
+    }
 
 }

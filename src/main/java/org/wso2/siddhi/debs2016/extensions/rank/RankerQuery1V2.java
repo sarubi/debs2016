@@ -73,10 +73,15 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             // What is the plan for commentPostMap?
             // What aren't we doing timeWindow(ts) at the start?
 
+            //The order given necessarily means that we have to delete a post after updating the store
+            //We need commentPostMap to point a comment to comment to the correct post (Eliminates recursion)
+
+            Post post;
             switch (isPostFlag){
                 case Constants.POSTS:
                     long post_id = (Long) objects[2];
-                    postStore.addPost(post_id, ts, user_name); // 2)
+                    post = postStore.addPost(post_id, ts, user_name); // 2)
+                    timeWindow.addNewPost(post);
                     timeWindow.updateTime(ts);
                     break;
 
@@ -87,26 +92,26 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     long commenter_id = (Long) objects[2];
 
                     if (post_replied_id != -1 && comment_replied_id == -1){
-                        Post post = postStore.getPost(post_replied_id);
-                        if (post != null){
+                        post = postStore.getPost(post_replied_id);
+                        timeWindow.updateTime(ts);
+                        if (post != null) {
                             post.addComment(ts, commenter_id);
                             timeWindow.addComment(post, ts);
                         }
-                        timeWindow.updateTime(ts);
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
                         long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
-                        Post post = postStore.getPost(parent_post_id);
-                        if (post != null){
+                        post = postStore.getPost(parent_post_id);
+                        timeWindow.updateTime(ts);
+                        if (post != null) {
                             post.addComment(ts, commenter_id);
                             timeWindow.addComment(post, ts);
                         }
-                        timeWindow.updateTime(ts);
                     }
                     break;
             }
-            Long endTime= -1L;
-            postStore.printTopThreeComments(ts);
+//            Long endTime= -1L;
+            Long endTime = postStore.printTopThreeComments(ts, true, true, ",");
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;

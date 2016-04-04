@@ -4,7 +4,6 @@ import com.google.common.collect.*;
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import edu.ucla.sspace.util.SortedMultiMap;
 import edu.ucla.sspace.util.TreeMultiMap;
-import org.wso2.siddhi.debs2016.comment.MyLong;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,7 +19,7 @@ import java.util.*;
 public class PostStore {
 
     private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
-    private BoundedSortedMultiMap<Long, Long> postScoreMap = new BoundedSortedMultiMap<Long, Long>(3, true, true, true);
+    private BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<Integer, Long>(3, true, true, true);
     private Long[] previousOrderedTopThree = new Long[3];
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
@@ -53,9 +52,11 @@ public class PostStore {
      * @param ts of post
      * @param userName of person who posted
      */
-    public void addPost(Long postId, Long ts, String userName){
-        postList.put(postId, new Post(ts, userName, postId));
-        postScoreMap.put(10L, postId);
+    public Post addPost(Long postId, Long ts, String userName){
+        Post post = new Post(ts, userName, postId);
+        postList.put(postId, post);
+        postScoreMap.put(10, postId);
+        return post;
     }
 
     /**
@@ -73,7 +74,7 @@ public class PostStore {
      * Gets the postScoreMap
      *
      */
-    public BoundedSortedMultiMap<Long, Long> getPostScoreMap()
+    public BoundedSortedMultiMap<Integer, Long> getPostScoreMap()
     {
         return postScoreMap;
     }
@@ -84,32 +85,85 @@ public class PostStore {
      * @param ts is the timestamp of event that might trigger a change
      */
 
-    public void printTopThreeComments(Long ts) {
+    public long printTopThreeComments(Long ts, boolean printComments, boolean writeToFile, String delimiter) {
 
 
-        TreeMultimap<Long, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
+        TreeMultimap<Integer, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
 
         int uniqueScoreCount = 0;
 
+//        System.out.println(postScoreMap.toString());
+//        System.out.println(" post map size " + postScoreMap.size());
 
-        System.out.println(" post map size " + postScoreMap.size());
         Iterator itr =  postScoreMap.entrySet().iterator();
-        for (Iterator<Map.Entry<Long, Long>> it = itr; it.hasNext();) {
-            Map.Entry<Long, Long> entry = it.next();
-            long score = entry.getKey();
+        for (Iterator<Map.Entry<Integer, Long>> it = itr; it.hasNext();) {
+            Map.Entry<Integer, Long> entry = it.next();
+            int score = entry.getKey();
             long id = entry.getValue();
            // System.out.println("Score ID " + score + "  "  + id);
             topScoreMap.put(score, postList.get(id));
         }
 
-        Iterator itr2 = topScoreMap.entries().iterator();
-        for (Iterator<Map.Entry<Long, Post>> it = itr2 ; it.hasNext(); ) {
-            Map.Entry<Long, Post> entry = it.next();
-            long score = entry.getKey();
-            long id = entry.getValue().getPostId();
-            System.out.println("Score ID " + score + "  "  + id);
+//        Iterator itr2 = topScoreMap.entries().iterator();
+//        for (Iterator<Map.Entry<Integer, Post>> it = itr2 ; it.hasNext(); ) {
+//            Map.Entry<Integer, Post> entry = it.next();
+//            int score = entry.getKey();
+//            long id = entry.getValue().getPostId();
+//            System.out.print("Score ID " + score + "  "  + id + ", ");
+//        }
+//        System.out.println();
+
+        boolean changeFlag = false;
+        int i = 0;
+
+        for (Post post: topScoreMap.values()) {
+            long id = post.getPostId();
+            if (previousOrderedTopThree[i] == null || previousOrderedTopThree[i] != id){
+                changeFlag = true;
+                previousOrderedTopThree[i] = id;
+            }
+            i++;
+            if (i == 3){
+                break;
+            }
         }
 
+        try{
+
+            if (changeFlag){
+                builder.setLength(0);
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                String fmm = df.format(new java.util.Date(ts));
+                builder.append(fmm + delimiter);
+                for (int k = 0; k < 3 ; k++){
+                    if (this.previousOrderedTopThree[k] != null){
+                        Post post = postList.get(this.previousOrderedTopThree[k]);
+                        builder.append(this.previousOrderedTopThree[k] + delimiter);
+                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
+                        builder.append(post.getScore(ts) + delimiter);
+                        builder.append(post.getNumberOfCommenters());
+                    }else{
+                        builder.append("-, -, -, -");
+                    }
+                    if(k != 2){
+                        builder.append(delimiter);
+                    }
+                }
+                builder.append("\n");
+                if (printComments) {
+                    System.out.print(builder.toString());
+                }
+
+                if (writeToFile) {
+                    writer.write(builder.toString());
+                }
+                return System.currentTimeMillis();
+            }
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return -1L;
     }
     /**
      *
@@ -240,7 +294,7 @@ class PostComparator implements Comparator<Post>{
                 return -1;
             }
         }
-        return -1;
+        return 1;
     }
 
 
