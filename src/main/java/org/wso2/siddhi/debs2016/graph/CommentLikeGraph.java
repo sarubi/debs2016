@@ -41,7 +41,7 @@ public class CommentLikeGraph {
      *
      * @return the size of the largest connected component
      */
-    public long getSizeOfLargestConnectedComponent()
+    public long computeLargestConnectedComponent()
     {
         if(dirty) {
             dirty = false;
@@ -66,7 +66,11 @@ public class CommentLikeGraph {
         }
         dirty = true;
     }
+    
+    private void computeLargestConnectedComponentInParallel (){
 
+
+    }
 
     /**
      * Handle event of a new friendship in CommentLikeGraph

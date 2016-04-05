@@ -154,7 +154,7 @@ public class CommentStore {
     private void updateKLargestComments() {
         componentSizeCommentMap.clear();
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
+            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
             if (sizeOfComponent == 0){
                 continue;
             }
@@ -277,5 +277,6 @@ public class CommentStore {
 
         return commentStore.size();
     }
+
 
 }
