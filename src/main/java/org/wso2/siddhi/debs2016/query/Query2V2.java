@@ -7,6 +7,7 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
+import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadSiddhi;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.File;
@@ -117,7 +118,7 @@ public class Query2V2 extends Thread{
         eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
         eventBufferList[2] = dataLoaderThreadLikes.getEventBuffer();
 
-        OrderedEventSenderThread orderedEventSenderThread = new OrderedEventSenderThread(eventBufferList, inputHandlerNew);
+        OrderedEventSenderThreadSiddhi orderedEventSenderThread = new OrderedEventSenderThreadSiddhi(eventBufferList, inputHandlerNew);
 
         executionPlanRuntime.start();
 
