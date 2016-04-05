@@ -4,11 +4,9 @@ import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
+import org.wso2.siddhi.debs2016.post.PostWindowObject;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -16,7 +14,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TimeWindow {
 
-//    LinkedBlockingQueue<Post> noComments = new LinkedBlockingQueue<>();
 
     LinkedBlockingQueue<CommentForPost> oneDay = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<CommentForPost> twoDays = new LinkedBlockingQueue<>();
@@ -30,6 +27,9 @@ public class TimeWindow {
     LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
     private PostStore postStore;
     BoundedSortedMultiMap<Integer, Long> postScoreMap;
+
+    LinkedList<PostWindowObject> postWindow = new LinkedList<>();
+
     /**
      * The constructor
      * @param postStore the post score object
@@ -46,12 +46,12 @@ public class TimeWindow {
      * @param post is the post object that received the new comment
      * @param ts is the time of arrival of the new comment
      */
-    public void addComment(Post post, long ts){
+    public void addComment(Post post, long ts, long commenter_id){
         long postId = post.getPostId();
-//        noComments.remove(post);
         oneDay.add(new CommentForPost(post, ts));
         postScoreMap.remove(post.getTotalScore(), postId);
-        postScoreMap.put(post.updateScore(ts), postId);
+        post.addComment(ts, commenter_id);
+        postScoreMap.put(post.getTotalScore(), postId);
     }
 
     /**
@@ -60,8 +60,9 @@ public class TimeWindow {
      *
      * @param post the new post
      */
-    public void addNewPost(Post post){
-//        noComments.add(post);
+    public void addNewPost(long ts, Post post){
+        postWindow.addFirst(new PostWindowObject(ts, post));
+        postScoreMap.put(10, post.getPostId());
     }
 
     /**
@@ -80,7 +81,7 @@ public class TimeWindow {
         process(ts, eightDays, nineDays, 8);
         process(ts, nineDays, tenDays, 9);
         process(ts, tenDays, null, 10);
-//        processPost(ts);
+        processPost(ts);
 
     }
 
@@ -96,7 +97,6 @@ public class TimeWindow {
         try {
 
             Iterator<CommentForPost> iterator = queue.iterator();
-            HashMap<Long, Post> postMap = postStore.getPostList();
 
             while (iterator.hasNext()) { //Iterate over Queue
                 CommentForPost commentPostObject = iterator.next();
@@ -104,18 +104,13 @@ public class TimeWindow {
                 if (commentTs <= (ts - CommentPostMap.DURATION * queueNumber)) {
                     Post post = commentPostObject.getPost();
                     long postID = post.getPostId();
-                    int totalScore = post.getTotalScore();
-                    post.decrementCommentScore();
-                    postScoreMap.remove(totalScore, postID);
-                    int newScore = post.updateScore(ts);
-                    if(newScore <= 0)
-                    {
-                        postMap.remove(postID);
-                    }else{
-                        postScoreMap.put(newScore, postID);
-                        if (nextQueue != null) {
-                            nextQueue.add(commentPostObject);
-                        }
+                    int oldScore = post.getTotalScore();
+                    postScoreMap.remove(oldScore, postID);
+                    post.decrementTotalScore();
+                    int newScore = post.getTotalScore();
+                    postScoreMap.put(newScore, postID);
+                    if (nextQueue != null) {
+                        nextQueue.add(commentPostObject);
                     }
                     iterator.remove();
                 } else {
@@ -134,23 +129,41 @@ public class TimeWindow {
      *
      * @param ts the event time
      */
-//    private void processPost(long ts){
-//        System.out.println(noComments.size());
-//        Iterator<Post> iterator= noComments.iterator();
-//        while (iterator.hasNext()){
-//            Post post = iterator.next();
-//            int totalScore = post.getTotalScore();
-//            int newScore = post.updateScore(ts);
-//            if (newScore <= 0){
-//                postScoreMap.remove(totalScore, post.getPostId());
-//                postStore.getPostList().remove(post.getPostId());
-//                iterator.remove();
-//            }else if (totalScore != newScore){
-//                postScoreMap.remove(totalScore, post.getPostId());
-//                postScoreMap.put(newScore, post.getPostId());
-//
-//            }
-//        }
-//    }
+    private void processPost(long ts){
 
+        Iterator<PostWindowObject> iterator = postWindow.descendingIterator();
+        HashMap<Long, Post> postMap = postStore.getPostList();
+        ArrayList<PostWindowObject> deductedPosts = new ArrayList<>();
+
+        while (iterator.hasNext()){
+            PostWindowObject postObject = iterator.next();
+            Post post = postObject.getPost();
+            long postId = post.getPostId();
+            int oldScore = post.getTotalScore();
+            long postArrivalTime = postObject.getArrivalTime();
+
+
+            //Check how many days it has passed
+            while (postArrivalTime <= (ts - CommentPostMap.DURATION)){
+                post.decrementTotalScore();
+                postArrivalTime = postArrivalTime + CommentPostMap.DURATION;
+            }
+            int newScore = post.getTotalScore();
+            if (oldScore != newScore){
+                iterator.remove();
+                postScoreMap.remove(oldScore, postId);
+                if(newScore <= 0){
+                    postMap.remove(postId);
+                }else{
+                    deductedPosts.add(new PostWindowObject(postArrivalTime, post));
+                    postScoreMap.put(post.getTotalScore(), postId);
+                }
+            }
+        }
+
+        for (PostWindowObject postObject:
+             deductedPosts) {
+            postWindow.addFirst(postObject);
+        }
+    }
 }

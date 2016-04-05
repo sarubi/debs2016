@@ -80,7 +80,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     long post_id = (Long) objects[2];
                     post = postStore.addPost(post_id, ts, user_name); // 2)
                     timeWindow.updateTime(ts);
-                    timeWindow.addNewPost(post);
+                    timeWindow.addNewPost(ts, post);
                     break;
 
                 case Constants.COMMENTS:
@@ -90,26 +90,20 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     long commenter_id = (Long) objects[2];
 
                     if (post_replied_id != -1 && comment_replied_id == -1){
+                        timeWindow.updateTime(ts);
                         post = postStore.getPost(post_replied_id);
                         if (post != null) {
-                            post.addComment(ts, commenter_id);
-                            timeWindow.updateTime(ts);
-                            timeWindow.addComment(post, ts);
-                        }else{
-                            timeWindow.updateTime(ts);
+                            timeWindow.addComment(post, ts, commenter_id);
                         }
-
                         commentPostMap.addCommentToPost(comment_id, post_replied_id);
+
                     } else if (comment_replied_id != -1 && post_replied_id == -1){
                         timeWindow.updateTime(ts);
                         long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
                         post = postStore.getPost(parent_post_id);
+                        timeWindow.updateTime(ts);
                         if (post != null) {
-                            post.addComment(ts, commenter_id);
-                            timeWindow.updateTime(ts);
-                            timeWindow.addComment(post, ts);
-                        }else{
-                            timeWindow.updateTime(ts);
+                            timeWindow.addComment(post, ts, commenter_id);
                         }
                     }
                     break;

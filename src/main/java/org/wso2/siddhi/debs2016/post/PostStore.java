@@ -53,7 +53,6 @@ public class PostStore {
     public Post addPost(Long postId, Long ts, String userName){
         Post post = new Post(ts, userName, postId);
         postList.put(postId, post);
-        postScoreMap.put(10, postId);
         return post;
     }
 
@@ -94,6 +93,7 @@ public class PostStore {
             int score = entry.getKey();
             long id = entry.getValue();
            // System.out.println("Score ID " + score + "  "  + id);
+
             topScoreMap.put(score, postList.get(id));
         }
 

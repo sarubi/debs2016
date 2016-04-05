@@ -13,10 +13,9 @@ public class Post {
     private long latestCommentTime;
     private long postId;
 
-    private int commentScore;
+//    private int commentScore;
     private int totalScore;
     private String userName;
-    private HashMap<Long, Comment> commentList = new HashMap<Long, Comment>(); //CommentId, CommentObject
     private Set<Long> commenters = new HashSet<Long>();
 
 
@@ -29,7 +28,7 @@ public class Post {
         this.arrivalTime = timeStamp;
         this.userName = userName;
         // This is total commentScore of comments of the post ??
-        this.commentScore = 0;
+//        this.commentScore = 0;
         this.totalScore = 10;
         this.postId = postId;
     }
@@ -44,15 +43,15 @@ public class Post {
         return userName;
     }
 
-    /**
-     * Gets the total commentScore of the post at time ts
-     *
-     * @return the total commentScore at time ts
-     */
-    public int updateScore(long ts) {
-        totalScore = commentScore + getPostScore(ts);
-        return totalScore;
-    }
+//    /**
+//     * Gets the total commentScore of the post at time ts
+//     *
+//     * @return the total commentScore at time ts
+//     */
+//    public int updateScore(long ts) {
+//        totalScore = commentScore + getPostScore(ts);
+//        return totalScore;
+//    }
 
     /**
      *
@@ -64,14 +63,29 @@ public class Post {
         return totalScore;
     }
 
+
+//    /**
+//     * Decrement Score by one
+//     */
+//    public void decrementCommentScore(){
+//        commentScore = commentScore - 1;
+//    }
+
     /**
-     * Update the post commentScore (i.e. total commentScore)
-     *
-     * @param ts the update time
+     * Decrement total score by one
      */
-    private int getPostScore(long ts) {
-        return CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/CommentPostMap.DURATION);
+    public void decrementTotalScore(){
+        totalScore = totalScore - 1;
     }
+
+//    /**
+//     * Update the post commentScore (i.e. total commentScore)
+//     *
+//     * @param ts the update time
+//     */
+//    private int getPostScore(long ts) {
+//        return CommentPostMap.INITIAL_SCORE - (int) ((ts - arrivalTime)/CommentPostMap.DURATION);
+//    }
 
     /**
      * Adds a new comment to a post
@@ -83,7 +97,8 @@ public class Post {
     {
         commenters.add(userID);
         latestCommentTime = arrivalTime;
-        commentScore = commentScore + 10;
+//        commentScore = commentScore + 10;
+        totalScore = totalScore + 10;
     }
 
 
@@ -97,19 +112,6 @@ public class Post {
         return arrivalTime;
     }
 
-
-
-    /**
-     * Gets the comment from the comment id (added to support unit testing)
-     *
-     * @param commentID the comment id
-     * @return the comment whose comment id = commentID
-     */
-    public Comment getComment(long commentID)
-    {
-        return commentList.get(commentID);
-
-    }
 
     /**
      * Calculate number of users who have commented on a post
@@ -135,12 +137,5 @@ public class Post {
      */
     public long getPostId() {
         return postId;
-    }
-
-    /**
-     * Decrement Score by one
-     */
-    public void decrementCommentScore(){
-        commentScore = commentScore - 1;
     }
 }
