@@ -104,7 +104,7 @@ public class CommentStore {
      */
     public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
 
-            updateKLargestComments();
+        computeLargestConnectedComponents();
             try {
                 if (hasKLargestCommentsChanged()) {
                     builder.setLength(0);
@@ -145,7 +145,7 @@ public class CommentStore {
     }
 
 
-    private void computeLargestConnectedComponentInParallel (){
+    private void computeLargestConnectedComponentsInParallel (){
 
         componentSizeCommentMap.clear();
 
@@ -171,7 +171,7 @@ public class CommentStore {
      *
 
      */
-    private void updateKLargestComments() {
+    private void computeLargestConnectedComponents() {
         componentSizeCommentMap.clear();
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
