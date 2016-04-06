@@ -15,16 +15,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TimeWindow {
 
 
-    LinkedBlockingQueue<CommentForPost> oneDay = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> twoDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> threeDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> fourDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> fiveDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> sixDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> sevenDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> eightDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> nineDays = new LinkedBlockingQueue<>();
-    LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> oneDay = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> twoDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> threeDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> fourDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> fiveDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> sixDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> sevenDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> eightDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> nineDays = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
     private PostStore postStore;
     BoundedSortedMultiMap<Integer, Long> postScoreMap;
 
@@ -56,7 +56,7 @@ public class TimeWindow {
 
     /**
      *
-     * Add a new post with no comments
+     * Add a new post to the post window
      *
      * @param post the new post
      */
@@ -66,7 +66,7 @@ public class TimeWindow {
     }
 
     /**
-     * Move the comments along the time axis
+     * Move the comments and posts along the time axis
      * @param ts time stamp
      */
     public void updateTime(long ts){
@@ -125,7 +125,7 @@ public class TimeWindow {
 
     /**
      *
-     * Process the post
+     * Process the post window
      *
      * @param ts the event time
      */
@@ -169,6 +169,11 @@ public class TimeWindow {
         addToList(deductedPosts);
     }
 
+    /**
+     * Adds the post to the list
+     *
+     * @param deductedPosts
+     */
     private void addToList(ArrayList<PostWindowObject> deductedPosts){
         Iterator<PostWindowObject> iterator1 = deductedPosts.iterator();
         while (iterator1.hasNext()){

@@ -57,9 +57,9 @@ public class PostStore {
     }
 
     /**
-     * Get the post details relating to a post ID
+     * Get the post object of a given post ID
      *
-     * @param postId of post required
+     * @param postId the post id
      * @return the Post object related to postId
      */
     public Post getPost(Long postId){
@@ -68,7 +68,7 @@ public class PostStore {
 
     /**
      *
-     * Gets the postScoreMap
+     * Gets map which contains the top three posts
      *
      */
     public BoundedSortedMultiMap<Integer, Long> getPostScoreMap()
@@ -76,27 +76,36 @@ public class PostStore {
         return postScoreMap;
     }
 
-
     /**
+     * Gets the map which contains the top three posts
      *
-     * @param ts is the timestamp of event that might trigger a change
+     * @return the map with top three scores
      */
-
-    public long printTopThreeComments(Long ts, boolean printComments, boolean writeToFile, String delimiter) {
-
+    private TreeMultimap<Integer, Post>  getTopThreePostsMap() {
 
         TreeMultimap<Integer, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
 
-        Iterator itr =  postScoreMap.entrySet().iterator();
-        for (Iterator<Map.Entry<Integer, Long>> it = itr; it.hasNext();) {
+        Iterator itr = postScoreMap.entrySet().iterator();
+        for (Iterator<Map.Entry<Integer, Long>> it = itr; it.hasNext(); ) {
             Map.Entry<Integer, Long> entry = it.next();
             int score = entry.getKey();
             long id = entry.getValue();
-           // System.out.println("Score ID " + score + "  "  + id);
-
             topScoreMap.put(score, postList.get(id));
+
         }
 
+        return topScoreMap;
+    }
+
+    /**
+     * Indicates if the top three posts have changed or not
+     *
+     * @return true if they have changed false otherwise
+     */
+    private boolean hasTopThreeChanged()
+    {
+
+        TreeMultimap<Integer, Post> topScoreMap = getTopThreePostsMap();
         boolean changeFlag = false;
         int i = 0;
 
@@ -118,7 +127,23 @@ public class PostStore {
                 changeFlag = true;
             }
         }
+        return changeFlag;
+    }
 
+
+    /**
+     *
+     * Print/write top three posts to a file
+     *
+     * @param ts is the timestamp of event that might trigger a change
+     * @param printComments print output
+     * @param writeToFile write the output to a file
+     * @param delimiter the delimiter to use
+     */
+
+    public long printTopThreeComments(Long ts, boolean printComments, boolean writeToFile, String delimiter) {
+
+        boolean changeFlag = hasTopThreeChanged();
         try{
             if (changeFlag){
                 builder.setLength(0);
@@ -144,7 +169,6 @@ public class PostStore {
                 if (printComments) {
                     System.out.print(builder.toString());
                 }
-
                 if (writeToFile) {
                     writer.write(builder.toString());
                 }
@@ -170,36 +194,6 @@ public class PostStore {
             e.printStackTrace();
         }
     }
-}
-
-class PostComparator implements Comparator<Post>{
-
-    @Override
-    public int compare(Post post_1, Post post_2) {
-        Long ts_1 = post_1.getArrivalTime();
-        Long ts_2 = post_2.getArrivalTime();
-
-
-        if (ts_1 > ts_2){
-            return 1;
-        } else if (ts_1 < ts_2){
-            return -1;
-        } else {
-
-            Long ts_comment_1 = post_1.getLatestCommentTime();
-            Long ts_comment_2 = post_2.getLatestCommentTime();
-
-            if (ts_comment_1 > ts_comment_2){
-                return 1;
-            }else if (ts_comment_1 < ts_comment_2){
-                return -1;
-            }
-        }
-        return 1;
-    }
-
-
-
 
 }
 

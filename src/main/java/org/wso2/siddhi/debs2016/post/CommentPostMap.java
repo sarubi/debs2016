@@ -31,7 +31,6 @@ public class CommentPostMap {
         long parentPostId = commentToPostMap.get(parentCommentId);
         commentToPostMap.put(commentId, parentPostId);
         return parentPostId;
-
     }
 
 }

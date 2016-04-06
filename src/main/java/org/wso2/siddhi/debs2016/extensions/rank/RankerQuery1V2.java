@@ -41,8 +41,6 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
             String user_name = (String) objects[5];
             int isPostFlag = (int) objects[8];
 
-//            System.out.println(ts);
-
             if (ts == -1L) {
                 //This is the place where time measuring starts.
                 startiij_timestamp = iij_timestamp;
@@ -57,8 +55,6 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
 
             }
             count++;
-
-
 
             /*Answer: When processing a new input tuple, processing steps should be performed in this order:
              1) decrease the score of all previous posts (given the semantics of the query)
@@ -108,7 +104,7 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
                     break;
             }
 //            Long endTime= -1L;
-            Long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+            Long endTime = postStore.printTopThreeComments(ts, false, true, ",");
             if (endTime != -1L){
                 latency += (endTime - (Long) objects[0]);
                 numberOfOutputs++;
@@ -138,11 +134,9 @@ public class RankerQuery1V2 extends StreamFunctionProcessor {
         commentPostMap = new CommentPostMap();
         timeWindow = new TimeWindow(postStore);
 
-        //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();
         startTime = startDateTime.getTime();
         SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
-//        System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
 
         System.out.println("Ranker Query 1 V2");
         ArrayList<Attribute> attributes = new ArrayList<Attribute>(13);

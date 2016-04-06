@@ -1,5 +1,9 @@
 package org.wso2.siddhi.debs2016.input;
 
+/**
+ * The post record
+ *
+ */
 public class PostRecord {
     public long post_id;
     public long ts; //Timestamp of the post
@@ -12,6 +16,15 @@ public class PostRecord {
     public String user; //This String contains the actual name of the user.
     public int numberOfCommentors; //The count of the commentors
 
+    /**
+     * The constructor
+     *
+     * @param post_id the post id
+     * @param ts the time stamp
+     * @param user_id the user_id
+     * @param score the score
+     * @param user the name of the user
+     */
     public PostRecord(long post_id, long ts, long user_id, int score, String user) {
         this.post_id = post_id;
         this.ts = ts;
