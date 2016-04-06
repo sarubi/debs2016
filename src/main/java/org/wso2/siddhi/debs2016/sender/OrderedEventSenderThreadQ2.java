@@ -6,18 +6,7 @@ package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
-import org.wso2.siddhi.debs2016.Processors.DEBSEventManager;
-import org.wso2.siddhi.debs2016.util.Constants;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
-import org.wso2.siddhi.debs2016.Processors.DEBSEventManager;
+import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.text.SimpleDateFormat;
@@ -36,7 +25,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
     private InputHandler inputHandler;
     private Date startDateTime;
     public boolean doneFlag = false;
-    DEBSEventManager manager = new DEBSEventManager();
+    Q2EventManager manager = new Q2EventManager();
 
 
     /**

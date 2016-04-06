@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by bhagya on 3/30/16.
  */
-public class DEBSEventManager {
+public class Q2EventManager {
     public Disruptor<DEBSEvent> getDataReadDisruptor() {
         return dataReadDisruptor;
     }
@@ -46,7 +46,7 @@ public class DEBSEventManager {
      * The constructor
      *
      */
-    public DEBSEventManager(){
+    public Q2EventManager(){
         List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
         commentStore = new CommentStore(duration, friendshipGraph, k);
