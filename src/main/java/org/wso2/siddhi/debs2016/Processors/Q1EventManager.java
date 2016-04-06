@@ -178,7 +178,7 @@ public class Q1EventManager {
                             break;
                     }
 
-                    Long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                    Long endTime = postStore.printTopThreeComments(ts, true, true, ",");
 
                     if (endTime != -1L){
                         latency += (endTime - (Long) objects[0]);

@@ -9,7 +9,7 @@ public class Run {
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
         }else{
-            Query2V2.main(args);
+            Query.main(args);
         }
 
         //        Query1.main(new String [] {"/usr/wso2/DEBS/data"});

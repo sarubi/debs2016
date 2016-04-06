@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQ2 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
-    private InputHandler inputHandler;
     private Date startDateTime;
     public boolean doneFlag = false;
     Q2EventManager manager = new Q2EventManager();
@@ -36,7 +35,6 @@ public class OrderedEventSenderThreadQ2 extends Thread {
     public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer []) {
         super("Event Sender");
         this.eventBufferList = eventBuffer;
-        this.inputHandler = inputHandler;
         manager.run();
     }
 

@@ -2,6 +2,7 @@ package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
+import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
 import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
 
@@ -20,17 +21,17 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     private LinkedBlockingQueue<Object[]> eventBufferList[];
     private Date startDateTime;
     public boolean doneFlag = false;
-    Q2EventManager manager = new Q2EventManager();
+    Q1EventManager manager = new Q1EventManager();
 
     /**
      * The constructor
      *
      * @param eventBuffer  the event buffer array
-     * @param inputHandler the input handler array
      */
-    public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler) {
+    public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[]) {
         super("Event Sender");
         this.eventBufferList = eventBuffer;
+        manager.run();
     }
 
 
@@ -70,10 +71,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             0L,
                             Constants.POSTS
                     };
-                    cTime = System.currentTimeMillis();
-                    firstPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime;
-
-
                     cTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(firstPostEvent);
