@@ -138,7 +138,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 //When all buffers are empty
                 if (commentEvent == null && postEvent == null) {
                     //Sending second dummy event to signal end of streams
-                    cTime = System.currentTimeMillis();
+
 
                     Object[] finalPostEvent = new Object[]{
                             0L,

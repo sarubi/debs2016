@@ -125,7 +125,7 @@ public class Q1EventManager {
                 //We need commentPostMap to point a comment to comment to the correct post (Eliminates recursion)
                 try {
 
-                    long iij_timestamp = (Long) objects[0];
+                    long iij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                     endiij_timestamp = iij_timestamp;
                     long ts = (Long) objects[1];
                     String user_name = (String) objects[5];
@@ -141,7 +141,6 @@ public class Q1EventManager {
                         //This is the place where time measuring ends.
                         showFinalStatistics();
                         postStore.destroy();
-
 
                     }
                     count++;

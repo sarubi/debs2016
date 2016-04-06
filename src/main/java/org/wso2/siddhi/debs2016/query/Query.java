@@ -62,10 +62,10 @@ public class Query {
         OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2);
 
 
-        OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
-        eventBufferListQ1 [0] =dataLoaderThreadPosts.getEventBuffer();
-        eventBufferListQ1 [1] =dataLoaderThreadComments.getEventBufferListSecondary();
+        eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
+        eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBufferListSecondary();
 
+        OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
 
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
@@ -73,7 +73,7 @@ public class Query {
         dataLoaderThreadPosts.start();
 
         orderedEventSenderThreadQ1.start();
-       //  orderedEventSenderThreadQ2.start();
+        orderedEventSenderThreadQ2.start();
 
 
         //Just make the main thread sleep infinitely
@@ -87,7 +87,7 @@ public class Query {
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ1.doneFlag){
+                if (orderedEventSenderThreadQ1.doneFlag&&orderedEventSenderThreadQ2.doneFlag){
                     System.exit(0);
                 }
             } catch (InterruptedException e) {

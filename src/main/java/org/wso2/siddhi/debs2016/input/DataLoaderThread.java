@@ -114,6 +114,7 @@ public class DataLoaderThread extends Thread {
                                 Constants.COMMENTS
                         };
                         eventBufferList.put(eventData);
+                        eventBufferListSecondary.put(eventData);
                         break;
                     case FRIENDSHIPS:
                         String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
@@ -137,7 +138,6 @@ public class DataLoaderThread extends Thread {
                                 0L,
                                 Constants.FRIENDSHIPS
                         };
-                        eventBufferListSecondary.put(eventData);
                         eventBufferList.put(eventData);
                         break;
                     case LIKES:

@@ -36,6 +36,10 @@ public class PostStore {
         return postList;
     }
 
+    /**
+     * The constructor
+     *
+     */
     public PostStore(){
         q1= new File("q1.txt");
         try{
