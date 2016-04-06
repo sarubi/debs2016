@@ -55,7 +55,7 @@ public class Q1EventManager {
             postStore = new PostStore();
             commentPostMap = new CommentPostMap();
             timeWindow = new TimeWindow(postStore);
-            System.out.println("Query 1: version 5");
+            System.out.println("Query 1 ----------------------------------");
         }
 
         /**
@@ -70,7 +70,7 @@ public class Q1EventManager {
                 public DEBSEvent newInstance() {
                     return new DEBSEvent();
                 }
-            }, bufferSize, Executors.newFixedThreadPool(3), ProducerType.SINGLE, new SleepingWaitStrategy());
+            }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
             //******************Handler**************************************//
 
@@ -124,6 +124,7 @@ public class Q1EventManager {
                 //The order given necessarily means that we have to delete a post after updating the store
                 //We need commentPostMap to point a comment to comment to the correct post (Eliminates recursion)
                 try {
+
                     long iij_timestamp = (Long) objects[0];
                     endiij_timestamp = iij_timestamp;
                     long ts = (Long) objects[1];
@@ -178,7 +179,7 @@ public class Q1EventManager {
                             break;
                     }
 
-                    Long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                    Long endTime = postStore.printTopThreeComments(ts, false, true, ",");
 
                     if (endTime != -1L){
                         latency += (endTime - (Long) objects[0]);
@@ -203,6 +204,7 @@ public class Q1EventManager {
 
         Date dNow = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+        System.out.println("Query 1 has completed ..........");
         System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
         System.out.println("Event count : " + count);
         System.out.println("Total run time : " + timeDifference);

@@ -149,6 +149,11 @@ public class CommentStore {
         componentSizeCommentMap.clear();
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
+
+            if(sizeOfComponent > 0)
+            {
+                System.out.println("DDDDDDDDDDD");
+            }
             if (sizeOfComponent == 0){
                 continue;
             }

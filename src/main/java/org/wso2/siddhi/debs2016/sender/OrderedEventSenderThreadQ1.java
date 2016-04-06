@@ -116,8 +116,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 }
 
                 if (tsComment < tsPost && tsComment != Long.MAX_VALUE) {
-                    cTime = System.currentTimeMillis();
-                    commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime; //This corresponds to the iij_timestamp
+
                     cTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(commentEvent);
@@ -130,7 +129,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(postEvent);
                     event.setSystemArrivalTime(cTime);
-                    manager.publish();;
+                     manager.publish();;
                     flag = Constants.POSTS;
                 }
 
@@ -153,7 +152,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             Constants.POSTS
                     };
 
-                    finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime;
                     Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
                     cTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();

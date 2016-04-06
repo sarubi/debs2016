@@ -52,7 +52,7 @@ public class Query {
         DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS);
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
         DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES);
-        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.LIKES);
+        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS);
 
 
         eventBufferListQ2[0] = dataLoaderThreadFriendships.getEventBuffer();
@@ -70,9 +70,10 @@ public class Query {
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
         dataLoaderThreadLikes.start();
+        dataLoaderThreadPosts.start();
 
         orderedEventSenderThreadQ1.start();
-       // orderedEventSenderThreadQ2.start();
+       //  orderedEventSenderThreadQ2.start();
 
 
         //Just make the main thread sleep infinitely
@@ -86,7 +87,7 @@ public class Query {
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ2.doneFlag){
+                if (orderedEventSenderThreadQ1.doneFlag){
                     System.exit(0);
                 }
             } catch (InterruptedException e) {

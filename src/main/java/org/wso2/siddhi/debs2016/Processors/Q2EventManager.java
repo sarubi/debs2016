@@ -29,7 +29,7 @@ public class Q2EventManager {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 3600000*24;
+    private long duration= 3600000;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 1;
@@ -111,6 +111,7 @@ public class Q2EventManager {
 
         Date dNow = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+        System.out.println("\n\n Query 2 has completed ..........\n\n");
         System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
         System.out.println("Event count : " + count);
         System.out.println("Total run time : " + timeDifference);
@@ -174,7 +175,7 @@ public class Q2EventManager {
                 }
 
                 if (ts != -2 && ts != -1){
-                    Long endTime = commentStore.computeKLargestComments(" : " , true, true);
+                    Long endTime = commentStore.computeKLargestComments(" : " , false, true);
 
                     if (endTime != -1L){
                         latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
