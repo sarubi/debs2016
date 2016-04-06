@@ -32,9 +32,8 @@ public class OrderedEventSenderThreadQ2 extends Thread {
      * The constructor
      *
      * @param eventBuffer the event buffer array
-     * @param inputHandler the input handler array
      */
-    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer [], InputHandler inputHandler) {
+    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer []) {
         super("Event Sender");
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;

@@ -3,15 +3,16 @@ package org.wso2.siddhi.debs2016.query;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
+import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by bhagya on 3/30/16.
+ * Created by malithjayasinghe on 4/6/16.
  */
-public class Query2Disruptor {
+public class Query {
     private String friendshipFile;
     private String postsFile;
     private String commentsFile;
@@ -27,49 +28,49 @@ public class Query2Disruptor {
             return;
         }
 
-        Query2Disruptor query2 = new Query2Disruptor(args);
-        query2.run();
+        Query query = new Query(args);
+        query.run();
     }
 
-    public Query2Disruptor(String[] args){
+    public Query(String[] args){
         friendshipFile = args[0];
         postsFile = args[1];
         commentsFile = args[2];
         likesFile = args[3];
     }
 
-    public void run() {
+    public void run(){
 
-/*
+
         System.out.println("Incremental data loading is performed.");
 
-        LinkedBlockingQueue<Object[]> eventBufferList [] = new LinkedBlockingQueue[3];
+        LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
+        LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
 
-
-        LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Friendships
-        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, eventBufferListPosts, FileType.FRIENDSHIPS);
+        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS);
+        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
+        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES);
+        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.LIKES);
 
-        //Comments
-        LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, eventBufferListComments, FileType.COMMENTS);
 
-        //Likes
-        LinkedBlockingQueue<Object[]> eventBufferListLikes = new LinkedBlockingQueue<Object[]>();
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, eventBufferListLikes, FileType.LIKES);
+        eventBufferListQ2[0] = dataLoaderThreadFriendships.getEventBuffer();
+        eventBufferListQ2[1] = dataLoaderThreadComments.getEventBuffer();
+        eventBufferListQ2[2] = dataLoaderThreadLikes.getEventBuffer();
 
-        eventBufferList[0] = dataLoaderThreadFriendships.getEventBuffer();
-        eventBufferList[1] = dataLoaderThreadComments.getEventBuffer();
-        eventBufferList[2] = dataLoaderThreadLikes.getEventBuffer();
+        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2);
+        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ2(eventBufferListQ1);
 
-        OrderedEventSenderThread orderedEventSenderThread = new OrderedEventSenderThread(eventBufferList, null);
+        eventBufferListQ1 [0] =dataLoaderThreadPosts.getEventBuffer();
+        eventBufferListQ1 [1] =dataLoaderThreadComments.getEventBufferListSecondary();
 
-        //start the data loading process
+
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
         dataLoaderThreadLikes.start();
 
-        orderedEventSenderThread.start();
+        orderedEventSenderThreadQ1.start();
+        orderedEventSenderThreadQ2.start();
 
 
         //Just make the main thread sleep infinitely
@@ -78,10 +79,12 @@ public class Query2Disruptor {
         //the SiddhiManager, the SiddhiManager object may be conducting the processing of the remaining
         //data. Furthermore, since this is CEP its better have this type of mechanism, rather than
         //terminating once we are done sending the data to the CEP engine.
+
+
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThread.doneFlag){
+                if (orderedEventSenderThreadQ2.doneFlag){
                     System.exit(0);
                 }
             } catch (InterruptedException e) {
@@ -89,6 +92,5 @@ public class Query2Disruptor {
             }
         }
     }
-    */
-    }
+
 }

@@ -1,6 +1,8 @@
 package org.wso2.siddhi.debs2016.sender;
 
 import org.wso2.siddhi.core.stream.input.InputHandler;
+import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
+import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.text.SimpleDateFormat;
@@ -16,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQ1 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList[];
-    private InputHandler inputHandler;
     private Date startDateTime;
     public boolean doneFlag = false;
+    Q2EventManager manager = new Q2EventManager();
 
     /**
      * The constructor
@@ -29,7 +31,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler) {
         super("Event Sender");
         this.eventBufferList = eventBuffer;
-        this.inputHandler = inputHandler;
     }
 
 
@@ -71,8 +72,13 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     };
                     cTime = System.currentTimeMillis();
                     firstPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime;
-                    inputHandler.send(cTime, firstPostEvent);
 
+
+                    cTime = System.currentTimeMillis();
+                    DEBSEvent event = manager.getNextDebsEvent();
+                    event.setObjectArray(firstPostEvent);
+                    event.setSystemArrivalTime(cTime);
+                    manager.publish();
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
                     startDateTime = new Date();
                     startTime = startDateTime.getTime();
@@ -115,12 +121,19 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 if (tsComment < tsPost && tsComment != Long.MAX_VALUE) {
                     cTime = System.currentTimeMillis();
                     commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime; //This corresponds to the iij_timestamp
-                    inputHandler.send(cTime, commentEvent);
+                    cTime = System.currentTimeMillis();
+                    DEBSEvent event = manager.getNextDebsEvent();
+                    event.setObjectArray(commentEvent);
+                    event.setSystemArrivalTime(cTime);
+                    manager.publish();
                     flag = Constants.COMMENTS;
                 } else if (tsPost != Long.MAX_VALUE) {
+
                     cTime = System.currentTimeMillis();
-                    postEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime; //This corresponds to the iij_timestamp
-                    inputHandler.send(cTime, postEvent);
+                    DEBSEvent event = manager.getNextDebsEvent();
+                    event.setObjectArray(postEvent);
+                    event.setSystemArrivalTime(cTime);
+                    manager.publish();;
                     flag = Constants.POSTS;
                 }
 
@@ -145,8 +158,11 @@ public class OrderedEventSenderThreadQ1 extends Thread {
 
                     finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = cTime;
                     Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
-                    inputHandler.send(cTime, finalPostEvent);
-
+                    cTime = System.currentTimeMillis();
+                    DEBSEvent event = manager.getNextDebsEvent();
+                    event.setObjectArray(finalPostEvent);
+                    event.setSystemArrivalTime(cTime);
+                    manager.publish();
                     doneFlag = true;
                     break;
                 }

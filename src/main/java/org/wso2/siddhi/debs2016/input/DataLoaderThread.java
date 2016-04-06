@@ -20,7 +20,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class DataLoaderThread extends Thread {
     private String fileName;
     private final static Splitter splitter = Splitter.on('|');
-    private LinkedBlockingQueue<Object[]> eventBufferList;
+    private LinkedBlockingQueue<Object[]> eventBufferList = new LinkedBlockingQueue<Object[]>();
+    private LinkedBlockingQueue<Object[]> eventBufferListSecondary = new LinkedBlockingQueue<Object[]>();
     private BufferedReader br;
     private int count;
     private FileType fileType;
@@ -31,13 +32,11 @@ public class DataLoaderThread extends Thread {
      * The constructor
      *
      * @param fileName the name of the file to be read
-     * @param eventBuffer the blocking queue which stores the data read from the file
      * @param fileType the type of the file to be read
      */
-    public DataLoaderThread(String fileName, LinkedBlockingQueue<Object[]> eventBuffer, FileType fileType){
+    public DataLoaderThread(String fileName, FileType fileType){
         super("Data Loader");
         this.fileName = fileName;
-        this.eventBufferList = eventBuffer;
         this.fileType = fileType;
     }
 
@@ -55,8 +54,6 @@ public class DataLoaderThread extends Thread {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
                         String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
-//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-//                        String startDate = "2013-07-12T18:31:01.000Z";
                         DateTime dt = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
                         Long postsTimeStampLong = dt.getMillis();
                         Long postID = Long.parseLong(dataStrIterator.next());
@@ -140,6 +137,7 @@ public class DataLoaderThread extends Thread {
                                 0L,
                                 Constants.FRIENDSHIPS
                         };
+                        eventBufferListSecondary.put(eventData);
                         eventBufferList.put(eventData);
                         break;
                     case LIKES:
@@ -188,5 +186,14 @@ public class DataLoaderThread extends Thread {
     public LinkedBlockingQueue<Object[]> getEventBuffer()
     {
         return eventBufferList;
+    }
+
+    /**
+     *
+     * @return the event buffer which has the event data
+     */
+    public LinkedBlockingQueue<Object[]> getEventBufferListSecondary()
+    {
+        return eventBufferListSecondary;
     }
 }
