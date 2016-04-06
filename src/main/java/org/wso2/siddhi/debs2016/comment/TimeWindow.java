@@ -142,12 +142,17 @@ public class TimeWindow {
             int oldScore = post.getTotalScore();
             long postArrivalTime = postObject.getArrivalTime();
 
+            long timeWindowStart = ts - CommentPostMap.DURATION;
+            if (postArrivalTime > timeWindowStart){
+                break;
+            }
 
             //Check how many days it has passed
-            while (postArrivalTime <= (ts - CommentPostMap.DURATION)){
+            while (postArrivalTime <= timeWindowStart){
                 post.decrementTotalScore();
                 postArrivalTime = postArrivalTime + CommentPostMap.DURATION;
             }
+
             int newScore = post.getTotalScore();
             if (oldScore != newScore){
                 iterator.remove();
@@ -161,9 +166,13 @@ public class TimeWindow {
             }
         }
 
-        for (PostWindowObject postObject:
-             deductedPosts) {
-            postWindow.addFirst(postObject);
+        addToList(deductedPosts);
+    }
+
+    private void addToList(ArrayList<PostWindowObject> deductedPosts){
+        Iterator<PostWindowObject> iterator1 = deductedPosts.iterator();
+        while (iterator1.hasNext()){
+            postWindow.addFirst(iterator1.next());
         }
     }
 }
