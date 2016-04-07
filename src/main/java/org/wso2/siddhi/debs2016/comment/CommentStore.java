@@ -150,17 +150,12 @@ public class CommentStore {
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
 
-            if(sizeOfComponent > 0)
-            {
-                System.out.println("DDDDDDDDDDD");
-            }
             if (sizeOfComponent == 0){
                 continue;
             }
             String comment = commentLikeGraph.getComment();
 
             componentSizeCommentMap.put(sizeOfComponent, comment);
-            componentSizeCommentMap.hashCode();
         }
     }
 

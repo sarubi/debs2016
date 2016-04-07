@@ -2,7 +2,6 @@ package org.wso2.siddhi.debs2016.query;
 
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThread;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
 import org.wso2.siddhi.debs2016.util.Constants;
