@@ -131,22 +131,22 @@ public class Q1EventManager {
                     String user_name = (String) objects[5];
                     int isPostFlag = (int) objects[8];
 
-                    if (ts == -1L) {
-                        //This is the place where time measuring starts.
-                        startiij_timestamp = iij_timestamp;
-
-                    }
-
-                    if (ts == -2L) {
-                        //This is the place where time measuring ends.
-                        showFinalStatistics();
-                        postStore.destroy();
-
-                    }
                     count++;
                     Post post;
                     switch (isPostFlag){
                         case Constants.POSTS:
+                            if (ts == -1L) {
+                                //This is the place where time measuring starts.
+                                startiij_timestamp = iij_timestamp;
+                                break;
+                            }
+
+                            if (ts == -2L) {
+                                //This is the place where time measuring ends.
+                                showFinalStatistics();
+                                postStore.destroy();
+                                break;
+                            }
                             long post_id = (Long) objects[2];
                             post = postStore.addPost(post_id, ts, user_name); // 2)
                             timeWindow.updateTime(ts);
@@ -178,7 +178,10 @@ public class Q1EventManager {
                             break;
                     }
 
-                    Long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                    Long endTime =  -1L;
+                    if(ts != -1L && ts != -2L){
+                        endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                    }
 
                     if (endTime != -1L){
                         latency += (endTime - (Long) objects[0]);

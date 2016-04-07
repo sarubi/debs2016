@@ -129,7 +129,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(postEvent);
                     event.setSystemArrivalTime(cTime);
-                     manager.publish();;
+                     manager.publish();
                     flag = Constants.POSTS;
                 }
 
