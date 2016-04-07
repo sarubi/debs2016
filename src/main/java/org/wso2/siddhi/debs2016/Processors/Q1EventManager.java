@@ -182,16 +182,13 @@ public class Q1EventManager {
                             break;
                     }
 
-                    Long endTime =  -1L;
-                    if(ts != -1L && ts != -2L){
-                        endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                    if(ts != -1L && ts != -2L) {
+                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                        if (endTime != -1L) {
+                            latency += (endTime - iij_timestamp);
+                            numberOfOutputs++;
+                        }
                     }
-
-                    if (endTime != -1L){
-                        latency += (endTime - (Long) objects[0]);
-                        numberOfOutputs++;
-                    }
-
                     } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -229,9 +226,9 @@ public class Q1EventManager {
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
-            if (numberOfOutputs!=0){
+            if (numberOfOutputs != 0){
                 long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency);
+                String latencyString = String.format("%06d", averageLatency/1000);
                 System.out.println("Average Latency " + latencyString);
                 builder.append(latencyString);
                 builder.append(" ");
