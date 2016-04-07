@@ -28,7 +28,7 @@ public class Query2 {
             return;
         }
 
-        Query1 query = new Query1(args);
+        Query2 query = new Query2(args);
         query.run();
     }
 
