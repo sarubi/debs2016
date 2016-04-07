@@ -37,7 +37,7 @@ public class CommentStore {
      * @param duration the duration
      */
     public CommentStore(long duration, Graph friendshipGraph, int k) {
-        System.out.println("Query 2: version 2");
+        System.out.println("Query1 2: version 2");
         this.duration = duration;
         this.friendshipGraph = friendshipGraph;
         this.k = k;

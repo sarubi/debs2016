@@ -42,6 +42,7 @@ public class Q2EventManager {
     static int bufferSize = 512;
     private long sequenceNumber;
 
+
     /**
      * The constructor
      *
@@ -70,7 +71,7 @@ public class Q2EventManager {
             public DEBSEvent newInstance() {
                 return new DEBSEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(3), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
@@ -111,7 +112,7 @@ public class Q2EventManager {
 
         Date dNow = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-        System.out.println("\n\n Query 2 has completed ..........\n\n");
+        System.out.println("\n\n Query1 2 has completed ..........\n\n");
         System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
         System.out.println("Event count : " + count);
         System.out.println("Total run time : " + timeDifference);

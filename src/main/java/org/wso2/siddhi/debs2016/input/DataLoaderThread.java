@@ -21,7 +21,6 @@ public class DataLoaderThread extends Thread {
     private String fileName;
     private final static Splitter splitter = Splitter.on('|');
     private LinkedBlockingQueue<Object[]> eventBufferList = new LinkedBlockingQueue<Object[]>();
-    private LinkedBlockingQueue<Object[]> eventBufferListSecondary = new LinkedBlockingQueue<Object[]>();
     private BufferedReader br;
     private int count;
     private FileType fileType;
@@ -114,7 +113,6 @@ public class DataLoaderThread extends Thread {
                                 Constants.COMMENTS
                         };
                         eventBufferList.put(eventData);
-                        eventBufferListSecondary.put(eventData);
                         break;
                     case FRIENDSHIPS:
                         String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
@@ -188,12 +186,5 @@ public class DataLoaderThread extends Thread {
         return eventBufferList;
     }
 
-    /**
-     *
-     * @return the event buffer which has the event data
-     */
-    public LinkedBlockingQueue<Object[]> getEventBufferListSecondary()
-    {
-        return eventBufferListSecondary;
-    }
+
 }

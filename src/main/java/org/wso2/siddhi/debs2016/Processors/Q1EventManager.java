@@ -55,7 +55,7 @@ public class Q1EventManager {
             postStore = new PostStore();
             commentPostMap = new CommentPostMap();
             timeWindow = new TimeWindow(postStore);
-            System.out.println("Query 1 ----------------------------------");
+            System.out.println("Query1 1 ----------------------------------");
         }
 
         /**
@@ -203,7 +203,7 @@ public class Q1EventManager {
 
         Date dNow = new Date();
         SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-        System.out.println("Query 1 has completed ..........");
+        System.out.println("Query1 1 has completed ..........");
         System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
         System.out.println("Event count : " + count);
         System.out.println("Total run time : " + timeDifference);

@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by malithjayasinghe on 4/6/16.
  */
-public class Query {
+public class Query1 {
     private String friendshipFile;
     private String postsFile;
     private String commentsFile;
@@ -20,19 +20,19 @@ public class Query {
 
     public static void main(String[] args){
 
-        File q2 = new File("q2.txt");
-        q2.delete();
+        File q1 = new File("q1.txt");
+        q1.delete();
 
         if(args.length == 0){
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
         }
 
-        Query query = new Query(args);
+        Query1 query = new Query1(args);
         query.run();
     }
 
-    public Query(String[] args){
+    public Query1(String[] args){
         friendshipFile = args[0];
         postsFile = args[1];
         commentsFile = args[2];
@@ -41,38 +41,21 @@ public class Query {
 
     public void run(){
 
-
         System.out.println("Incremental data loading is performed.");
-
         LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
-        LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
 
         //Friendships
-        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS);
+
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES);
         DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS);
 
-
-        eventBufferListQ2[0] = dataLoaderThreadFriendships.getEventBuffer();
-        eventBufferListQ2[1] = dataLoaderThreadComments.getEventBuffer();
-        eventBufferListQ2[2] = dataLoaderThreadLikes.getEventBuffer();
-
-        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2);
-
-
         eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
-        eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBufferListSecondary();
+        eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBuffer();
 
         OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
-
-        dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
-        dataLoaderThreadLikes.start();
         dataLoaderThreadPosts.start();
-
         orderedEventSenderThreadQ1.start();
-        orderedEventSenderThreadQ2.start();
 
 
         //Just make the main thread sleep infinitely
@@ -86,7 +69,7 @@ public class Query {
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ1.doneFlag&&orderedEventSenderThreadQ2.doneFlag){
+                if (orderedEventSenderThreadQ1.doneFlag){
                     System.exit(0);
                 }
             } catch (InterruptedException e) {
