@@ -17,6 +17,7 @@ public class Query1 {
     private String postsFile;
     private String commentsFile;
     private String likesFile;
+    private String[] args;
 
     public static void main(String[] args){
 
@@ -27,7 +28,6 @@ public class Query1 {
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
         }
-
         Query1 query = new Query1(args);
         query.run();
     }
@@ -37,6 +37,7 @@ public class Query1 {
         postsFile = args[1];
         commentsFile = args[2];
         likesFile = args[3];
+        this.args = args;
     }
 
     public void run(){
@@ -70,7 +71,7 @@ public class Query1 {
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
                 if (orderedEventSenderThreadQ1.doneFlag){
-                    System.exit(0);
+                    Query2.main(args);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

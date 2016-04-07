@@ -10,7 +10,6 @@ public class Run {
             return;
         }else{
             Query1.main(args);
-            Query2.main(args);
         }
     }
 }
