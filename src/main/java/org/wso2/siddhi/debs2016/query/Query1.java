@@ -24,6 +24,9 @@ public class Query1 {
         File q1 = new File("q1.txt");
         q1.delete();
 
+        File performance = new File("performance.txt");
+        performance.delete();
+
         if(args.length == 0){
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
