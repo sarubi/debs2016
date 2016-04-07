@@ -23,6 +23,12 @@ public class Query {
         File q2 = new File("q2.txt");
         q2.delete();
 
+        File q1 = new File("q1.txt");
+        q1.delete();
+
+        File performance = new File("performance.txt");
+        performance.delete();
+
         if(args.length == 0){
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
@@ -86,7 +92,7 @@ public class Query {
         while(true){
             try {
                 Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ1.doneFlag&&orderedEventSenderThreadQ2.doneFlag){
+                if (orderedEventSenderThreadQ1.doneFlag && orderedEventSenderThreadQ2.doneFlag){
                     System.exit(0);
                 }
             } catch (InterruptedException e) {

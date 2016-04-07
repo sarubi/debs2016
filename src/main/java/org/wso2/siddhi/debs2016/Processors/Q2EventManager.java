@@ -10,6 +10,10 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,21 +111,43 @@ public class Q2EventManager {
      */
     private void showFinalStatistics()
     {
-        timeDifference = endiij_timestamp - startiij_timestamp;
+        try {
+            StringBuilder builder = new StringBuilder();
+            BufferedWriter writer;
+            File performance = new File("performance.txt");
+            writer = new BufferedWriter(new FileWriter(performance, true));
+            builder.setLength(0);
 
-        Date dNow = new Date();
-        SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-        System.out.println("\n\n Query 2 has completed ..........\n\n");
-        System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
-        System.out.println("Event count : " + count);
-        System.out.println("Total run time : " + timeDifference);
-        System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
-        System.out.println("Total Latency " + latency);
-        System.out.println("Total Outputs " + numberOfOutputs);
-        if (numberOfOutputs!=0){
-            System.out.println("Average Latency " + (double)latency/numberOfOutputs);
+            timeDifference = endiij_timestamp - startiij_timestamp;
+
+            Date dNow = new Date();
+            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+            System.out.println("\n\n Query 2 has completed ..........\n\n");
+            System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+            System.out.println("Event count : " + count);
+
+            String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
+            System.out.println("Total run time : " + timeDifferenceString);
+            builder.append(timeDifferenceString);
+            builder.append(" ");
+
+            System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
+            System.out.println("Total Latency " + latency);
+            System.out.println("Total Outputs " + numberOfOutputs);
+            if (numberOfOutputs != 0) {
+                long averageLatency = latency/numberOfOutputs;
+                String latencyString = String.format("%06d", averageLatency);
+                System.out.println("Average Latency " + latencyString);
+                builder.append(latencyString);
+            }
+
+            writer.write(builder.toString());
+            writer.close();
+            System.out.flush();
+
+        }catch (IOException e){
+            e.printStackTrace();
         }
-        System.out.flush();
     }
 
 
