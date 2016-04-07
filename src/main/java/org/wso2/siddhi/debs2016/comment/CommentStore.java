@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Created by malithjayasinghe on 3/8/16.
  * <p/>
- * Stores a list of active comments (i.e. comments arrived < d time)
+ * Stores a commentComponentlist of active comments (i.e. comments arrived < d time)
  */
 public class CommentStore {
 
@@ -27,6 +27,7 @@ public class CommentStore {
     private StringBuilder builder = new StringBuilder();
     private BufferedWriter writer;
     private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
+    private LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>();
 
 
 
@@ -58,17 +59,22 @@ public class CommentStore {
      */
     public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
+        int removals=0;
 
-        for(Iterator<Map.Entry<Long, CommentLikeGraph>> it = this.commentStore.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Long, CommentLikeGraph> entry = it.next();
-            long key = entry.getKey();
-            long arrivalTime = this.commentStore.get(key).getArrivalTime();
-            long lifetime = time - arrivalTime;
-
-            if (duration < lifetime) {
-                it.remove();
+        for(Iterator<CommentComponent> iter = commentComponentlist.iterator(); iter.hasNext();){
+            CommentComponent commentComponent=iter.next();
+            long arrivalTime=commentComponent.getTs();
+            long lifeTime=time-arrivalTime;
+            long commentId=commentComponent.getCommentId();
+            if(duration<lifeTime){
+                iter.remove();
+                commentStore.remove(commentId);
+            }
+            else {
+                break;
             }
         }
+
     }
 
     /**
@@ -98,28 +104,28 @@ public class CommentStore {
      */
     public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
 
-            updateKLargestComments();
-            try {
-                if (hasKLargestCommentsChanged()) {
-                    builder.setLength(0);
-                    builder.append(tsTriggeredChange);
-                    for (String print : previousKcomments) {
-                        builder.append(delimiter + print);
-                    }
-                    builder.append("\n");
-                    if (printKComments) {
-                        System.out.println(builder.toString());
-                    }
-
-                    if (writeToFile) {
-                        writer.write(builder.toString());
-                    }
-                    return System.currentTimeMillis();
+        computeLargestConnectedComponents();
+        try {
+            if (hasKLargestCommentsChanged()) {
+                builder.setLength(0);
+                builder.append(tsTriggeredChange);
+                for (String print : previousKcomments) {
+                    builder.append(delimiter + print);
                 }
-            }catch(IOException e)
-            {
-                e.printStackTrace();
+                builder.append("\n");
+                if (printKComments) {
+                    System.out.println(builder.toString());
+                }
+
+                if (writeToFile) {
+                    writer.write(builder.toString());
+                }
+                return System.currentTimeMillis();
             }
+        }catch(IOException e)
+        {
+            e.printStackTrace();
+        }
         return  -1L;
     }
 
@@ -139,23 +145,43 @@ public class CommentStore {
     }
 
 
+    private void computeLargestConnectedComponentsInParallel (){
 
-    /**
-     * Update the K Largest comment arrays
-     *
-
-     */
-    private void updateKLargestComments() {
         componentSizeCommentMap.clear();
+
+        commentStore.entrySet().stream().forEach(e->e.getValue().computeLargestConnectedComponent());
+
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
             long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
-
             if (sizeOfComponent == 0){
                 continue;
             }
             String comment = commentLikeGraph.getComment();
 
             componentSizeCommentMap.put(sizeOfComponent, comment);
+            componentSizeCommentMap.hashCode();
+        }
+
+    }
+
+
+
+    /**
+     * Update the K Largest comment arrays
+     *
+
+     */
+    private void computeLargestConnectedComponents() {
+        componentSizeCommentMap.clear();
+        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
+            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
+            if (sizeOfComponent == 0){
+                continue;
+            }
+            String comment = commentLikeGraph.getComment();
+
+            componentSizeCommentMap.put(sizeOfComponent, comment);
+            componentSizeCommentMap.hashCode();
         }
     }
 
@@ -200,7 +226,7 @@ public class CommentStore {
         return flagChange;
     }
 
-    
+
 
 
     /**
@@ -212,11 +238,14 @@ public class CommentStore {
      */
     public void registerComment(long commentID, long ts, String comment, boolean printComment) {
 
+
         if (printComment) {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
 
         commentStore.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
+        commentComponentlist.add(new CommentComponent( ts , commentID));
+
 
     }
 
@@ -268,5 +297,6 @@ public class CommentStore {
 
         return commentStore.size();
     }
+
 
 }
