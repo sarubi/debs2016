@@ -180,7 +180,7 @@ public class Q2EventManager {
                             count--;
                             showFinalStatistics();
                             commentStore.destroy();
-                          //  dataReadDisruptor.shutdown();
+                            //  dataReadDisruptor.shutdown();
                             break;
                         }else if (ts == -1) {
                             count--;
@@ -220,3 +220,4 @@ public class Q2EventManager {
     }
 
 }
+

@@ -189,6 +189,7 @@ public class Q1EventManager {
                             numberOfOutputs++;
                         }
                     }
+
                     } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -226,9 +227,9 @@ public class Q1EventManager {
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
-            if (numberOfOutputs != 0){
+            if (numberOfOutputs!=0){
                 long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency/1000);
+                String latencyString = String.format("%06d", averageLatency);
                 System.out.println("Average Latency " + latencyString);
                 builder.append(latencyString);
                 builder.append(" ");
