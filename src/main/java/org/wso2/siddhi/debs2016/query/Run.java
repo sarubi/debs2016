@@ -10,8 +10,7 @@ public class Run {
             return;
         }else{
             Query1.main(args);
+            Query2.main(args);
         }
-
-        //        Query1.main(new String [] {"/usr/wso2/DEBS/data"});
     }
 }
