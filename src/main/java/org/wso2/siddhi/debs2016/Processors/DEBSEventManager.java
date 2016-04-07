@@ -29,7 +29,7 @@ public class DEBSEventManager {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 3600000*24;
+    private long duration= 3600000*1;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 1;
