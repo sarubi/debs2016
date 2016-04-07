@@ -41,7 +41,7 @@ public class CommentLikeGraph {
      *
      * @return the size of the largest connected component
      */
-    public long getSizeOfLargestConnectedComponent()
+    public long computeLargestConnectedComponent()
     {
         if(dirty) {
             dirty = false;

@@ -145,24 +145,7 @@ public class CommentStore {
     }
 
 
-    private void computeLargestConnectedComponentsInParallel (){
 
-        componentSizeCommentMap.clear();
-
-        commentStore.entrySet().stream().forEach(e->e.getValue().computeLargestConnectedComponent());
-
-        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-            long sizeOfComponent = commentLikeGraph.getSizeOfLargestConnectedComponent();
-            if (sizeOfComponent == 0){
-                continue;
-            }
-            String comment = commentLikeGraph.getComment();
-
-            componentSizeCommentMap.put(sizeOfComponent, comment);
-            componentSizeCommentMap.hashCode();
-        }
-
-    }
 
 
 
