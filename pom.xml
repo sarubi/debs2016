@@ -8,6 +8,9 @@
     <artifactId>debs2016gc</artifactId>
     <version>0.10</version>
 
+    <!-- Output to jar format -->
+    <packaging>jar</packaging>
+
     <repositories>
         <repository>
             <id>wso2-maven2-repository</id>
