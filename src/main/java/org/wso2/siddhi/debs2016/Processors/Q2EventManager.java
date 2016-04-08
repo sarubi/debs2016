@@ -35,14 +35,19 @@ public class Q2EventManager {
     private String ts;
     private long duration= 3600000;
     public Graph friendshipGraph ;
+
+    private static long[] count = {0,0};
+    private static long[] numberOfOutputs = {0,0};
+    private static long[] latencyArray={0,0};
+
     private CommentStore commentStore ;
     private int k = 1;
-    private static int count = 0;
+   // private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
-    private Long latency = 0L;
-    private Long numberOfOutputs = 0L;
+   // private Long latency = 0L;
+   // private Long numberOfOutputs = 0L;
     static int bufferSize = 512;
     private long sequenceNumber;
 
@@ -50,10 +55,15 @@ public class Q2EventManager {
      * The constructor
      *
      */
-    public Q2EventManager(){
+    public Q2EventManager(long[] count,long[] numberOfOutputs,long[] latencyArray){
+
+        this.count=count;
+        this.numberOfOutputs=numberOfOutputs;
+        this.latencyArray=latencyArray;
+
         List<Attribute> attributeList = new ArrayList<Attribute>();
-        friendshipGraph = new Graph();
-        commentStore = new CommentStore(duration, friendshipGraph, k);
+        //friendshipGraph = new Graph();
+        //commentStore = new CommentStore(duration, friendshipGraph, k);
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();
@@ -74,12 +84,16 @@ public class Q2EventManager {
             public DEBSEvent newInstance() {
                 return new DEBSEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(3), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(2), ProducerType.SINGLE, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
-        DEBSEventHandler debsEventHandler = new DEBSEventHandler();
-        dataReadDisruptor.handleEventsWith(debsEventHandler);
+        DEBSEventHandler debsEventHandler1 = new DEBSEventHandler(0);
+        DEBSEventHandler debsEventHandler2 = new DEBSEventHandler(1);
+
+
+        dataReadDisruptor.handleEventsWith(debsEventHandler1);
+        dataReadDisruptor.handleEventsWith(debsEventHandler2);
         dataReadBuffer = dataReadDisruptor.start();
     }
 
@@ -109,45 +123,57 @@ public class Q2EventManager {
      * Print the throughput etc
      *
      */
-    private void showFinalStatistics()
+    private void showFinalStatistics(int handlerID)
     {
-        try {
-            StringBuilder builder = new StringBuilder();
-            BufferedWriter writer;
-            File performance = new File("performance.txt");
-            writer = new BufferedWriter(new FileWriter(performance, true));
-            builder.setLength(0);
+       // if(handlerID==0) {
+            try {
+                StringBuilder builder = new StringBuilder();
+                StringBuilder builder1=new StringBuilder();
+                BufferedWriter writer;
+                File performance = new File("performance.txt");
+                writer = new BufferedWriter(new FileWriter(performance, true));
+                builder.setLength(0);
 
-            timeDifference = endiij_timestamp - startiij_timestamp;
+                timeDifference = endiij_timestamp - startiij_timestamp;
 
-            Date dNow = new Date();
-            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("\n\n Query 2 has completed ..........\n\n");
-            System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
-            System.out.println("Event count : " + count);
+                Date dNow = new Date();
+                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+                System.out.println("\n\n Query 2 has completed ..........\n\n");
+               // System.out.println("Handler ID : "+handlerID);
+                builder1.append("Handler ID : "+handlerID);
+                builder1.append("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+                builder1.append("Event count : " + count[handlerID]);
+                //System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+              //  System.out.println("Event count : " + count[handlerID]);
 
-            String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
-            System.out.println("Total run time : " + timeDifferenceString);
-            builder.append(timeDifferenceString);
-            builder.append(" ");
+                String timeDifferenceString = String.format("%06d", timeDifference / 1000); //Convert time to seconds
+                builder1.append("Total run time : " + timeDifferenceString);
+               // System.out.println("Total run time : " + timeDifferenceString);
+                builder.append(timeDifferenceString);
+                builder.append(" ");
+                //System.out.println("Throughput (events/s): " + Math.round((count[handlerID] * 1000.0) / timeDifference));
+                builder1.append("Throughput (events/s): " + Math.round((count[handlerID] * 1000.0) / timeDifference));
+                //System.out.println("Total Latency " + latencyArray[handlerID]);
+                builder1.append("Total Latency " + latencyArray[handlerID]);
+                //System.out.println("Total Outputs " + numberOfOutputs[handlerID]);
+                builder1.append("Total Outputs " + numberOfOutputs[handlerID]);
+                if (numberOfOutputs[handlerID] != 0) {
+                    long averageLatency =  (latencyArray[handlerID]) / (numberOfOutputs[handlerID]);
+                    String latencyString = String.format("%06d", averageLatency);
+                   // System.out.println("Average Latency " + latencyString);
+                    builder1.append("Average Latency " + averageLatency);
+                    builder.append(latencyString);
+                }
+                System.out.println(builder1.toString());
 
-            System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
-            System.out.println("Total Latency " + latency);
-            System.out.println("Total Outputs " + numberOfOutputs);
-            if (numberOfOutputs != 0) {
-                long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency);
-                System.out.println("Average Latency " + latencyString);
-                builder.append(latencyString);
+                writer.write(builder.toString());
+                writer.close();
+                System.out.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            writer.write(builder.toString());
-            writer.close();
-            System.out.flush();
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+       // }
     }
 
 
@@ -157,58 +183,74 @@ public class Q2EventManager {
      *
      */
     private class DEBSEventHandler implements EventHandler<DEBSEvent>{
+        public Graph friendshipGraph ;
+        private CommentStore commentStore ;
+        private int handlerId;
+        private int myHandlerID;
+
+        public DEBSEventHandler(int myHandlerID){
+            this.myHandlerID = myHandlerID;
+            friendshipGraph = new Graph();
+            commentStore = new CommentStore(duration, friendshipGraph, k);
+        }
         @Override
         public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
             try{
+                if(myHandlerID == debsEvent.getHandlerId()||debsEvent.getHandlerId()==-1) {
+                    Object[] objects = debsEvent.getObjectArray();
 
-                Object [] objects = debsEvent.getObjectArray();
+                    long ts = (Long) objects[1];
+                    //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
+                    int streamType = (Integer) objects[8];
+                    commentStore.cleanCommentStore(ts);
+                  //  count++;
 
-                long ts = (Long) objects[1];
-                //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
-                int streamType = (Integer) objects[8];
-                commentStore.cleanCommentStore(ts);
-                count++;
-
-                switch (streamType) {
-                    case Constants.COMMENTS:
-                        long comment_id = (Long) objects[3];
-                        String comment = (String) objects[4];
-                        commentStore.registerComment(comment_id, ts, comment, false);
-                        break;
-                    case Constants.FRIENDSHIPS:
-                        if (ts == -2){
-                            count--;
-                            showFinalStatistics();
-                            commentStore.destroy();
-                            //  dataReadDisruptor.shutdown();
+                    switch (streamType) {
+                        case Constants.COMMENTS:
+                            long comment_id = (Long) objects[3];
+                            String comment = (String) objects[4];
+                            commentStore.registerComment(comment_id, ts, comment, false);
+                            count[myHandlerID]++;
                             break;
-                        }else if (ts == -1) {
-                            count--;
-                            startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
-                            break;
-                        }else{
+                        case Constants.FRIENDSHIPS:
+                            if (ts == -2) {
+                                count[myHandlerID]--;
+                                showFinalStatistics(myHandlerID);
+                                commentStore.destroy();
+                                if (myHandlerID==0){
+                                    count[myHandlerID]++;
+                                }
+                                //  dataReadDisruptor.shutdown();
+                                break;
+                            } else if (ts == -1) {
+                                count[myHandlerID]--;
+                                startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
+                                break;
+                            } else {
+                                long user_id_1 = (Long) objects[2];
+                                long friendship_user_id_2 = (Long) objects[3];
+                                friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
+                                commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
+                                break;
+                            }
+                        case Constants.LIKES:
                             long user_id_1 = (Long) objects[2];
-                            long friendship_user_id_2 = (Long) objects[3];
-                            friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
-                            commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
+                            long like_comment_id = (Long) objects[3];
+                            commentStore.registerLike(like_comment_id, user_id_1);
+                            count[myHandlerID]++;
                             break;
-                        }
-                    case Constants.LIKES:
-                        long user_id_1 = (Long) objects[2];
-                        long like_comment_id = (Long) objects[3];
-                        commentStore.registerLike(like_comment_id, user_id_1);
-                        break;
-                }
-
-                if (ts != -2 && ts != -1){
-                    Long endTime = commentStore.computeKLargestComments(" : " , false, true);
-
-                    if (endTime != -1L){
-                        latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
-                        numberOfOutputs++;
                     }
 
-                    endiij_timestamp = System.currentTimeMillis();
+                    if (ts != -2 && ts != -1) {
+                        Long endTime = commentStore.computeKLargestComments(" : ", false, true);
+
+                        if (endTime != -1L) {
+                            latencyArray[handlerId] += (endTime - (Long) debsEvent.getSystemArrivalTime());
+                            numberOfOutputs[myHandlerID]++;
+                        }
+
+                        endiij_timestamp = System.currentTimeMillis();
+                    }
                 }
 
             }catch (Exception e)

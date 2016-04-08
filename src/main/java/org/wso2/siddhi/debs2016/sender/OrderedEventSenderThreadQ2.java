@@ -4,7 +4,6 @@ package org.wso2.siddhi.debs2016.sender;
  * Created by malithjayasinghe on 4/6/16.
  */
 
-import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
 import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
@@ -22,9 +21,13 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQ2 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
+  //  private InputHandler inputHandler;
     private Date startDateTime;
     public boolean doneFlag = false;
-    Q2EventManager manager = new Q2EventManager();
+    long[] count = {0,0};
+    long[] numberOfOutputs = {0,0};
+    long[] latencyArray={0,0};
+    Q2EventManager manager = new Q2EventManager(count,numberOfOutputs,latencyArray);
 
 
     /**
@@ -33,8 +36,9 @@ public class OrderedEventSenderThreadQ2 extends Thread {
      * @param eventBuffer the event buffer array
      */
     public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer []) {
-        super("Event Sender");
+       // super("Event Sender");
         this.eventBufferList = eventBuffer;
+        //this.inputHandler = inputHandler;
         manager.run();
     }
 
@@ -51,6 +55,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         long cTime = 0;
         boolean firstEvent = true;
         int flag = Constants.NOEVENT;
+        int count=0;
 
         while(true){
             //Send dummy event to mark the commencement of processing
@@ -68,6 +73,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 };
                 cTime = System.currentTimeMillis();
                 DEBSEvent event = manager.getNextDebsEvent();
+                event.setHandlerId(-1);
                 event.setObjectArray(finalFriendshipEvent);
                 event.setSystemArrivalTime(cTime);
                 manager.publish();
@@ -125,6 +131,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(friendshipEvent);
                 debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setHandlerId(-1);
                 manager.publish();
                 flag = Constants.FRIENDSHIPS;
             }else if (tsComment <= tsFriendship && tsComment <= tsLike && tsComment != Long.MAX_VALUE){
@@ -132,6 +139,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(commentEvent);
                 debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setHandlerId((long)(commentEvent[3])%2);
                 manager.publish();
                 flag = Constants.COMMENTS;
             }else if (tsLike != Long.MAX_VALUE){
@@ -139,6 +147,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(likeEvent);
                 debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setHandlerId((long)(likeEvent[3])%2);
                 manager.publish();
                 flag = Constants.LIKES;
             }
@@ -162,6 +171,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(finalFriendshipEvent);
                 debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setHandlerId(-1);
                 manager.publish();
                 manager.getDataReadDisruptor().shutdown();
                 doneFlag = true;
