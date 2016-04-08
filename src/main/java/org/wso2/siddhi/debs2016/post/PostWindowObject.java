@@ -5,8 +5,8 @@ package org.wso2.siddhi.debs2016.post;
  */
 public class PostWindowObject {
 
-    long arrivalTime;
-    Post post;
+    private long arrivalTime;
+    private Post post;
 
     /**
      * The constructor
