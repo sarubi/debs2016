@@ -8,17 +8,15 @@ public class KLargestEvent {
     private String [] kLargestComment;
     private long timeStamp;
 
-    /**
-     *
-     * The constructor
-     *
-     * @param kLargestComment k largest comment array
-     * @param timeStamp time stamp
-     */
-    public KLargestEvent(String [] kLargestComment, long timeStamp){
 
+    public void setKLargestComment(String [] kLargestComment)
+    {
         this.kLargestComment = kLargestComment;
-        this.timeStamp = timeStamp;
+    }
+
+    public void setTimeStamp(long timestamp)
+    {
+        this.timeStamp = timestamp;
     }
 
     /**

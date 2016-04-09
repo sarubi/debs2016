@@ -31,9 +31,10 @@ public class Q2EventManager {
 
 
     Disruptor<DEBSEvent> dataReadDisruptor;
-    Disruptor<DEBSEvent> outputDisruptor;
+    Disruptor<KLargestEvent> outputDisruptor;
 
     private RingBuffer dataReadBuffer;
+    private RingBuffer outputBuffer;
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
@@ -84,11 +85,11 @@ public class Q2EventManager {
         }, bufferSize, Executors.newFixedThreadPool(4), ProducerType.SINGLE, new SleepingWaitStrategy());
 
 
-        outputDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
+        outputDisruptor = new Disruptor<KLargestEvent>(new com.lmax.disruptor.EventFactory<KLargestEvent>() {
 
             @Override
-            public DEBSEvent newInstance() {
-                return new DEBSEvent();
+            public KLargestEvent newInstance() {
+                return new  KLargestEvent();
             }
         }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
@@ -106,6 +107,7 @@ public class Q2EventManager {
         dataReadDisruptor.handleEventsWith(debsEventHandler4);
 
         dataReadBuffer = dataReadDisruptor.start();
+        outputBuffer =  outputDisruptor.start();
     }
 
     /**
@@ -258,6 +260,14 @@ public class Q2EventManager {
                     }
                     if (ts != -2 && ts != -1) {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
+
+                       String kLargestComments [] = commentStore.getKLargestConnectedComponents().clone();
+                        sequenceNumber = dataReadBuffer.next();
+                        KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
+                        kLargestEvent.setKLargestComment(kLargestComments);
+                        kLargestEvent.setTimeStamp(ts);
+                        dataReadBuffer.publish(sequenceNumber);
+
                         if (endTime != -1L) {
                             latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
                             numberOfOutputs++;
