@@ -31,7 +31,7 @@ public class Q2EventManager {
 
 
     Disruptor<DEBSEvent> dataReadDisruptor;
-    Disruptor<DEBSEvent> outputProcessDisruptor;
+    Disruptor<DEBSEvent> outputDisruptor;
 
     private RingBuffer dataReadBuffer;
     private long startiij_timestamp;
@@ -39,14 +39,6 @@ public class Q2EventManager {
     private String ts;
     private long duration= 3600000;
     public Graph friendshipGraph ;
-
-    private static long count_1 = 0;
-    private static long count_2 = 0;
-    private static long count_3 = 0;
-
-    private static long[] count = {0,0};
-    private static long[] numberOfOutputs = {0,0};
-    private static long[] latencyArray={0,0};
 
     private CommentStore commentStore ;
     private int k = 1;
@@ -63,11 +55,8 @@ public class Q2EventManager {
      * The constructor
      *
      */
-    public Q2EventManager(long[] count,long[] numberOfOutputs,long[] latencyArray){
+    public Q2EventManager(){
 
-        this.count=count;
-        this.numberOfOutputs=numberOfOutputs;
-        this.latencyArray=latencyArray;
 
         List<Attribute> attributeList = new ArrayList<Attribute>();
         //friendshipGraph = new Graph();
@@ -98,8 +87,8 @@ public class Q2EventManager {
 
         DEBSEventHandler debsEventHandler1 = new DEBSEventHandler(0);
         DEBSEventHandler debsEventHandler2 = new DEBSEventHandler(1);
-        DEBSEventHandler debsEventHandler3 = new DEBSEventHandler(3);
-        DEBSEventHandler debsEventHandler4 = new DEBSEventHandler(4);
+        DEBSEventHandler debsEventHandler3 = new DEBSEventHandler(2);
+        DEBSEventHandler debsEventHandler4 = new DEBSEventHandler(3);
 
 
         dataReadDisruptor.handleEventsWith(debsEventHandler1);
@@ -136,9 +125,9 @@ public class Q2EventManager {
      * Print the throughput etc
      *
      */
-    private void showFinalStatistics(int handlerID)
+    private void showFinalStatistics(int handlerID, long count, long latency)
     {
-       // if(handlerID==0) {
+
             try {
                 StringBuilder builder = new StringBuilder();
                 StringBuilder builder1=new StringBuilder();
@@ -152,33 +141,30 @@ public class Q2EventManager {
                 Date dNow = new Date();
                 SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
                 System.out.println("\n\n Query 2 has completed ..........\n\n");
-               // System.out.println("Handler ID : "+handlerID);
-                builder1.append("Handler ID : "+handlerID);
-                builder1.append("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
-                builder1.append("Event count : " + count[handlerID]);
-                //System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
-              //  System.out.println("Event count : " + count[handlerID]);
+
+                builder1.append("Handler ID = " + handlerID + " ");
+
+                builder1.append("Event count = " + count + " ");
+
 
                 String timeDifferenceString = String.format("%06d", timeDifference / 1000); //Convert time to seconds
-                builder1.append("Total run time : " + timeDifferenceString);
-               // System.out.println("Total run time : " + timeDifferenceString);
+                builder1.append("Total run time : " + timeDifferenceString + ",");
+
                 builder.append(timeDifferenceString);
                 builder.append(" ");
-                //System.out.println("Throughput (events/s): " + Math.round((count[handlerID] * 1000.0) / timeDifference));
-                builder1.append("Throughput (events/s): " + Math.round((count[handlerID] * 1000.0) / timeDifference));
-                //System.out.println("Total Latency " + latencyArray[handlerID]);
-                builder1.append("Total Latency " + latencyArray[handlerID]);
-                //System.out.println("Total Outputs " + numberOfOutputs[handlerID]);
-                builder1.append("Total Outputs " + numberOfOutputs[handlerID]);
-                if (numberOfOutputs[handlerID] != 0) {
-                    long averageLatency =  (latencyArray[handlerID]) / (numberOfOutputs[handlerID]);
+
+                builder1.append("Throughput (events/s) = " + Math.round((count * 1000.0) / timeDifference) + ",");
+
+                builder1.append("Total Latency = " + latency + ",");
+
+                builder1.append("Total Outputs = " + count + ",");
+                if (count != 0) {
+                    long averageLatency =  (latency / count);
                     String latencyString = String.format("%06d", averageLatency);
-                   // System.out.println("Average Latency " + latencyString);
-                    builder1.append("Average Latency " + averageLatency);
+                    builder1.append("Average Latency = " + averageLatency);
                     builder.append(latencyString);
                 }
                 System.out.println(builder1.toString());
-
                 writer.write(builder.toString());
                 writer.close();
                 System.out.flush();
@@ -186,7 +172,6 @@ public class Q2EventManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-       // }
     }
 
 
@@ -202,7 +187,7 @@ public class Q2EventManager {
         private int myHandlerID;
         private long count = 0;
         private long numberOfOutputs = 0;
-        private long latencyArray = 0;
+        private long latency = 0;
 
         /**
          * The constructor
@@ -222,7 +207,7 @@ public class Q2EventManager {
                 long ts = (Long) objects[1];
                 commentStore.cleanCommentStore(ts);
 
-                if(myHandlerID == debsEvent.getHandlerId()||debsEvent.getHandlerId()==-1) {
+                if(myHandlerID == debsEvent.getHandlerId()|| debsEvent.getHandlerId()==-1) {
 
                     int streamType = (Integer) objects[8];
                     switch (streamType) {
@@ -235,7 +220,7 @@ public class Q2EventManager {
                         case Constants.FRIENDSHIPS:
                             if (ts == -2) {
                                 count--;
-                                showFinalStatistics(myHandlerID);
+                                showFinalStatistics(myHandlerID, count, latency);
                                 commentStore.destroy();
                                 if (myHandlerID==0){
                                     count++;
@@ -262,15 +247,12 @@ public class Q2EventManager {
                             count++;
                             break;
                     }
-
                     if (ts != -2 && ts != -1) {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
-
                         if (endTime != -1L) {
-                            latencyArray += (endTime - (Long) debsEvent.getSystemArrivalTime());
+                            latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
                             numberOfOutputs++;
                         }
-
                         endiij_timestamp = System.currentTimeMillis();
                     }
                 }

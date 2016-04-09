@@ -23,10 +23,8 @@ public class OrderedEventSenderThreadQ2 extends Thread {
     private LinkedBlockingQueue<Object[]> eventBufferList [];
     private Date startDateTime;
     public boolean doneFlag = false;
-    long[] count = {0,0};
-    long[] numberOfOutputs = {0,0};
-    long[] latencyArray={0,0};
-    Q2EventManager manager = new Q2EventManager(count, numberOfOutputs, latencyArray);
+
+    Q2EventManager manager = new Q2EventManager();
 
 
     /**
