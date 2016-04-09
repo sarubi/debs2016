@@ -130,6 +130,17 @@ public class CommentStore {
     }
 
     /**
+     * Gets k largest connected components
+     *
+     *
+     * @return the array containing the k largest comments
+     */
+    public String [] getKLargestConnectedComponents()
+    {
+        return previousKcomments;
+    }
+
+    /**
      *
      * De-allocate resources
      *
@@ -146,9 +157,6 @@ public class CommentStore {
 
 
 
-
-
-
     /**
      * Update the K Largest comment arrays
      *
@@ -162,9 +170,8 @@ public class CommentStore {
                 continue;
             }
             String comment = commentLikeGraph.getComment();
-
             componentSizeCommentMap.put(sizeOfComponent, comment);
-            componentSizeCommentMap.hashCode();
+
         }
     }
 
