@@ -58,7 +58,7 @@ public class Q1EventManager {
             System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
             postStore = new PostStore();
             commentPostMap = new CommentPostMap();
-            timeWindow = new TimeWindow(postStore);
+            timeWindow = new TimeWindow(postStore, commentPostMap);
             System.out.println("Query 1 ----------------------------------");
         }
 

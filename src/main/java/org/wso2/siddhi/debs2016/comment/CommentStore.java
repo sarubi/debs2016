@@ -18,7 +18,7 @@ import java.util.*;
 public class CommentStore {
 
     private long duration;
-    private HashMap<Long, CommentLikeGraph> commentStore = new HashMap<Long, CommentLikeGraph>();
+    private HashMap<Long, CommentLikeGraph> commentStore = new HashMap<Long, CommentLikeGraph>(); //Comment ID, CLG
     String[] previousKcomments;
     private boolean debug = false;
     private long tsTriggeredChange;
@@ -28,8 +28,8 @@ public class CommentStore {
     private File q2 ;
     private StringBuilder builder = new StringBuilder();
     private BufferedWriter writer;
-    private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
-    private LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>();
+    private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder()); //sizeOfComponent, comment
+    private LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>(); //timeWindow
 
 
 
@@ -61,15 +61,18 @@ public class CommentStore {
      */
     public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
-        int removals=0;
 
         for(Iterator<CommentComponent> iter = commentComponentlist.iterator(); iter.hasNext();){
             CommentComponent commentComponent=iter.next();
-            long arrivalTime=commentComponent.getTs();
-            long lifeTime=time-arrivalTime;
-            long commentId=commentComponent.getCommentId();
-            if(duration<lifeTime){
+            long arrivalTime = commentComponent.getTs();
+            long lifeTime = time - arrivalTime;
+            long commentId = commentComponent.getCommentId();
+            if(duration  < lifeTime){
                 iter.remove();
+                CommentLikeGraph clg = commentStore.get(commentId);
+                long size = clg.getSizeOfLargestConnectedComponent();
+                String comment = clg.getComment();
+                componentSizeCommentMap.remove(size, comment);
                 commentStore.remove(commentId);
             }
             else {
@@ -106,7 +109,6 @@ public class CommentStore {
      */
     public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
 
-        computeLargestConnectedComponents();
         try {
             if (hasKLargestCommentsChanged()) {
                 builder.setLength(0);
@@ -149,29 +151,23 @@ public class CommentStore {
         }
     }
 
-
-
-
-
-
-    /**
-     * Update the K Largest comment arrays
-     *
-
-     */
-    private void computeLargestConnectedComponents() {
-        componentSizeCommentMap.clear();
-        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
-            if (sizeOfComponent == 0){
-                continue;
-            }
-            String comment = commentLikeGraph.getComment();
-
-            componentSizeCommentMap.put(sizeOfComponent, comment);
-            componentSizeCommentMap.hashCode();
-        }
-    }
+//    /**
+//     * Update the K Largest comment arrays
+//     *
+//
+//     */
+//    private void computeLargestConnectedComponents() {
+//        componentSizeCommentMap.clear();
+//        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
+//            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
+//            if (sizeOfComponent == 0){
+//                continue;
+//            }
+//            String comment = commentLikeGraph.getComment();
+//
+//            componentSizeCommentMap.put(sizeOfComponent, comment);
+//        }
+//    }
 
     /**
      * Check if the k largest comments have changed
@@ -230,11 +226,8 @@ public class CommentStore {
         if (printComment) {
             System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
         }
-
         commentStore.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
         commentComponentlist.add(new CommentComponent( ts , commentID));
-
-
     }
 
 
@@ -258,7 +251,7 @@ public class CommentStore {
     public void registerLike(long commentID, long userID) {
         CommentLikeGraph commentLikeGraph = commentStore.get(commentID);
         if (commentLikeGraph != null) {
-            commentLikeGraph.registerLike(userID);
+            commentLikeGraph.registerLike(userID, componentSizeCommentMap);
         }
 
     }
@@ -271,7 +264,7 @@ public class CommentStore {
      */
     public void handleNewFriendship(long uId1, long uId2) {
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-            commentLikeGraph.handleNewFriendship(uId1, uId2);
+            commentLikeGraph.handleNewFriendship(uId1, uId2, componentSizeCommentMap);
         }
 
     }

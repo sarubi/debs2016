@@ -27,17 +27,20 @@ public class TimeWindow {
     private LinkedBlockingQueue<CommentForPost> tenDays = new LinkedBlockingQueue<>();
     private PostStore postStore;
     BoundedSortedMultiMap<Integer, Long> postScoreMap;
+    CommentPostMap commentPostMap;
 
     LinkedList<PostWindowObject> postWindow = new LinkedList<>();
 
     /**
      * The constructor
      * @param postStore the post score object
+     * @param commentPostMap the comment post map object
      */
-    public TimeWindow(PostStore postStore)
+    public TimeWindow(PostStore postStore, CommentPostMap commentPostMap)
     {
         this.postStore = postStore;
         this.postScoreMap = postStore.getPostScoreMap();
+        this.commentPostMap = commentPostMap;
     }
 
 
@@ -159,6 +162,7 @@ public class TimeWindow {
                 postScoreMap.remove(oldScore, postId);
                 if(newScore <= 0){
                     postMap.remove(postId);
+                    commentPostMap.getCommentToPostMap().remove(postId);
                 }else{
                     deductedPosts.add(new PostWindowObject(postArrivalTime, post));
                     postScoreMap.put(post.getTotalScore(), postId);

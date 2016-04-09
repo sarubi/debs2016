@@ -9,7 +9,8 @@ public class Run {
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
             return;
         }else{
-            Query1.main(args);
+//            Query1.main(args);
+            Query2.main(args);
         }
     }
 }

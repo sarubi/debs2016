@@ -1,4 +1,7 @@
 package org.wso2.siddhi.debs2016.graph;
+
+import com.google.common.collect.Multimap;
+
 import java.util.*;
 /**
  * The graph of users who have liked a given comment where edges of the represents the friendship relationship between them.
@@ -12,7 +15,6 @@ public class CommentLikeGraph {
 	private String comment;
     private long sizeOfLargestConnectedComponent;
     private Graph friendshipGraph ;
-    private boolean dirty = true;
 
 
     /**
@@ -25,6 +27,7 @@ public class CommentLikeGraph {
         this.ts = ts;
         this.comment = comment;
         this.friendshipGraph = friendshipGraph;
+        this.sizeOfLargestConnectedComponent = 0;
     }
 
     /**
@@ -37,17 +40,14 @@ public class CommentLikeGraph {
     }
 
     /**
-     * Gets the size of the largest connected component
+     * Gets the size of the largest connected component by running pegasus
      *
      * @return the size of the largest connected component
      */
     public long computeLargestConnectedComponent()
     {
-        if(dirty) {
-            dirty = false;
-            sizeOfLargestConnectedComponent = graph.getLargestConnectedComponent();
 
-        }
+        sizeOfLargestConnectedComponent = graph.getLargestConnectedComponent();
         return sizeOfLargestConnectedComponent;
     }
 
@@ -56,7 +56,7 @@ public class CommentLikeGraph {
      *
      * @param uId is user id of person who likes comment
      */
-    public void registerLike(long uId) {
+    public void registerLike(long uId, Multimap componentSizeCommentMap) {
         graph.addVertex(uId);
         Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
@@ -64,7 +64,11 @@ public class CommentLikeGraph {
                     graph.addEdge(uId, vertex);
             }
         }
-        dirty = true;
+        if (sizeOfLargestConnectedComponent != 0){
+            componentSizeCommentMap.remove(getSizeOfLargestConnectedComponent(), comment);
+        }
+        sizeOfLargestConnectedComponent = computeLargestConnectedComponent();
+        componentSizeCommentMap.put(sizeOfLargestConnectedComponent, comment);
     }
 
 
@@ -74,10 +78,14 @@ public class CommentLikeGraph {
      * @param uId1 the userID of friend one
      * @param uId2 the userID of friend two
      */
-    public void handleNewFriendship(long uId1, long uId2) {
-        if (graph.hasVertex(uId1) && graph.hasVertex(uId2)){
+    public void handleNewFriendship(long uId1, long uId2, Multimap componentSizeCommentMap) {
+        if (graph.hasVertex(uId1) && graph.hasVertex(uId2)) {
             graph.addEdge(uId1, uId2);
-            dirty = true;
+            if (sizeOfLargestConnectedComponent != 0){
+                componentSizeCommentMap.remove(getSizeOfLargestConnectedComponent(), comment);
+            }
+            sizeOfLargestConnectedComponent = computeLargestConnectedComponent();
+            componentSizeCommentMap.put(sizeOfLargestConnectedComponent, comment);
         }
     }
 
@@ -99,5 +107,16 @@ public class CommentLikeGraph {
      */
     public Graph getGraph() {
         return graph;
+    }
+
+
+    /**
+     *
+     * Get the size of the largest connected component
+     *
+     * @return size of largest connected component
+     */
+    public long getSizeOfLargestConnectedComponent() {
+        return sizeOfLargestConnectedComponent;
     }
 }

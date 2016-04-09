@@ -33,4 +33,7 @@ public class CommentPostMap {
         return parentPostId;
     }
 
+    public HashMap<Long, Long> getCommentToPostMap() {
+        return commentToPostMap;
+    }
 }
