@@ -83,6 +83,15 @@ public class Q2EventManager {
             }
         }, bufferSize, Executors.newFixedThreadPool(4), ProducerType.SINGLE, new SleepingWaitStrategy());
 
+
+        outputDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
+
+            @Override
+            public DEBSEvent newInstance() {
+                return new DEBSEvent();
+            }
+        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
+
         //******************Handler**************************************//
 
         DEBSEventHandler debsEventHandler1 = new DEBSEventHandler(0);
