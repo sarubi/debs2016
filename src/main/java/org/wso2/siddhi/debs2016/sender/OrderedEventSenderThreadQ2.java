@@ -21,13 +21,12 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQ2 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
-  //  private InputHandler inputHandler;
     private Date startDateTime;
     public boolean doneFlag = false;
     long[] count = {0,0};
     long[] numberOfOutputs = {0,0};
     long[] latencyArray={0,0};
-    Q2EventManager manager = new Q2EventManager(count,numberOfOutputs,latencyArray);
+    Q2EventManager manager = new Q2EventManager(count, numberOfOutputs, latencyArray);
 
 
     /**
@@ -139,7 +138,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(commentEvent);
                 debsEvent.setSystemArrivalTime(cTime);
-                debsEvent.setHandlerId((long)(commentEvent[3])%2);
+                debsEvent.setHandlerId((long)(commentEvent[3])%4);
                 manager.publish();
                 flag = Constants.COMMENTS;
             }else if (tsLike != Long.MAX_VALUE){
@@ -147,7 +146,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(likeEvent);
                 debsEvent.setSystemArrivalTime(cTime);
-                debsEvent.setHandlerId((long)(likeEvent[3])%2);
+                debsEvent.setHandlerId((long)(likeEvent[3])%4);
                 manager.publish();
                 flag = Constants.LIKES;
             }

@@ -28,13 +28,21 @@ public class Q2EventManager {
         return dataReadDisruptor;
     }
 
+
+
     Disruptor<DEBSEvent> dataReadDisruptor;
+    Disruptor<DEBSEvent> outputProcessDisruptor;
+
     private RingBuffer dataReadBuffer;
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
     private long duration= 3600000;
     public Graph friendshipGraph ;
+
+    private static long count_1 = 0;
+    private static long count_2 = 0;
+    private static long count_3 = 0;
 
     private static long[] count = {0,0};
     private static long[] numberOfOutputs = {0,0};
@@ -84,16 +92,21 @@ public class Q2EventManager {
             public DEBSEvent newInstance() {
                 return new DEBSEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(2), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(4), ProducerType.SINGLE, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
         DEBSEventHandler debsEventHandler1 = new DEBSEventHandler(0);
         DEBSEventHandler debsEventHandler2 = new DEBSEventHandler(1);
+        DEBSEventHandler debsEventHandler3 = new DEBSEventHandler(3);
+        DEBSEventHandler debsEventHandler4 = new DEBSEventHandler(4);
 
 
         dataReadDisruptor.handleEventsWith(debsEventHandler1);
         dataReadDisruptor.handleEventsWith(debsEventHandler2);
+        dataReadDisruptor.handleEventsWith(debsEventHandler3);
+        dataReadDisruptor.handleEventsWith(debsEventHandler4);
+
         dataReadBuffer = dataReadDisruptor.start();
     }
 
@@ -187,7 +200,15 @@ public class Q2EventManager {
         private CommentStore commentStore ;
         private int handlerId;
         private int myHandlerID;
+        private long count = 0;
+        private long numberOfOutputs = 0;
+        private long latencyArray = 0;
 
+        /**
+         * The constructor
+         *
+         * @param myHandlerID the handler id
+         */
         public DEBSEventHandler(int myHandlerID){
             this.myHandlerID = myHandlerID;
             friendshipGraph = new Graph();
@@ -196,34 +217,32 @@ public class Q2EventManager {
         @Override
         public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
             try{
+
+                Object[] objects = debsEvent.getObjectArray();
+                long ts = (Long) objects[1];
+                commentStore.cleanCommentStore(ts);
+
                 if(myHandlerID == debsEvent.getHandlerId()||debsEvent.getHandlerId()==-1) {
-                    Object[] objects = debsEvent.getObjectArray();
 
-                    long ts = (Long) objects[1];
-                    //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
                     int streamType = (Integer) objects[8];
-                    commentStore.cleanCommentStore(ts);
-                  //  count++;
-
                     switch (streamType) {
                         case Constants.COMMENTS:
                             long comment_id = (Long) objects[3];
                             String comment = (String) objects[4];
                             commentStore.registerComment(comment_id, ts, comment, false);
-                            count[myHandlerID]++;
+                            count++;
                             break;
                         case Constants.FRIENDSHIPS:
                             if (ts == -2) {
-                                count[myHandlerID]--;
+                                count--;
                                 showFinalStatistics(myHandlerID);
                                 commentStore.destroy();
                                 if (myHandlerID==0){
-                                    count[myHandlerID]++;
+                                    count++;
                                 }
-                                //  dataReadDisruptor.shutdown();
                                 break;
                             } else if (ts == -1) {
-                                count[myHandlerID]--;
+                                count--;
                                 startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                                 break;
                             } else {
@@ -231,13 +250,16 @@ public class Q2EventManager {
                                 long friendship_user_id_2 = (Long) objects[3];
                                 friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
                                 commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
+                                if (myHandlerID==0){
+                                    count++;
+                                }
                                 break;
                             }
                         case Constants.LIKES:
                             long user_id_1 = (Long) objects[2];
                             long like_comment_id = (Long) objects[3];
                             commentStore.registerLike(like_comment_id, user_id_1);
-                            count[myHandlerID]++;
+                            count++;
                             break;
                     }
 
@@ -245,8 +267,8 @@ public class Q2EventManager {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
 
                         if (endTime != -1L) {
-                            latencyArray[handlerId] += (endTime - (Long) debsEvent.getSystemArrivalTime());
-                            numberOfOutputs[myHandlerID]++;
+                            latencyArray += (endTime - (Long) debsEvent.getSystemArrivalTime());
+                            numberOfOutputs++;
                         }
 
                         endiij_timestamp = System.currentTimeMillis();
