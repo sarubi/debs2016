@@ -31,6 +31,19 @@ public class KLargestEvent {
         return kLargestComment;
     }
 
+    public String toString()
+    {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("handlerID " + handlerID + " ");
+        for(int i = 0; i < kLargestComment.length ; i++)
+        {
+            builder.append(kLargestComment[i] + ",");
+        }
+        builder.append("\n");
+        return builder.toString();
+    }
+
     /**
      * The time stamp of the event
      *

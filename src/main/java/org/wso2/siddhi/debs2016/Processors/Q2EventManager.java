@@ -309,13 +309,12 @@ public class Q2EventManager {
 
         }
         @Override
-        public void onEvent(KLargestEvent debsEvent, long l, boolean b) throws Exception {
+        public void onEvent(KLargestEvent KLargestEvent, long l, boolean b) throws Exception {
             try{
 
-                int handlerID = debsEvent.getHandlerID();
-                outputProcessor.add(debsEvent, handlerID);
-                System.out.println(handlerID);
-
+                int handlerID = KLargestEvent.getHandlerID();
+                outputProcessor.add(KLargestEvent, handlerID);
+                System.out.println(KLargestEvent.toString());
 
             }catch (Exception e)
             {
