@@ -268,7 +268,8 @@ public class Q2EventManager {
                         KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
                         kLargestEvent.setKLargestComment(kLargestComments);
                         kLargestEvent.setTimeStamp(ts);
-                       outputBuffer.publish(sequenceNumber);
+                        kLargestEvent.setEventHandler(myHandlerID);
+                        outputBuffer.publish(sequenceNumber);
 
                         if (endTime != -1L) {
                             latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
