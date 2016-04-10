@@ -7,6 +7,7 @@ public class KLargestEvent {
 
     private String [] kLargestComment;
     private long timeStamp;
+    private int handlerID;
 
 
     public void setKLargestComment(String [] kLargestComment)
@@ -38,6 +39,16 @@ public class KLargestEvent {
     public long getTimeStamp()
     {
         return timeStamp;
+    }
+
+    public void setEventHandler(int handlerID)
+    {
+        this.handlerID = handlerID;
+    }
+
+    public int getHandlerID()
+    {
+        return handlerID;
     }
 
 }

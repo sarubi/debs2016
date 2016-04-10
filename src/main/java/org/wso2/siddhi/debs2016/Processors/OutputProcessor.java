@@ -17,6 +17,8 @@ public class OutputProcessor implements Runnable {
     {
 
         // do the sorting here...
+        // write the final output to a file
+        // compute stats etc
 
     }
 

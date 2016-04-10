@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by bhagya on 3/30/16.
@@ -27,7 +28,6 @@ public class Q2EventManager {
     public Disruptor<DEBSEvent> getDataReadDisruptor() {
         return dataReadDisruptor;
     }
-
 
 
     Disruptor<DEBSEvent> dataReadDisruptor;
@@ -51,6 +51,7 @@ public class Q2EventManager {
    // private Long numberOfOutputs = 0L;
     static int bufferSize = 512;
     private long sequenceNumber;
+    private OutputProcessor outputProcessor = new OutputProcessor();
 
     /**
      * The constructor
@@ -100,14 +101,18 @@ public class Q2EventManager {
         DEBSEventHandler debsEventHandler3 = new DEBSEventHandler(2);
         DEBSEventHandler debsEventHandler4 = new DEBSEventHandler(3);
 
+        KLargestEventHandler kLargestEventHandler = new KLargestEventHandler();
+
 
         dataReadDisruptor.handleEventsWith(debsEventHandler1);
         dataReadDisruptor.handleEventsWith(debsEventHandler2);
         dataReadDisruptor.handleEventsWith(debsEventHandler3);
         dataReadDisruptor.handleEventsWith(debsEventHandler4);
+        outputDisruptor.handleEventsWith(kLargestEventHandler);
 
         dataReadBuffer = dataReadDisruptor.start();
         outputBuffer =  outputDisruptor.start();
+        outputProcessor.run();
     }
 
     /**
@@ -151,7 +156,7 @@ public class Q2EventManager {
 
                 Date dNow = new Date();
                 SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-                System.out.println("\n\n Query 2 has completed ..........\n\n");
+                 System.out.println("\n\n Query 2 has completed ..........\n\n");
 
                 builder1.append("Handler ID = " + handlerID + " ");
 
@@ -217,9 +222,7 @@ public class Q2EventManager {
                 Object[] objects = debsEvent.getObjectArray();
                 long ts = (Long) objects[1];
                 commentStore.cleanCommentStore(ts);
-
                 if(myHandlerID == debsEvent.getHandlerId()|| debsEvent.getHandlerId()==-1) {
-
                     int streamType = (Integer) objects[8];
                     switch (streamType) {
                         case Constants.COMMENTS:
@@ -260,8 +263,7 @@ public class Q2EventManager {
                     }
                     if (ts != -2 && ts != -1) {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
-
-                       String kLargestComments [] = commentStore.getKLargestConnectedComponents().clone();
+                        String kLargestComments [] = commentStore.getKLargestConnectedComponents().clone();
                         sequenceNumber = dataReadBuffer.next();
                         KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
                         kLargestEvent.setKLargestComment(kLargestComments);
@@ -284,5 +286,42 @@ public class Q2EventManager {
         }
     }
 
+    /**
+     *
+     * The debs event handler
+     *
+     */
+    private class KLargestEventHandler implements EventHandler<KLargestEvent>{
+        public Graph friendshipGraph ;
+        private CommentStore commentStore ;
+        private int handlerId;
+        private int myHandlerID;
+        private long count = 0;
+        private long numberOfOutputs = 0;
+        private long latency = 0;
+
+        /**
+         * The constructor
+         *
+         */
+        public KLargestEventHandler(){
+
+        }
+        @Override
+        public void onEvent(KLargestEvent debsEvent, long l, boolean b) throws Exception {
+            try{
+
+                int handlerID = debsEvent.getHandlerID();
+                outputProcessor.add(debsEvent, handlerID);
+                System.out.println(handlerID);
+
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
 
