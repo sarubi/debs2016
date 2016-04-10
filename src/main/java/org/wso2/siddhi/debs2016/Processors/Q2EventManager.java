@@ -1,5 +1,6 @@
 package org.wso2.siddhi.debs2016.Processors;
 
+import com.google.common.collect.Multimap;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by bhagya on 3/30/16.
@@ -263,7 +263,7 @@ public class Q2EventManager {
                     }
                     if (ts != -2 && ts != -1) {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
-                        String kLargestComments [] = commentStore.getKLargestConnectedComponents().clone();
+                        Multimap<Long, String> kLargestComments = commentStore.getTopKComments();
                         sequenceNumber = outputBuffer.next();
                         KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
                         kLargestEvent.setKLargestComment(kLargestComments);

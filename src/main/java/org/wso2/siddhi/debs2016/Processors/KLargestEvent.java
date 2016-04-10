@@ -1,16 +1,22 @@
 package org.wso2.siddhi.debs2016.Processors;
 
+import com.google.common.collect.Multimap;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Created by malithjayasinghe on 4/9/16.
  */
 public class KLargestEvent {
 
-    private String [] kLargestComment;
+    private Multimap<Long, String> kLargestComment;
     private long timeStamp;
     private int handlerID;
 
 
-    public void setKLargestComment(String [] kLargestComment)
+    public void setKLargestComment(Multimap<Long, String> kLargestComment)
     {
         this.kLargestComment = kLargestComment;
     }
@@ -26,7 +32,7 @@ public class KLargestEvent {
      *
      * @return the k largest connected array
      */
-    public String[] getkLargestComment()
+    public Multimap<Long, String> getkLargestComment()
     {
         return kLargestComment;
     }
@@ -36,10 +42,12 @@ public class KLargestEvent {
 
         StringBuilder builder = new StringBuilder();
         builder.append("handlerID " + handlerID + " ");
-        for(int i = 0; i < kLargestComment.length ; i++)
-        {
-            builder.append(kLargestComment[i] + ",");
+
+        for (String comment:
+             kLargestComment.values()) {
+            builder.append(comment + ",");
         }
+
         builder.append("\n");
         return builder.toString();
     }

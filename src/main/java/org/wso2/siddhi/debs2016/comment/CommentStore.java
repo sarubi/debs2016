@@ -216,7 +216,21 @@ public class CommentStore {
         return flagChange;
     }
 
+    public TreeMultimap<Long, String> getTopKComments(){
+        TreeMultimap<Long, String> topKComments = TreeMultimap.create();
 
+        Collection<Map.Entry<Long, String>> collection = componentSizeCommentMap.entries();
+        Iterator<Map.Entry<Long, String>> iterator = collection.iterator();
+
+        int i = 0;
+        while (iterator.hasNext() && i < 3){
+            Map.Entry<Long, String> keyValue = iterator.next();
+            topKComments.put(keyValue.getKey(), keyValue.getValue());
+            i++;
+        }
+
+        return topKComments;
+    }
 
 
     /**
