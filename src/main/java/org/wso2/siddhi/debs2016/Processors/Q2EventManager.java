@@ -264,11 +264,11 @@ public class Q2EventManager {
                     if (ts != -2 && ts != -1) {
                         Long endTime = commentStore.computeKLargestComments(" : ", false, true);
                         String kLargestComments [] = commentStore.getKLargestConnectedComponents().clone();
-                        sequenceNumber = dataReadBuffer.next();
+                        sequenceNumber = outputBuffer.next();
                         KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
                         kLargestEvent.setKLargestComment(kLargestComments);
                         kLargestEvent.setTimeStamp(ts);
-                        dataReadBuffer.publish(sequenceNumber);
+                       outputBuffer.publish(sequenceNumber);
 
                         if (endTime != -1L) {
                             latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
