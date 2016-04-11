@@ -32,7 +32,7 @@ public class Q2EventManager {
     private RingBuffer dataReadBuffer;
     private RingBuffer outputBuffer;
     private String ts;
-    private long duration=  7200000*6;
+    private long duration=  7200000;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 1;

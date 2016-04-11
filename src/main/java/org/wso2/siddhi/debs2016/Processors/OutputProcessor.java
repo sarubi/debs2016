@@ -71,7 +71,7 @@ public class OutputProcessor extends Thread {
             Multimap<Long, String> event4 = event4Object.getkLargestComment();
             componentSizeCommentMap.putAll(event4);
 
-            printKLargestComments(",", true, false);  //tsTriggeredChange = event1Object.getTimeStamp(); //All events will have same timestamp
+            printKLargestComments(",", false, false);  //tsTriggeredChange = event1Object.getTimeStamp(); //All events will have same timestamp
 
             //TODO: Verify that .putAll() method adds all elements in order of the comparator
         }catch (Exception e)
