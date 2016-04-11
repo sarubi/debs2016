@@ -25,29 +25,20 @@ import java.util.concurrent.Executors;
  * Created by bhagya on 3/30/16.
  */
 public class Q2EventManager {
-    public Disruptor<DEBSEvent> getDataReadDisruptor() {
-        return dataReadDisruptor;
-    }
 
 
-    Disruptor<DEBSEvent> dataReadDisruptor;
-    Disruptor<KLargestEvent> outputDisruptor;
-
+    private Disruptor<DEBSEvent> dataReadDisruptor;
+    private Disruptor<KLargestEvent> outputDisruptor;
     private RingBuffer dataReadBuffer;
     private RingBuffer outputBuffer;
-
     private String ts;
     private long duration=  7200000*6;
     public Graph friendshipGraph ;
-
     private CommentStore commentStore ;
     private int k = 1;
-    // private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
-    // private Long latency = 0L;
-    // private Long numberOfOutputs = 0L;
     static int bufferSize = 8192*4;
     private long sequenceNumber;
     private OutputProcessor outputProcessor ;
@@ -57,7 +48,6 @@ public class Q2EventManager {
      *
      */
     public Q2EventManager(){
-
         List<Attribute> attributeList = new ArrayList<Attribute>();
         outputProcessor = new OutputProcessor();
         startDateTime = new Date();
@@ -67,8 +57,16 @@ public class Q2EventManager {
     }
 
     /**
+     * Gets the reference to data reader distruptor
      *
-     * Starts the distrupter
+     * @return the data reader distruptor
+     */
+    public Disruptor<DEBSEvent> getDataReadDisruptor() {
+        return dataReadDisruptor;
+    }
+    /**
+     *
+     * Starts the distruptor + other threads
      *
      */
     public void run() {
@@ -90,7 +88,6 @@ public class Q2EventManager {
             }
         }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.MULTI, new SleepingWaitStrategy());
 
-        //******************Handler**************************************//
 
         DEBSEventHandler debsEventHandler1 = new DEBSEventHandler(0);
         DEBSEventHandler debsEventHandler2 = new DEBSEventHandler(1);
@@ -98,8 +95,6 @@ public class Q2EventManager {
         DEBSEventHandler debsEventHandler4 = new DEBSEventHandler(3);
 
         KLargestEventHandler kLargestEventHandler = new KLargestEventHandler();
-
-
         dataReadDisruptor.handleEventsWith(debsEventHandler1);
         dataReadDisruptor.handleEventsWith(debsEventHandler2);
         dataReadDisruptor.handleEventsWith(debsEventHandler3);
@@ -109,9 +104,6 @@ public class Q2EventManager {
         dataReadBuffer = dataReadDisruptor.start();
         outputBuffer =  outputDisruptor.start();
         outputProcessor.start();
-
-
-
     }
 
     /**
@@ -287,7 +279,7 @@ public class Q2EventManager {
 
     /**
      *
-     * The debs event handler
+     * The k largest event handler
      *
      */
     private class KLargestEventHandler implements EventHandler<KLargestEvent>{
@@ -313,39 +305,15 @@ public class Q2EventManager {
         @Override
         public void onEvent(KLargestEvent KLargestEvent, long l, boolean b) throws Exception {
             try{
-
                 int handlerID = KLargestEvent.getHandlerID();
                 outputProcessor.add(KLargestEvent, handlerID);
-
-
-//                System.out.println("sum  = " + (count1+count2+count3+count4));
-//
-//
-//                if(handlerID == 0)
-//                System.out.println("myHandlerID  = " + handlerID  + " count = " + count1++ );
-//
-//                if(handlerID == 1)
-//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count2++ );
-//
-//                if(handlerID == 2)
-//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count3++ );
-//
-//                if(handlerID == 3)
-//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count4++ );
-
-                //System.out.println(count++);
-
-                // System.out.println(KLargestEvent.toString());
-
 
             }catch (Exception e)
             {
                 e.printStackTrace();
             }
-
         }
     }
 }
-
 
 

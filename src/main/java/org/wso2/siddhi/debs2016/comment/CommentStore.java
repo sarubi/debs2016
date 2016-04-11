@@ -99,7 +99,26 @@ public class CommentStore {
 
     }
 
+    /**
+     * Gets the top k comments
+     *
+     * @return the top k comments map
+     */
+    public TreeMultimap<Long, String> getTopKComments(){
+        TreeMultimap<Long, String> topKComments = TreeMultimap.create();
 
+        Collection<Map.Entry<Long, String>> collection = componentSizeCommentMap.entries();
+        Iterator<Map.Entry<Long, String>> iterator = collection.iterator();
+
+        int i = 0;
+        while (iterator.hasNext() && i < k){
+            Map.Entry<Long, String> keyValue = iterator.next();
+            topKComments.put(keyValue.getKey(), keyValue.getValue());
+            i++;
+        }
+
+        return topKComments;
+    }
     /**
      * print the k largest comments if there is change in the order
      *
@@ -150,24 +169,6 @@ public class CommentStore {
             e.printStackTrace();
         }
     }
-
-//    /**
-//     * Update the K Largest comment arrays
-//     *
-//
-//     */
-//    private void computeLargestConnectedComponents() {
-//        componentSizeCommentMap.clear();
-//        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-//            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
-//            if (sizeOfComponent == 0){
-//                continue;
-//            }
-//            String comment = commentLikeGraph.getComment();
-//
-//            componentSizeCommentMap.put(sizeOfComponent, comment);
-//        }
-//    }
 
     /**
      * Check if the k largest comments have changed
