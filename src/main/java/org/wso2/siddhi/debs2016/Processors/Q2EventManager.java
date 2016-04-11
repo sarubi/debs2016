@@ -35,10 +35,9 @@ public class Q2EventManager {
 
     private RingBuffer dataReadBuffer;
     private RingBuffer outputBuffer;
-    private long startiij_timestamp;
-    private long endiij_timestamp;
+
     private String ts;
-    private long duration= 3600000;
+    private long duration=  7200000;
     public Graph friendshipGraph ;
 
     private CommentStore commentStore ;
@@ -141,59 +140,7 @@ public class Q2EventManager {
         dataReadBuffer.publish(sequenceNumber);
     }
 
-    /**
-     *
-     * Print the throughput etc
-     *
-     */
-    private void showFinalStatistics(int handlerID, long count, long latency)
-    {
 
-            try {
-                StringBuilder builder = new StringBuilder();
-                StringBuilder builder1=new StringBuilder();
-                BufferedWriter writer;
-                File performance = new File("performance.txt");
-                writer = new BufferedWriter(new FileWriter(performance, true));
-                builder.setLength(0);
-
-                timeDifference = endiij_timestamp - startiij_timestamp;
-
-                Date dNow = new Date();
-                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-                 System.out.println("\n\n Query 2 has completed ..........\n\n");
-
-                builder1.append("Handler ID = " + handlerID + " ");
-
-                builder1.append("Event count = " + count + " ");
-
-
-                String timeDifferenceString = String.format("%06d", timeDifference / 1000); //Convert time to seconds
-                builder1.append("Total run time : " + timeDifferenceString + ",");
-
-                builder.append(timeDifferenceString);
-                builder.append(" ");
-
-                builder1.append("Throughput (events/s) = " + Math.round((count * 1000.0) / timeDifference) + ",");
-
-                builder1.append("Total Latency = " + latency + ",");
-
-                builder1.append("Total Outputs = " + count + ",");
-                if (count != 0) {
-                    long averageLatency =  (latency / count);
-                    String latencyString = String.format("%06d", averageLatency);
-                    builder1.append("Average Latency = " + averageLatency);
-                    builder.append(latencyString);
-                }
-                System.out.println(builder1.toString());
-                writer.write(builder.toString());
-                writer.close();
-                System.out.flush();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    }
 
 
     /**
@@ -209,6 +156,8 @@ public class Q2EventManager {
         private long count = 0;
         private long numberOfOutputs = 0;
         private long latency = 0;
+        private long startiij_timestamp;
+        private long endiij_timestamp;
 
         /**
          * The constructor
@@ -229,6 +178,7 @@ public class Q2EventManager {
                 commentStore.cleanCommentStore(ts);
                 count++;
                 if(myHandlerID == debsEvent.getHandlerId()|| debsEvent.getHandlerId()==-1) {
+
                     int streamType = (Integer) objects[8];
                     switch (streamType) {
                         case Constants.COMMENTS:
@@ -284,6 +234,59 @@ public class Q2EventManager {
                 e.printStackTrace();
             }
 
+        }
+        /**
+         *
+         * Print the throughput etc
+         *
+         */
+        private void showFinalStatistics(int handlerID, long count, long latency)
+        {
+
+            try {
+                StringBuilder builder = new StringBuilder();
+                StringBuilder builder1=new StringBuilder();
+                BufferedWriter writer;
+                File performance = new File("performance.txt");
+                writer = new BufferedWriter(new FileWriter(performance, true));
+                builder.setLength(0);
+
+                timeDifference = endiij_timestamp - startiij_timestamp;
+
+                Date dNow = new Date();
+                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+                System.out.println("\n\n Query 2 has completed ..........\n\n");
+
+                builder1.append("Handler ID = " + handlerID + " ");
+
+                builder1.append("Event count = " + count + " ");
+
+
+                String timeDifferenceString = String.format("%06d", timeDifference / 1000); //Convert time to seconds
+                builder1.append("Total run time : " + timeDifferenceString + ",");
+
+                builder.append(timeDifferenceString);
+                builder.append(" ");
+
+                builder1.append("Throughput (events/s) = " + Math.round((count * 1000.0) / timeDifference) + ",");
+
+                builder1.append("Total Latency = " + latency + ",");
+
+                builder1.append("Total Outputs = " + count + ",");
+                if (count != 0) {
+                    long averageLatency =  (latency / count);
+                    String latencyString = String.format("%06d", averageLatency);
+                    builder1.append("Average Latency = " + averageLatency);
+                    builder.append(latencyString);
+                }
+                System.out.println(builder1.toString());
+                writer.write(builder.toString());
+                writer.close();
+                System.out.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
