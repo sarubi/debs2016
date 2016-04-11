@@ -32,14 +32,14 @@ public class Q2EventManager {
     private RingBuffer dataReadBuffer;
     private RingBuffer outputBuffer;
     private String ts;
-    private long duration=  7200000;
+    private long duration=  3600000*24;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
-    private int k = 1;
+    private int k = 2;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
-    static int bufferSize = 8192*4;
+    static int bufferSize = 8192;
     private long sequenceNumber;
     private OutputProcessor outputProcessor ;
 
