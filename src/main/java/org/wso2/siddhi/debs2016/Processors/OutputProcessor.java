@@ -35,7 +35,7 @@ public class OutputProcessor extends Thread {
 
             Thread.sleep(1000);
             while(true) {
-          //   sort1();
+             sort1();
             }
 
         } catch (Exception e) {
@@ -118,12 +118,12 @@ public class OutputProcessor extends Thread {
                 componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder());
                 Long timeStampArray [] = new Long[4];
 
-                System.out.println("size buffer 1 = " + eventBufferList1.size());
-                System.out.println("size buffer 2 = " + eventBufferList2.size());
-                System.out.println("size buffer 3 = " + eventBufferList3.size());
-                System.out.println("size buffer 4 = " + eventBufferList4.size());
-
-                System.out.println("\n");
+//                System.out.println("size buffer 1 = " + eventBufferList1.size());
+//                System.out.println("size buffer 2 = " + eventBufferList2.size());
+//                System.out.println("size buffer 3 = " + eventBufferList3.size());
+//                System.out.println("size buffer 4 = " + eventBufferList4.size());
+//
+//                System.out.println("\n");
 
                 KLargestEvent event1Object = eventBufferList1.take();
                 KLargestEvent event2Object = eventBufferList2.take();
@@ -147,25 +147,25 @@ public class OutputProcessor extends Thread {
 
 
 
-                if (event1Object != null) {
-                    Multimap<Long, String> event = event1Object.getkLargestComment();
-                    componentSizeCommentMap.putAll(event);
-                }
 
-                if (event2Object != null) {
-                    Multimap<Long, String> event = event2Object.getkLargestComment();
-                    componentSizeCommentMap.putAll(event);
-                }
+                    Multimap<Long, String> event1 = event1Object.getkLargestComment();
+                    componentSizeCommentMap.putAll(event1);
 
-                if (event3Object != null) {
-                    Multimap<Long, String> event = event3Object.getkLargestComment();
-                    componentSizeCommentMap.putAll(event);
-                }
 
-                if (event4Object != null) {
-                    Multimap<Long, String> event = event4Object.getkLargestComment();
-                    componentSizeCommentMap.putAll(event);
-                }
+
+                    Multimap<Long, String> event2 = event2Object.getkLargestComment();
+                    componentSizeCommentMap.putAll(event2);
+
+
+
+                    Multimap<Long, String> event3 = event3Object.getkLargestComment();
+                    componentSizeCommentMap.putAll(event3);
+
+
+
+                    Multimap<Long, String> event4 = event4Object.getkLargestComment();
+                    componentSizeCommentMap.putAll(event4);
+
 
 
 
@@ -173,7 +173,7 @@ public class OutputProcessor extends Thread {
 
             //TODO: Verify that .putAll() method adds all elements in order of the comparator
 
-            //printKLargestComments(",", true, true);  //tsTriggeredChange = event1Object.getTimeStamp(); //All events will have same timestamp
+            printKLargestComments(",", true, false);  //tsTriggeredChange = event1Object.getTimeStamp(); //All events will have same timestamp
 
             //TODO: Verify that .putAll() method adds all elements in order of the comparator
 

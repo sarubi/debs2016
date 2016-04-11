@@ -113,7 +113,7 @@ public class Q2EventManager {
 
         dataReadBuffer = dataReadDisruptor.start();
         outputBuffer =  outputDisruptor.start();
-       // outputProcessor.start();
+        outputProcessor.start();
 
 
 
@@ -320,23 +320,23 @@ public class Q2EventManager {
             try{
 
                 int handlerID = KLargestEvent.getHandlerID();
-               // outputProcessor.add(KLargestEvent, handlerID);
+                outputProcessor.add(KLargestEvent, handlerID);
 
 
-                System.out.println("sum  = " + (count1+count2+count3+count4));
-
-
-                if(handlerID == 0)
-                System.out.println("myHandlerID  = " + handlerID  + " count = " + count1++ );
-
-                if(handlerID == 1)
-                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count2++ );
-
-                if(handlerID == 2)
-                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count3++ );
-
-                if(handlerID == 3)
-                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count4++ );
+//                System.out.println("sum  = " + (count1+count2+count3+count4));
+//
+//
+//                if(handlerID == 0)
+//                System.out.println("myHandlerID  = " + handlerID  + " count = " + count1++ );
+//
+//                if(handlerID == 1)
+//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count2++ );
+//
+//                if(handlerID == 2)
+//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count3++ );
+//
+//                if(handlerID == 3)
+//                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count4++ );
 
                 //System.out.println(count++);
 
