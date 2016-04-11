@@ -223,7 +223,7 @@ public class CommentStore {
         Iterator<Map.Entry<Long, String>> iterator = collection.iterator();
 
         int i = 0;
-        while (iterator.hasNext() && i < 3){
+        while (iterator.hasNext() && i < k){
             Map.Entry<Long, String> keyValue = iterator.next();
             topKComments.put(keyValue.getKey(), keyValue.getValue());
             i++;
