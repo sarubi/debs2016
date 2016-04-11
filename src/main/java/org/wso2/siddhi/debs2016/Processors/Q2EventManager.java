@@ -34,10 +34,9 @@ public class Q2EventManager {
     private long endiij_timestamp;
     private String ts;
     private long duration= 7200000;
-    public Graph friendshipGraph ;
-    private CommentStore commentStore ;
+
     private int k = 2;
-    private static int count = 0;
+   // private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
@@ -52,8 +51,8 @@ public class Q2EventManager {
      */
     public Q2EventManager(){
         List<Attribute> attributeList = new ArrayList<Attribute>();
-        friendshipGraph = new Graph();
-        commentStore = new CommentStore(duration, friendshipGraph, k);
+       // friendshipGraph = new Graph();
+        //commentStore = new CommentStore(duration, friendshipGraph, k);
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
         startDateTime = new Date();
@@ -74,12 +73,14 @@ public class Q2EventManager {
             public DEBSEvent newInstance() {
                 return new DEBSEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(3), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
-        DEBSEventHandler debsEventHandler = new DEBSEventHandler();
-        dataReadDisruptor.handleEventsWith(debsEventHandler);
+        DEBSEventHandler debsEventHandler1 = new DEBSEventHandler();
+        DEBSEventHandler debsEventHandler2 = new DEBSEventHandler();
+        dataReadDisruptor.handleEventsWith(debsEventHandler1);
+      //  dataReadDisruptor.handleEventsWith(debsEventHandler2);
         dataReadBuffer = dataReadDisruptor.start();
     }
 
@@ -104,51 +105,7 @@ public class Q2EventManager {
         dataReadBuffer.publish(sequenceNumber);
     }
 
-    /**
-     *
-     * Print the throughput etc
-     *
-     */
-    private void showFinalStatistics()
-    {
-        try {
-            StringBuilder builder = new StringBuilder();
-            BufferedWriter writer;
-            File performance = new File("performance.txt");
-            writer = new BufferedWriter(new FileWriter(performance, true));
-            builder.setLength(0);
 
-            timeDifference = endiij_timestamp - startiij_timestamp;
-
-            Date dNow = new Date();
-            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("\n\n Query 2 has completed ..........\n\n");
-            System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
-            System.out.println("Event count : " + count);
-
-            String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
-            System.out.println("Total run time : " + timeDifferenceString);
-            builder.append(timeDifferenceString);
-            builder.append(" ");
-
-            System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
-            System.out.println("Total Latency " + latency);
-            System.out.println("Total Outputs " + numberOfOutputs);
-            if (numberOfOutputs != 0) {
-                long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency);
-                System.out.println("Average Latency " + latencyString);
-                builder.append(latencyString);
-            }
-
-            writer.write(builder.toString());
-            writer.close();
-            System.out.flush();
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
 
 
     /**
@@ -157,6 +114,14 @@ public class Q2EventManager {
      *
      */
     private class DEBSEventHandler implements EventHandler<DEBSEvent>{
+
+
+        private int count = 0;
+        public Graph friendshipGraph = new Graph();
+        private CommentStore commentStore = new CommentStore(duration, friendshipGraph, k);
+
+
+
         @Override
         public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
             try{
@@ -168,6 +133,7 @@ public class Q2EventManager {
                 int streamType = (Integer) objects[8];
                 commentStore.cleanCommentStore(ts);
                 count++;
+
 
                 switch (streamType) {
                     case Constants.COMMENTS:
@@ -216,6 +182,52 @@ public class Q2EventManager {
                 e.printStackTrace();
             }
 
+        }
+
+        /**
+         *
+         * Print the throughput etc
+         *
+         */
+        private void showFinalStatistics()
+        {
+            try {
+                StringBuilder builder = new StringBuilder();
+                BufferedWriter writer;
+                File performance = new File("performance.txt");
+                writer = new BufferedWriter(new FileWriter(performance, true));
+                builder.setLength(0);
+
+                timeDifference = endiij_timestamp - startiij_timestamp;
+
+                Date dNow = new Date();
+                SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+                System.out.println("\n\n Query 2 has completed ..........\n\n");
+                System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+                System.out.println("Event count : " + count);
+
+                String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
+                System.out.println("Total run time : " + timeDifferenceString);
+                builder.append(timeDifferenceString);
+                builder.append(" ");
+
+                System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
+                System.out.println("Total Latency " + latency);
+                System.out.println("Total Outputs " + numberOfOutputs);
+                if (numberOfOutputs != 0) {
+                    long averageLatency = latency/numberOfOutputs;
+                    String latencyString = String.format("%06d", averageLatency);
+                    System.out.println("Average Latency " + latencyString);
+                    builder.append(latencyString);
+                }
+
+                writer.write(builder.toString());
+                writer.close();
+                System.out.flush();
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
     }
 
