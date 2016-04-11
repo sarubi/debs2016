@@ -37,7 +37,7 @@ public class Q2EventManager {
     private RingBuffer outputBuffer;
 
     private String ts;
-    private long duration=  7200000;
+    private long duration=  7200000*6;
     public Graph friendshipGraph ;
 
     private CommentStore commentStore ;
@@ -48,7 +48,7 @@ public class Q2EventManager {
     private Date startDateTime;
    // private Long latency = 0L;
    // private Long numberOfOutputs = 0L;
-    static int bufferSize = 512;
+    static int bufferSize = 8192*4;
     private long sequenceNumber;
     private OutputProcessor outputProcessor ;
 
@@ -115,7 +115,7 @@ public class Q2EventManager {
         outputBuffer =  outputDisruptor.start();
        // outputProcessor.start();
 
-        System.out.println("SSSdsdsdsdsdsdsdsdsddddddsdsdsdsadsadsadasdsadsadsa");
+
 
     }
 
@@ -215,12 +215,12 @@ public class Q2EventManager {
                 if (ts != -2 && ts != -1) {
                     Long endTime = commentStore.computeKLargestComments(" : ", false, false);
                     Multimap<Long, String> kLargestComments = commentStore.getTopKComments();
-                  //  long sequenceNumber1 = outputBuffer.next();
-                   // KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber1);
-                    //kLargestEvent.setKLargestComment(kLargestComments);
-                   // kLargestEvent.setTimeStamp(ts);
-                    //kLargestEvent.setEventHandler(myHandlerID);
-                    //outputBuffer.publish(sequenceNumber1);
+                    long sequenceNumber1 = outputBuffer.next();
+                    KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber1);
+                    kLargestEvent.setKLargestComment(kLargestComments);
+                     kLargestEvent.setTimeStamp(ts);
+                    kLargestEvent.setEventHandler(myHandlerID);
+                    outputBuffer.publish(sequenceNumber1);
 
                     if (endTime != -1L) {
                         latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
@@ -320,9 +320,9 @@ public class Q2EventManager {
             try{
 
                 int handlerID = KLargestEvent.getHandlerID();
-                //outputProcessor.add(KLargestEvent, handlerID);
+               // outputProcessor.add(KLargestEvent, handlerID);
 
-/*
+
                 System.out.println("sum  = " + (count1+count2+count3+count4));
 
 
@@ -341,7 +341,7 @@ public class Q2EventManager {
                 //System.out.println(count++);
 
                // System.out.println(KLargestEvent.toString());
-               */
+
 
             }catch (Exception e)
             {
