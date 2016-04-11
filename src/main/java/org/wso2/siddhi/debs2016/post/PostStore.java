@@ -163,7 +163,7 @@ public class PostStore {
                         builder.append(post.getTotalScore() + delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
-                        builder.append("-, -, -, -");
+                        builder.append("-,-,-,-");
                     }
                     if(k != 2){
                         builder.append(delimiter);

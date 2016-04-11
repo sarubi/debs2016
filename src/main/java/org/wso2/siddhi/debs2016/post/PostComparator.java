@@ -16,18 +16,18 @@ public class PostComparator implements Comparator<Post> {
 
 
         if (ts_1 > ts_2) {
-            return 1;
-        } else if (ts_1 < ts_2) {
             return -1;
+        } else if (ts_1 < ts_2) {
+            return 1;
         } else {
 
             Long ts_comment_1 = post_1.getLatestCommentTime();
             Long ts_comment_2 = post_2.getLatestCommentTime();
 
             if (ts_comment_1 > ts_comment_2) {
-                return 1;
-            } else if (ts_comment_1 < ts_comment_2) {
                 return -1;
+            } else if (ts_comment_1 < ts_comment_2) {
+                return 1;
             }
         }
         return 1;
