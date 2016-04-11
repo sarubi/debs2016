@@ -139,6 +139,9 @@ public class Q2EventManager {
                 String latencyString = String.format("%06d", averageLatency);
                 System.out.println("Average Latency " + latencyString);
                 builder.append(latencyString);
+            } else {
+                String latencyString = "000000";
+                builder.append(latencyString);
             }
 
             writer.write(builder.toString());
