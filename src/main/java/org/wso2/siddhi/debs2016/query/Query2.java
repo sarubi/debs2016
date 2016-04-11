@@ -77,9 +77,11 @@ public class Query2 {
 
         while(true){
             try {
-                Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
+
                 if (orderedEventSenderThreadQ2.doneFlag){
+                    Thread.sleep(100);
                     System.exit(0);
+
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

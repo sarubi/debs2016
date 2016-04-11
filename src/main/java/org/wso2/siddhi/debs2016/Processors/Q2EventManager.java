@@ -51,7 +51,7 @@ public class Q2EventManager {
    // private Long numberOfOutputs = 0L;
     static int bufferSize = 512;
     private long sequenceNumber;
-    private OutputProcessor outputProcessor = new OutputProcessor();
+    private OutputProcessor outputProcessor ;
 
     /**
      * The constructor
@@ -65,6 +65,7 @@ public class Q2EventManager {
         //commentStore = new CommentStore(duration, friendshipGraph, k);
 
         //We print the start and the end times of the experiment even if the performance logging is disabled.
+        outputProcessor = new OutputProcessor();
         startDateTime = new Date();
         startTime = startDateTime.getTime();
         SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
@@ -77,6 +78,7 @@ public class Q2EventManager {
      *
      */
     public void run() {
+
         dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
 
             @Override
@@ -92,7 +94,7 @@ public class Q2EventManager {
             public KLargestEvent newInstance() {
                 return new  KLargestEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.MULTI, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
@@ -112,7 +114,10 @@ public class Q2EventManager {
 
         dataReadBuffer = dataReadDisruptor.start();
         outputBuffer =  outputDisruptor.start();
-        outputProcessor.run();
+       // outputProcessor.start();
+
+        System.out.println("SSSdsdsdsdsdsdsdsdsddddddsdsdsdsadsadsadasdsadsadsa");
+
     }
 
     /**
@@ -222,6 +227,7 @@ public class Q2EventManager {
                 Object[] objects = debsEvent.getObjectArray();
                 long ts = (Long) objects[1];
                 commentStore.cleanCommentStore(ts);
+                count++;
                 if(myHandlerID == debsEvent.getHandlerId()|| debsEvent.getHandlerId()==-1) {
                     int streamType = (Integer) objects[8];
                     switch (streamType) {
@@ -229,16 +235,12 @@ public class Q2EventManager {
                             long comment_id = (Long) objects[3];
                             String comment = (String) objects[4];
                             commentStore.registerComment(comment_id, ts, comment, false);
-                            count++;
                             break;
                         case Constants.FRIENDSHIPS:
                             if (ts == -2) {
                                 count--;
                                 showFinalStatistics(myHandlerID, count, latency);
                                 commentStore.destroy();
-                                if (myHandlerID==0){
-                                    count++;
-                                }
                                 break;
                             } else if (ts == -1) {
                                 count--;
@@ -249,34 +251,32 @@ public class Q2EventManager {
                                 long friendship_user_id_2 = (Long) objects[3];
                                 friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
                                 commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
-                                if (myHandlerID==0){
-                                    count++;
-                                }
                                 break;
                             }
                         case Constants.LIKES:
                             long user_id_1 = (Long) objects[2];
                             long like_comment_id = (Long) objects[3];
                             commentStore.registerLike(like_comment_id, user_id_1);
-                            count++;
                             break;
                     }
-                    if (ts != -2 && ts != -1) {
-                        Long endTime = commentStore.computeKLargestComments(" : ", false, true);
-                        Multimap<Long, String> kLargestComments = commentStore.getTopKComments();
-                        sequenceNumber = outputBuffer.next();
-                        KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber);
-                        kLargestEvent.setKLargestComment(kLargestComments);
-                        kLargestEvent.setTimeStamp(ts);
-                        kLargestEvent.setEventHandler(myHandlerID);
-                        outputBuffer.publish(sequenceNumber);
 
-                        if (endTime != -1L) {
-                            latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
-                            numberOfOutputs++;
-                        }
-                        endiij_timestamp = System.currentTimeMillis();
+                }
+
+                if (ts != -2 && ts != -1) {
+                    Long endTime = commentStore.computeKLargestComments(" : ", false, false);
+                    Multimap<Long, String> kLargestComments = commentStore.getTopKComments();
+                  //  long sequenceNumber1 = outputBuffer.next();
+                   // KLargestEvent kLargestEvent =  outputDisruptor.get(sequenceNumber1);
+                    //kLargestEvent.setKLargestComment(kLargestComments);
+                   // kLargestEvent.setTimeStamp(ts);
+                    //kLargestEvent.setEventHandler(myHandlerID);
+                    //outputBuffer.publish(sequenceNumber1);
+
+                    if (endTime != -1L) {
+                        latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
+                        numberOfOutputs++;
                     }
+                    endiij_timestamp = System.currentTimeMillis();
                 }
 
             }catch (Exception e)
@@ -296,10 +296,14 @@ public class Q2EventManager {
         public Graph friendshipGraph ;
         private CommentStore commentStore ;
         private int handlerId;
-        private int myHandlerID;
-        private long count = 0;
+
+
         private long numberOfOutputs = 0;
         private long latency = 0;
+        private int count1  = 0;
+        private int count2 = 0;
+        private int count3 = 0;
+        private int count4 = 0;
 
         /**
          * The constructor
@@ -313,8 +317,28 @@ public class Q2EventManager {
             try{
 
                 int handlerID = KLargestEvent.getHandlerID();
-                outputProcessor.add(KLargestEvent, handlerID);
-                System.out.println(KLargestEvent.toString());
+                //outputProcessor.add(KLargestEvent, handlerID);
+
+/*
+                System.out.println("sum  = " + (count1+count2+count3+count4));
+
+
+                if(handlerID == 0)
+                System.out.println("myHandlerID  = " + handlerID  + " count = " + count1++ );
+
+                if(handlerID == 1)
+                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count2++ );
+
+                if(handlerID == 2)
+                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count3++ );
+
+                if(handlerID == 3)
+                    System.out.println("myHandlerID  = " + handlerID  + " count = " + count4++ );
+
+                //System.out.println(count++);
+
+               // System.out.println(KLargestEvent.toString());
+               */
 
             }catch (Exception e)
             {
