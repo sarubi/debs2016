@@ -148,7 +148,7 @@ public class Q1EventManager {
 
                             if (ts == -2L) {
                                 //This is the place where time measuring ends.
-                                flush(timeWindow);
+                                flush(timeWindow, ts);
                                 showFinalStatistics();
                                 postStore.destroy();
                                 break;
@@ -185,7 +185,7 @@ public class Q1EventManager {
                     }
 
                     if(ts != -1L && ts != -2L) {
-                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
                         if (endTime != -1L) {
                             latency += (endTime - iij_timestamp);
                             numberOfOutputs++;
@@ -198,17 +198,18 @@ public class Q1EventManager {
             }
         }
 
-    private void flush(TimeWindow timeWindow)
+    private void flush(TimeWindow timeWindow, long ts)
     {
-        endiij_timestamp = endiij_timestamp +  CommentPostMap.DURATION;
+        ts = ts +  CommentPostMap.DURATION;
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
         while(!isEmpty) {
-            timeWindow.updateTime(endiij_timestamp);
-            long endTime =  postStore.printTopThreeComments(endiij_timestamp, true, true, ",");
+            timeWindow.updateTime(ts);
+            long endTime =  postStore.printTopThreeComments(ts, true, true, ",");
             if (endTime != -1L) {
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;
             }
+            ts = ts +  CommentPostMap.DURATION;
         }
     }
     /**
