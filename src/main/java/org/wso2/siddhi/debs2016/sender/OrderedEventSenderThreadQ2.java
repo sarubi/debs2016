@@ -24,7 +24,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
     private LinkedBlockingQueue<Object[]> eventBufferList [];
     private Date startDateTime;
     public boolean doneFlag = false;
-    Q2EventManager manager = new Q2EventManager();
+    Q2EventManager manager;
 
 
     /**
@@ -32,9 +32,10 @@ public class OrderedEventSenderThreadQ2 extends Thread {
      *
      * @param eventBuffer the event buffer array
      */
-    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer []) {
+    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer [], int k, long d) {
         super("Event Sender");
         this.eventBufferList = eventBuffer;
+        manager = new Q2EventManager(k, d*1000);
         manager.run();
     }
 

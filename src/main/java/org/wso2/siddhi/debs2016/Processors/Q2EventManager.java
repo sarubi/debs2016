@@ -33,10 +33,10 @@ public class Q2EventManager {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 3600000*24;
+//    private long duration;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
-    private int k = 2;
+//    private int k;
     private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
@@ -50,7 +50,7 @@ public class Q2EventManager {
      * The constructor
      *
      */
-    public Q2EventManager(){
+    public Q2EventManager(int k, long duration){
         List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
         commentStore = new CommentStore(duration, friendshipGraph, k);
@@ -186,6 +186,8 @@ public class Q2EventManager {
                             //  dataReadDisruptor.shutdown();
                             break;
                         }else if (ts == -1) {
+//                            duration = (long)objects[7];
+//                            k = (int) (objects[8])*1000;
                             count--;
                             startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                             break;

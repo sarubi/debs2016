@@ -17,6 +17,8 @@ public class Query2 {
     private String postsFile;
     private String commentsFile;
     private String likesFile;
+    private int k;
+    private long d;
 
     public static void main(String[] args){
 
@@ -37,6 +39,8 @@ public class Query2 {
         postsFile = args[1];
         commentsFile = args[2];
         likesFile = args[3];
+        k = Integer.parseInt(args[4]);
+        d = Long.parseLong(args[5]);
     }
 
     public void run(){
@@ -56,7 +60,7 @@ public class Query2 {
         eventBufferListQ2[1] = dataLoaderThreadComments.getEventBuffer();
         eventBufferListQ2[2] = dataLoaderThreadLikes.getEventBuffer();
 
-        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2);
+        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2, k, d);
 
 
         dataLoaderThreadFriendships.start();
