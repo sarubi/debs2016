@@ -95,7 +95,6 @@ public class PostStore {
             int score = entry.getKey();
             long id = entry.getValue();
             topScoreMap.put(score, postList.get(id));
-
         }
 
         return topScoreMap;

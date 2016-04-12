@@ -111,9 +111,11 @@ public class TimeWindow {
                     postScoreMap.remove(oldScore, postID);
                     post.decrementTotalScore();
                     int newScore = post.getTotalScore();
-                    postScoreMap.put(newScore, postID);
-                    if (nextQueue != null) {
-                        nextQueue.add(commentPostObject);
+                    if (postStore.getPostList().containsKey(postID)){
+                        postScoreMap.put(newScore, postID);
+                        if (nextQueue != null) {
+                            nextQueue.add(commentPostObject);
+                        }
                     }
                     iterator.remove();
                 } else {
