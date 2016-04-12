@@ -115,6 +115,8 @@ public class Q1EventManager {
          *
          */
         private class DEBSEventHandler implements EventHandler<DEBSEvent> {
+            long last_timestamp = 0;
+
             @Override
             public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
                 Object [] objects = debsEvent.getObjectArray();
@@ -135,6 +137,7 @@ public class Q1EventManager {
 
                     long iij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                     endiij_timestamp = iij_timestamp;
+
                     long ts = (Long) objects[1];
                     String user_name = (String) objects[5];
                     int isPostFlag = (int) objects[8];
@@ -151,7 +154,7 @@ public class Q1EventManager {
 
                             if (ts == -2L) {
                                 //This is the place where time measuring ends.
-                                flush(timeWindow, ts);
+                                flush(timeWindow, last_timestamp);
                                 showFinalStatistics();
                                 postStore.destroy();
                                 break;
@@ -187,6 +190,8 @@ public class Q1EventManager {
                             break;
                     }
 
+                    last_timestamp = ts;
+
                     if(ts != -1L && ts != -2L) {
                         long endTime = postStore.printTopThreeComments(ts, true, true, ",");
                         if (endTime != -1L) {
@@ -206,6 +211,7 @@ public class Q1EventManager {
         ts = ts +  CommentPostMap.DURATION;
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
         while(!isEmpty) {
+            isEmpty = postStore.getPostScoreMap().isEmpty();
             timeWindow.updateTime(ts);
             long endTime =  postStore.printTopThreeComments(ts, true, true, ",");
             if (endTime != -1L) {
