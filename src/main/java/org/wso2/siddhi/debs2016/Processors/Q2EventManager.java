@@ -133,7 +133,8 @@ public class Q2EventManager {
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
             if (numberOfOutputs != 0) {
-                BigDecimal averageLatency = new BigDecimal((float)(latency/numberOfOutputs)/1000);
+                float temp = ((float)latency/numberOfOutputs)/1000;
+                BigDecimal averageLatency = new BigDecimal(temp);
                 String latencyString = averageLatency.toPlainString() + "000000";
                 System.out.println("Average Latency " + latencyString.substring(0, 7));
                 builder.append(latencyString.substring(0, 7));
