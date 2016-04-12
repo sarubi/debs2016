@@ -53,6 +53,9 @@ public class DataLoaderThread extends Thread {
                     case POSTS:
                         //ts long, post_id long, user_id long, post string, user string
                         String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
+                        if (postsTimeStamp.equals("")){
+                            break;
+                        }
                         DateTime dt = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
                         Long postsTimeStampLong = dt.getMillis();
                         Long postID = Long.parseLong(dataStrIterator.next());
@@ -78,6 +81,9 @@ public class DataLoaderThread extends Thread {
                         //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
                         // post_commented long
                         String commentTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        if (commentTimeStamp.equals("")){
+                            break;
+                        }
                         DateTime dt2 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(commentTimeStamp);
                         Long commentTimeStampLong = dt2.getMillis();
                         Long commentID = Long.parseLong(dataStrIterator.next());
@@ -116,6 +122,9 @@ public class DataLoaderThread extends Thread {
                         break;
                     case FRIENDSHIPS:
                         String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        if (friendshipsTimeStamp.equals("")){
+                            break;
+                        }
                         DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
                         Long  friendshipTimeStampLong = dt3.getMillis();
                         Long user1ID = Long.parseLong(dataStrIterator.next());
@@ -140,6 +149,9 @@ public class DataLoaderThread extends Thread {
                         break;
                     case LIKES:
                         String likeTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        if (likeTimeStamp.equals("")){
+                            break;
+                        }
                         DateTime dt4 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(likeTimeStamp);
                         Long  likeTimeStampLong = dt4.getMillis();
                         userID = Long.parseLong(dataStrIterator.next());

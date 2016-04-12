@@ -179,9 +179,10 @@ public class TimeWindow {
      * @param deductedPosts is list of post to add back to the array list
      */
     private void addToList(ArrayList<PostWindowObject> deductedPosts){
+        Collections.reverse(deductedPosts);
         Iterator<PostWindowObject> iterator1 = deductedPosts.iterator();
         while (iterator1.hasNext()){
-            postWindow.add(iterator1.next());
+            postWindow.addFirst(iterator1.next());
         }
     }
 }
