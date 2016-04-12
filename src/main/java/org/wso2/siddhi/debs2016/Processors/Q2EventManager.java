@@ -15,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -136,9 +137,8 @@ public class Q2EventManager {
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
             if (numberOfOutputs != 0) {
-                float averageLatency = (float)latency/numberOfOutputs;
-                float averageLatencySeconds = averageLatency/1000;
-                String latencyString = Float.toString(averageLatencySeconds) + "000000";
+                BigDecimal averageLatency = new BigDecimal((float)(latency/numberOfOutputs)/1000);
+                String latencyString = averageLatency.toPlainString() + "000000";
                 System.out.println("Average Latency " + latencyString.substring(0, 7));
                 builder.append(latencyString.substring(0, 7));
             } else {
