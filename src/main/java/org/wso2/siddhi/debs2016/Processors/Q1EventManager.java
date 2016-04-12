@@ -151,6 +151,7 @@ public class Q1EventManager {
 
                             if (ts == -2L) {
                                 //This is the place where time measuring ends.
+                                flush(timeWindow);
                                 showFinalStatistics();
                                 postStore.destroy();
                                 break;
@@ -200,7 +201,19 @@ public class Q1EventManager {
             }
         }
 
-
+    private void flush(TimeWindow timeWindow)
+    {
+        endiij_timestamp = endiij_timestamp +  CommentPostMap.DURATION;
+        boolean isEmpty = postStore.getPostScoreMap().isEmpty();
+        while(!isEmpty) {
+            timeWindow.updateTime(endiij_timestamp);
+            long endTime =  postStore.printTopThreeComments(endiij_timestamp, true, true, ",");
+            if (endTime != -1L) {
+                latency += (endTime - endiij_timestamp);
+                numberOfOutputs++;
+            }
+        }
+    }
     /**
      *
      * Print the throughput etc
