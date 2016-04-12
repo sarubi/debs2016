@@ -33,7 +33,7 @@ public class Q2EventManager {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-    private long duration= 7200000;
+    private long duration= 3600000*24;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
     private int k = 2;
