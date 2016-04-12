@@ -7,6 +7,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
+import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -150,6 +151,8 @@ public class Q2EventManager {
 
         }catch (IOException e){
             e.printStackTrace();
+        }finally {
+            OrderedEventSenderThreadQ2.doneFlag = true;
         }
     }
 

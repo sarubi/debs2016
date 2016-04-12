@@ -11,6 +11,7 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
+import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
@@ -238,9 +239,11 @@ public class Q1EventManager {
             writer.write(builder.toString());
             writer.close();
             System.out.flush();
-
         }catch (IOException e) {
             e.printStackTrace();
+        }finally {
+
+            OrderedEventSenderThreadQ1.doneFlag = true;
         }
     }
 

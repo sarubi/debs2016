@@ -81,11 +81,10 @@ public class Query2 {
 
         while(true){
             try {
-                Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ2.doneFlag){
+                if (OrderedEventSenderThreadQ2.doneFlag){
                     System.exit(0);
                 }
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

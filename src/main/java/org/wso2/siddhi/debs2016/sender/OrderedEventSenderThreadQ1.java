@@ -20,7 +20,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList[];
     private Date startDateTime;
-    public boolean doneFlag = false;
+    public static volatile boolean doneFlag = false;
     Q1EventManager manager = new Q1EventManager();
 
     /**
@@ -152,16 +152,16 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             Constants.POSTS
                     };
 
-                    Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
+                    //Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
                     cTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(finalPostEvent);
                     event.setSystemArrivalTime(cTime);
                     manager.publish();
-                    doneFlag = true;
+//                    doneFlag = true;
                     break;
                 }
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

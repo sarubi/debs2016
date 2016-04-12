@@ -70,16 +70,16 @@ public class Query1 {
         //terminating once we are done sending the data to the CEP engine.
 
 
-        while(true){
-            try {
-                Thread.sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThreadQ1.doneFlag){
-                    Query2.main(args);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        while(true){
+//            try {
+//                if (orderedEventSenderThreadQ1.doneFlag){
+////                    Query2.main(args);
+//                    System.exit(0);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
 }

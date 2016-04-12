@@ -23,7 +23,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
     private Date startDateTime;
-    public boolean doneFlag = false;
+    public static volatile boolean doneFlag = false;
     Q2EventManager manager;
 
 
@@ -165,7 +165,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 debsEvent.setSystemArrivalTime(cTime);
                 manager.publish();
                 manager.getDataReadDisruptor().shutdown();
-                doneFlag = true;
+//                doneFlag = true;
                 break;
             }
         }
