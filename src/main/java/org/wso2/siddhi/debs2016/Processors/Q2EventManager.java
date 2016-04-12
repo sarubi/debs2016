@@ -75,7 +75,7 @@ public class Q2EventManager {
             public DEBSEvent newInstance() {
                 return new DEBSEvent();
             }
-        }, bufferSize, Executors.newFixedThreadPool(3), ProducerType.SINGLE, new SleepingWaitStrategy());
+        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
         //******************Handler**************************************//
 
