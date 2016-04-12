@@ -59,11 +59,9 @@ public class Q1EventManager {
             startDateTime = new Date();
             startTime = startDateTime.getTime();
             SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
             postStore = new PostStore();
             commentPostMap = new CommentPostMap();
             timeWindow = new TimeWindow(postStore, commentPostMap);
-            System.out.println("Query 1 ----------------------------------");
         }
 
         /**
@@ -193,7 +191,7 @@ public class Q1EventManager {
                     last_timestamp = ts;
 
                     if(ts != -1L && ts != -2L) {
-                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
                         if (endTime != -1L) {
                             latency += (endTime - iij_timestamp);
                             numberOfOutputs++;
@@ -213,7 +211,7 @@ public class Q1EventManager {
         while(!isEmpty) {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             timeWindow.updateTime(ts);
-            long endTime =  postStore.printTopThreeComments(ts, true, true, ",");
+            long endTime =  postStore.printTopThreeComments(ts, false, true, ",");
             if (endTime != -1L) {
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;

@@ -46,8 +46,7 @@ public class Query2 {
     public void run(){
 
 
-        System.out.println("Incremental data loading is performed.");
-
+        System.out.println("Query 2");
         LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
 
         //Friendships

@@ -34,10 +34,8 @@ public class Q2EventManager {
     private long startiij_timestamp;
     private long endiij_timestamp;
     private String ts;
-//    private long duration;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
-//    private int k;
     private static int count = 0;
     long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
@@ -60,7 +58,6 @@ public class Q2EventManager {
         startDateTime = new Date();
         startTime = startDateTime.getTime();
         SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
-        System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
     }
 
     /**
@@ -123,7 +120,6 @@ public class Q2EventManager {
 
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("\n\n Query 2 has completed ..........\n\n");
             System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
 
@@ -187,11 +183,8 @@ public class Q2EventManager {
                             count--;
                             showFinalStatistics();
                             commentStore.destroy();
-                            //  dataReadDisruptor.shutdown();
                             break;
                         }else if (ts == -1) {
-//                            duration = (long)objects[7];
-//                            k = (int) (objects[8])*1000;
                             count--;
                             startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
                             break;

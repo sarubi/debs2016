@@ -151,14 +151,11 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             0L,
                             Constants.POSTS
                     };
-
-                    //Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
                     cTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(finalPostEvent);
                     event.setSystemArrivalTime(cTime);
                     manager.publish();
-//                    doneFlag = true;
                     break;
                 }
             } catch (Exception e) {

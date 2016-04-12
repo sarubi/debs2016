@@ -165,7 +165,6 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 debsEvent.setSystemArrivalTime(cTime);
                 manager.publish();
                 manager.getDataReadDisruptor().shutdown();
-//                doneFlag = true;
                 break;
             }
         }

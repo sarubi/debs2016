@@ -13,7 +13,6 @@ public class Run {
         }else{
             Query1.main(args);
             while (true) {
-//                System.out.println(OrderedEventSenderThreadQ1.doneFlag);
                 boolean do1 = OrderedEventSenderThreadQ1.doneFlag;
                 if (do1) {
                     Query2.main(args);
