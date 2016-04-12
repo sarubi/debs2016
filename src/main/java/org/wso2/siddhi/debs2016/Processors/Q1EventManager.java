@@ -19,6 +19,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -221,19 +224,24 @@ public class Q1EventManager {
             System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
 
-            String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
-            System.out.println("Total run time : " + timeDifferenceString);
-            builder.append(timeDifferenceString);
-            builder.append(" ");
+            String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
+            System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
+            builder.append(timeDifferenceString.substring(0, 7));
+            builder.append(", ");
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
             if (numberOfOutputs!=0){
-                long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency);
-                System.out.println("Average Latency " + latencyString);
+
+                float averageLatency = (float)latency/numberOfOutputs;
+                float averageLatencySeconds = averageLatency/1000;
+                String latencyString = Float.toString(averageLatencySeconds) + "000000";
+                System.out.println("Average Latency " + latencyString.substring(0, 7));
+                builder.append(latencyString.substring(0, 7));
+                builder.append(", ");
+            } else {
+                String latencyString = "000000";
                 builder.append(latencyString);
-                builder.append(" ");
             }
 
             writer.write(builder.toString());

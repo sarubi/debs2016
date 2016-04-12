@@ -127,19 +127,20 @@ public class Q2EventManager {
             System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
 
-            String timeDifferenceString = String.format("%06d", timeDifference/1000); //Convert time to seconds
-            System.out.println("Total run time : " + timeDifferenceString);
-            builder.append(timeDifferenceString);
-            builder.append(" ");
+            String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
+            System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
+            builder.append(timeDifferenceString.substring(0, 7));
+            builder.append(", ");
 
             System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
             if (numberOfOutputs != 0) {
-                long averageLatency = latency/numberOfOutputs;
-                String latencyString = String.format("%06d", averageLatency);
-                System.out.println("Average Latency " + latencyString);
-                builder.append(latencyString);
+                float averageLatency = (float)latency/numberOfOutputs;
+                float averageLatencySeconds = averageLatency/1000;
+                String latencyString = Float.toString(averageLatencySeconds) + "000000";
+                System.out.println("Average Latency " + latencyString.substring(0, 7));
+                builder.append(latencyString.substring(0, 7));
             } else {
                 String latencyString = "000000";
                 builder.append(latencyString);
