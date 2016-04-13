@@ -70,5 +70,5 @@ public class Query1 {
         orderedEventSenderThreadQ1.start();
     }
 
- 
+
 }

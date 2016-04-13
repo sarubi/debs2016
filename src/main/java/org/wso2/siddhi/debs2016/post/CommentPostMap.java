@@ -10,7 +10,7 @@ public class CommentPostMap {
 
     public static final long DURATION =  86400000L;
     public static final int INITIAL_SCORE = 10;
-    private HashMap<Long, Long> commentToPostMap = new HashMap<>();
+    private HashMap<Long, Long> commentToPostMap = new HashMap<>(5000);
 
     /**
      * Adding a comment to a post

@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class PostStore {
 
-    private HashMap<Long, Post> postList  = new HashMap<Long, Post> (); //postID, PostObject
+    private HashMap<Long, Post> postList  = new HashMap<Long, Post> (5000); //postID, PostObject
     private BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<Integer, Long>(3, true, true, true);
     private Long[] previousOrderedTopThree = new Long[3];
     StringBuilder builder=new StringBuilder();
