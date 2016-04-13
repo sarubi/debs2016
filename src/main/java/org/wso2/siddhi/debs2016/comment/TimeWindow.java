@@ -1,6 +1,7 @@
 package org.wso2.siddhi.debs2016.comment;
 
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
+import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -72,7 +73,7 @@ public class TimeWindow {
      * Move the comments and posts along the time axis
      * @param ts time stamp
      */
-    public void updateTime(long ts){
+    public boolean updateTime(long ts){
 
         process(ts, oneDay, twoDays, 1);
         process(ts, twoDays, threeDays, 2);
@@ -84,7 +85,7 @@ public class TimeWindow {
         process(ts, eightDays, nineDays, 8);
         process(ts, nineDays, tenDays, 9);
         process(ts, tenDays, null, 10);
-        processPost(ts);
+        return processPost(ts);
 
     }
 
@@ -134,12 +135,11 @@ public class TimeWindow {
      *
      * @param ts the event time
      */
-    private void processPost(long ts){
+    private boolean processPost(long ts){
 
         Iterator<PostWindowObject> iterator = postWindow.descendingIterator();
         HashMap<Long, Post> postMap = postStore.getPostList();
         ArrayList<PostWindowObject> deductedPosts = new ArrayList<>();
-
         while (iterator.hasNext()){
             PostWindowObject postObject = iterator.next();
             Post post = postObject.getPost();
@@ -154,25 +154,26 @@ public class TimeWindow {
 
             //Check how many days it has passed
             while (postArrivalTime <= timeWindowStart){
-                post.decrementTotalScore();
                 postArrivalTime = postArrivalTime + CommentPostMap.DURATION;
-            }
-
-            int newScore = post.getTotalScore();
-            if (oldScore != newScore){
-                iterator.remove();
-                postScoreMap.remove(oldScore, postId);
-                if(newScore <= 0){
+                post.decrementTotalScore();
+                if (post.getTotalScore() <= 0){
                     postMap.remove(postId);
                     commentPostMap.getCommentToPostMap().remove(postId);
-                }else{
-                    deductedPosts.add(new PostWindowObject(postArrivalTime, post));
-                    postScoreMap.put(post.getTotalScore(), postId);
+                    Q1EventManager.timeOfEvent = postArrivalTime;
+                    break;
                 }
             }
-        }
+            int newScore = post.getTotalScore();
+            iterator.remove();
+            postScoreMap.remove(oldScore, postId);
 
+            if(newScore > 0){
+                deductedPosts.add(new PostWindowObject(postArrivalTime, post));
+                postScoreMap.put(post.getTotalScore(), postId);
+            }
+        }
         addToList(deductedPosts);
+        return postStore.hasTopThreeChanged();
     }
 
     /**

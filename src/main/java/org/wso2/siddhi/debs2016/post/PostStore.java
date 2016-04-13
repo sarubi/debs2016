@@ -105,7 +105,7 @@ public class PostStore {
      *
      * @return true if they have changed false otherwise
      */
-    private boolean hasTopThreeChanged()
+    public boolean hasTopThreeChanged()
     {
 
         TreeMultimap<Integer, Post> topScoreMap = getTopThreePostsMap();
@@ -146,9 +146,7 @@ public class PostStore {
 
     public long printTopThreeComments(Long ts, boolean printComments, boolean writeToFile, String delimiter) {
 
-        boolean changeFlag = hasTopThreeChanged();
         try{
-            if (changeFlag){
                 builder.setLength(0);
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                 df.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -175,12 +173,10 @@ public class PostStore {
                 if (writeToFile) {
                     writer.write(builder.toString());
                 }
-                return System.currentTimeMillis();
-            }
         }catch (IOException ex){
             ex.printStackTrace();
         }
-        return -1L;
+        return System.currentTimeMillis();
     }
     /**
      *

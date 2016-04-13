@@ -52,8 +52,7 @@ public class Q1EventManager {
         private TimeWindow timeWindow;
         private Long latency = 0L;
         private Long numberOfOutputs = 0L;
-
-
+    	public static long timeOfEvent = 0;
         /**
          * The constructor
          *
@@ -70,16 +69,19 @@ public class Q1EventManager {
 
         /**
          *
-         * Starts the distruptor
+         * Starts the distrupter
          *
          */
         public void run() {
             dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
+
                 @Override
                 public DEBSEvent newInstance() {
                     return new DEBSEvent();
                 }
             }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
+
+            //******************Handler**************************************//
 
             DEBSEventHandler debsEventHandler = new DEBSEventHandler();
             dataReadDisruptor.handleEventsWith(debsEventHandler);
@@ -191,13 +193,6 @@ public class Q1EventManager {
 
                     last_timestamp = ts;
 
-                    if(ts != -1L && ts != -2L) {
-                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
-                        if (endTime != -1L) {
-                            latency += (endTime - iij_timestamp);
-                            numberOfOutputs++;
-                        }
-                    }
 
                     } catch (Exception e) {
                     e.printStackTrace();
@@ -211,9 +206,9 @@ public class Q1EventManager {
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
         while(!isEmpty) {
             isEmpty = postStore.getPostScoreMap().isEmpty();
-            timeWindow.updateTime(ts);
-            long endTime =  postStore.printTopThreeComments(ts, false, true, ",");
-            if (endTime != -1L) {
+            hasChanged = timeWindow.updateTime(ts);
+            if (hasChanged){
+                long endTime =  postStore.printTopThreeComments(timeOfEvent, true, true, ",");
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;
             }
