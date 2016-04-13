@@ -52,7 +52,7 @@ public class TimeWindow {
      */
     public void addComment(Post post, long ts, long commenter_id){
         long postId = post.getPostId();
-        oneDay.add(new CommentForPost(post, ts));
+        oneDay.add(new CommentForPost(post, ts, commenter_id));
         postScoreMap.remove(post.getTotalScore(), postId);
         post.addComment(ts, commenter_id);
         postScoreMap.put(post.getTotalScore(), postId);
@@ -116,6 +116,8 @@ public class TimeWindow {
                         postScoreMap.put(newScore, postID);
                         if (nextQueue != null) {
                             nextQueue.add(commentPostObject);
+                        }else {
+                            post.removeCommenter(commentPostObject.getUserID());
                         }
                     }
                     iterator.remove();

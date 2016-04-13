@@ -17,6 +17,11 @@ public class Post {
     private Set<Long> commenters = new HashSet<Long>();
 
 
+    public void removeCommenter(long userID){
+        commenters.remove(userID);
+    }
+
+
     /**
      * Constructor to create new post
      * @param timeStamp the arrival time of the comment
