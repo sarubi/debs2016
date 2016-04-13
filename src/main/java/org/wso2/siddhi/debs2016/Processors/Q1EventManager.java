@@ -145,16 +145,19 @@ public class Q1EventManager {
 
                     count++;
                     Post post;
+                    boolean hasChanged = false;
                     switch (isPostFlag){
                         case Constants.POSTS:
                             if (ts == -1L) {
                                 //This is the place where time measuring starts.
+                                count--;
                                 startiij_timestamp = iij_timestamp;
                                 break;
                             }
 
                             if (ts == -2L) {
                                 //This is the place where time measuring ends.
+                                count--;
                                 flush(timeWindow, last_timestamp);
                                 showFinalStatistics();
                                 postStore.destroy();
@@ -164,6 +167,11 @@ public class Q1EventManager {
                             post = postStore.addPost(post_id, ts, user_name); // 2)
                             timeWindow.updateTime(ts);
                             timeWindow.addNewPost(ts, post);
+                            if (postStore.hasTopThreeChanged()){
+                                long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                latency += (endTime - iij_timestamp);
+                                numberOfOutputs++;
+                            }
                             break;
 
                         case Constants.COMMENTS:
@@ -177,7 +185,18 @@ public class Q1EventManager {
                                 if (post != null) {
                                     timeWindow.addComment(post, ts, commenter_id);
                                 }
-                                timeWindow.updateTime(ts);
+                                hasChanged = timeWindow.updateTime(ts);
+                                if (hasChanged){
+                                    if (postStore.getPost(post_replied_id) == null){
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
+                                        latency += (endTime - iij_timestamp);
+                                        numberOfOutputs++;
+                                    }else{
+                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                        latency += (endTime - iij_timestamp);
+                                        numberOfOutputs++;
+                                    }
+                                }
                                 commentPostMap.addCommentToPost(comment_id, post_replied_id);
 
                             } else if (comment_replied_id != -1 && post_replied_id == -1){
@@ -186,7 +205,18 @@ public class Q1EventManager {
                                 if (post != null) {
                                     timeWindow.addComment(post, ts, commenter_id);
                                 }
-                                timeWindow.updateTime(ts);
+                                hasChanged = timeWindow.updateTime(ts);
+                                if (hasChanged){
+                                    if (postStore.getPost(post_replied_id) == null){
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
+                                        latency += (endTime - iij_timestamp);
+                                        numberOfOutputs++;
+                                    }else{
+                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                        latency += (endTime - iij_timestamp);
+                                        numberOfOutputs++;
+                                    }
+                                }
                             }
                             break;
                     }
@@ -204,6 +234,7 @@ public class Q1EventManager {
     {
         ts = ts +  CommentPostMap.DURATION;
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
+        boolean hasChanged;
         while(!isEmpty) {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             hasChanged = timeWindow.updateTime(ts);
