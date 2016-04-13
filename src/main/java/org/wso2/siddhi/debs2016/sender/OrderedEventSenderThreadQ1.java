@@ -20,8 +20,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList[];
     private Date startDateTime;
-    public static volatile boolean doneFlag = false;
-    Q1EventManager manager = new Q1EventManager();
+    private Q1EventManager manager = new Q1EventManager();
 
     /**
      * The constructor
@@ -38,19 +37,13 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public void run() {
         Object[] commentEvent = null;
         Object[] postEvent = null;
-
         long count = 1;
         long timeDifferenceFromStart = 0;
         long timeDifference = 0; //This is the time difference for this time window.
         long currentTime = 0;
         long prevTime = 0;
-        //long startTime = System.currentTimeMillis();
         long startTime = 0;
         long cTime = 0;
-        //Special note : Originally we need not subtract 1. However, due to some reason if there are n events in the input data set that are
-        //pumped to the eventBufferList queue, only (n-1) is read. Therefore, we have -1 here.
-        //final int EVENT_COUNT = Integer.parseInt(Config.getConfigurationInfo("org.wso2.siddhi.debs2015.dataset.size")) - 1;
-
         boolean firstEvent = true;
         float percentageCompleted = 0;
         int flag = Constants.NOEVENT;

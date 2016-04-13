@@ -11,6 +11,8 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
+import org.wso2.siddhi.debs2016.query.Query2;
+import org.wso2.siddhi.debs2016.query.Run;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -51,6 +53,7 @@ public class Q1EventManager {
         private Long latency = 0L;
         private Long numberOfOutputs = 0L;
 
+
         /**
          * The constructor
          *
@@ -67,19 +70,16 @@ public class Q1EventManager {
 
         /**
          *
-         * Starts the distrupter
+         * Starts the distruptor
          *
          */
         public void run() {
             dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
-
                 @Override
                 public DEBSEvent newInstance() {
                     return new DEBSEvent();
                 }
             }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
-
-            //******************Handler**************************************//
 
             DEBSEventHandler debsEventHandler = new DEBSEventHandler();
             dataReadDisruptor.handleEventsWith(debsEventHandler);
@@ -269,8 +269,7 @@ public class Q1EventManager {
         }catch (IOException e) {
             e.printStackTrace();
         }finally {
-
-            OrderedEventSenderThreadQ1.doneFlag = true;
+            Query2.main(Run.INPUT_ARGUMENTS);
         }
     }
 

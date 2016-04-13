@@ -18,7 +18,15 @@ public class Query1 {
     private String commentsFile;
     private String likesFile;
     private String[] args;
+    private OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
+    DataLoaderThread dataLoaderThreadComments ;
+    DataLoaderThread dataLoaderThreadPosts;
 
+    /**
+     * The main method
+     *
+     * @param args arguments
+     */
     public static void main(String[] args){
 
         File q1 = new File("q1.txt");
@@ -35,31 +43,32 @@ public class Query1 {
         query.run();
     }
 
+    /**
+     * The constructor
+     *
+     * @param args arguments
+     */
     public Query1(String[] args){
         friendshipFile = args[0];
         postsFile = args[1];
         commentsFile = args[2];
         likesFile = args[3];
         this.args = args;
+        System.out.println("Query 1");
+        LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
+        orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
+        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
+        dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS);
+        eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
+        eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBuffer();
     }
 
     public void run(){
-        
-        System.out.println("Query 1");
-        LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
 
-
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
-        DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS);
-
-        eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
-        eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBuffer();
-
-        OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
         dataLoaderThreadComments.start();
         dataLoaderThreadPosts.start();
         orderedEventSenderThreadQ1.start();
-
     }
 
+ 
 }

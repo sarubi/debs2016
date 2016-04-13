@@ -26,11 +26,9 @@ import java.util.concurrent.Executors;
  * Created by bhagya on 3/30/16.
  */
 public class Q2EventManager {
-    public Disruptor<DEBSEvent> getDataReadDisruptor() {
-        return dataReadDisruptor;
-    }
 
-    Disruptor<DEBSEvent> dataReadDisruptor;
+
+    private Disruptor<DEBSEvent> dataReadDisruptor;
     private RingBuffer dataReadBuffer;
     private long startiij_timestamp;
     private long endiij_timestamp;
@@ -45,6 +43,7 @@ public class Q2EventManager {
     private Long numberOfOutputs = 0L;
     static int bufferSize = 512;
     private long sequenceNumber;
+
 
     /**
      * The constructor
@@ -62,8 +61,17 @@ public class Q2EventManager {
     }
 
     /**
+     * Gets the data reader distruptor
      *
-     * Starts the distrupter
+     * @return the data reader distruptor
+     */
+    public Disruptor<DEBSEvent> getDataReadDisruptor() {
+        return dataReadDisruptor;
+    }
+
+    /**
+     *
+     * Starts the distruptor
      *
      */
     public void run() {
@@ -75,7 +83,6 @@ public class Q2EventManager {
             }
         }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
-        //******************Handler**************************************//
 
         DEBSEventHandler debsEventHandler = new DEBSEventHandler();
         dataReadDisruptor.handleEventsWith(debsEventHandler);
@@ -150,7 +157,7 @@ public class Q2EventManager {
         }catch (IOException e){
             e.printStackTrace();
         }finally {
-            OrderedEventSenderThreadQ2.doneFlag = true;
+            System.exit(0);
         }
     }
 

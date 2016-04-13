@@ -70,23 +70,6 @@ public class Query2 {
         orderedEventSenderThreadQ2.start();
 
 
-        //Just make the main thread sleep infinitely
-        //Note that we cannot have an event based mechanism to exit from this infinit loop. It is
-        //because even if the data sending thread has completed its task of sending the data to
-        //the SiddhiManager, the SiddhiManager object may be conducting the processing of the remaining
-        //data. Furthermore, since this is CEP its better have this type of mechanism, rather than
-        //terminating once we are done sending the data to the CEP engine.
-
-
-        while(true){
-            try {
-                if (OrderedEventSenderThreadQ2.doneFlag){
-                    System.exit(0);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }

@@ -23,8 +23,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList [];
     private Date startDateTime;
-    public static volatile boolean doneFlag = false;
-    Q2EventManager manager;
+    private Q2EventManager manager;
 
 
     /**
