@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class DataLoaderThread extends Thread {
     private String fileName;
     private final static Splitter splitter = Splitter.on('|');
-    private LinkedBlockingQueue<Object[]> eventBufferList = new LinkedBlockingQueue<Object[]>();
+    private LinkedBlockingQueue<Object[]> eventBufferList;
     private BufferedReader br;
     private int count;
     private FileType fileType;
@@ -41,6 +41,7 @@ public class DataLoaderThread extends Thread {
         this.sleepTime = sleepTime;
         this.fileName = fileName;
         this.fileType = fileType;
+        eventBufferList = new LinkedBlockingQueue<Object[]>(bufferLimit);
     }
 
     public void run() {
@@ -52,10 +53,10 @@ public class DataLoaderThread extends Thread {
             int count = 0;
             while (line != null) {
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
-                if(eventBufferList.size() > bufferLimit)
-                {
-                   Thread.sleep(sleepTime);
-                }
+               // if(eventBufferList.size() > bufferLimit)
+                //{
+                  // Thread.sleep(sleepTime);
+                //}
 
                 switch(fileType) {
                     case POSTS:
