@@ -150,23 +150,6 @@ public class CommentStore {
         }
     }
 
-//    /**
-//     * Update the K Largest comment arrays
-//     *
-//
-//     */
-//    private void computeLargestConnectedComponents() {
-//        componentSizeCommentMap.clear();
-//        for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-//            long sizeOfComponent = commentLikeGraph.computeLargestConnectedComponent();
-//            if (sizeOfComponent == 0){
-//                continue;
-//            }
-//            String comment = commentLikeGraph.getComment();
-//
-//            componentSizeCommentMap.put(sizeOfComponent, comment);
-//        }
-//    }
 
     /**
      * Check if the k largest comments have changed

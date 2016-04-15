@@ -272,6 +272,8 @@ public class Q1EventManager {
     private void showFinalStatistics()
     {
         try{
+
+            postStore.destroy();
             builder.setLength(0);
             timeDifference = endiij_timestamp - startiij_timestamp;
             Date dNow = new Date();
