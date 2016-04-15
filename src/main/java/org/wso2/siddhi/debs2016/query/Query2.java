@@ -49,11 +49,9 @@ public class Query2 {
         System.out.println("Query 2");
         LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
 
-        //Friendships
-        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS);
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES);
-
+        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS,100000,100);
+        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS, 100000, 100);
+        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES, 100000, 100);
 
         eventBufferListQ2[0] = dataLoaderThreadFriendships.getEventBuffer();
         eventBufferListQ2[1] = dataLoaderThreadComments.getEventBuffer();

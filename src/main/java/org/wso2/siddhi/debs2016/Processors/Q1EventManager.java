@@ -81,8 +81,6 @@ public class Q1EventManager {
                 }
             }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
-            //******************Handler**************************************//
-
             DEBSEventHandler debsEventHandler = new DEBSEventHandler();
             dataReadDisruptor.handleEventsWith(debsEventHandler);
             dataReadBuffer = dataReadDisruptor.start();
@@ -239,7 +237,7 @@ public class Q1EventManager {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             hasChanged = timeWindow.updateTime(ts);
             if (hasChanged){
-                long endTime =  postStore.printTopThreeComments(timeOfEvent, false, true, ",");
+                long endTime =  postStore.printTopThreeComments(timeOfEvent,false, true, ",");
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;
             }

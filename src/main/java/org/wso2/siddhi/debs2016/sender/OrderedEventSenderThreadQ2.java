@@ -51,9 +51,13 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         long cTime = 0;
         boolean firstEvent = true;
         int flag = Constants.NOEVENT;
+        boolean friendshipLastEventArrived = false;
+        boolean commentsLastEventArrived = false;
+        boolean likesLastEventArrived = false;
 
         while(true){
             //Send dummy event to mark the commencement of processing
+
             if(firstEvent){
                 Object[] finalFriendshipEvent = new Object[]{
                         0L,
@@ -71,8 +75,6 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 event.setObjectArray(finalFriendshipEvent);
                 event.setSystemArrivalTime(cTime);
                 manager.publish();
-
-                //We print the start and the end times of the experiment even if the performance logging is disabled.
                 startDateTime = new Date();
                 startTime = startDateTime.getTime();
                 SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
@@ -81,16 +83,66 @@ public class OrderedEventSenderThreadQ2 extends Thread {
             }
 
             try{
-                if (flag == Constants.FRIENDSHIPS){
-                    friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].poll(500, TimeUnit.MILLISECONDS);
+                if (flag == Constants.FRIENDSHIPS) {
+                    if(!friendshipLastEventArrived)
+                    {
+                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+                        long lastEvent = (Long) friendshipEvent[0];
+                        if (lastEvent == -1L)
+                        {
+                            friendshipEvent = null;
+                            friendshipLastEventArrived = true;
+                        }
+                    }
                 }else if (flag == 1){
-                    commentEvent = eventBufferList[Constants.COMMENTS].poll(500, TimeUnit.MILLISECONDS);
-                }else if (flag == 2){
-                    likeEvent = eventBufferList[Constants.LIKES].poll(500, TimeUnit.MILLISECONDS);
+                    if(!commentsLastEventArrived) {
+                        commentEvent = eventBufferList[Constants.COMMENTS].take();
+                        long lastEvent = (Long) commentEvent[0];
+                        if (lastEvent == -1L) {
+
+                            commentEvent = null;
+                            commentsLastEventArrived = true;
+                        }
+                    }
+                }else if (flag == 2) {
+                    if (!likesLastEventArrived) {
+                        likeEvent = eventBufferList[Constants.LIKES].take();
+                        long lastEvent = (Long) likeEvent[0];
+
+                        if (lastEvent == -1L) {
+                            likeEvent = null;
+                            likesLastEventArrived = true;
+                         }
+                    }
                 }else{
-                    friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
-                    commentEvent = eventBufferList[Constants.COMMENTS].take();
-                    likeEvent = eventBufferList[Constants.LIKES].take();
+
+                    if(!friendshipLastEventArrived) {
+                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+                        long lastEvent = (Long) friendshipEvent[0];
+                        if (lastEvent == -1L)
+                        {
+                            friendshipEvent = null;
+                            friendshipLastEventArrived = true;
+                        }
+                    }
+                    if(!commentsLastEventArrived) {
+                        commentEvent = eventBufferList[Constants.COMMENTS].take();
+                        long lastEvent = (Long) commentEvent[0];
+                        if (lastEvent == -1L) {
+
+                            commentEvent = null;
+                            commentsLastEventArrived = true;
+                        }
+
+                    }
+                    if(!likesLastEventArrived) {
+                        likeEvent = eventBufferList[Constants.LIKES].take();
+                        long lastEvent = (Long) likeEvent[0];
+                        if (lastEvent == -1L) {
+                            likeEvent = null;
+                            likesLastEventArrived = true;
+                        }
+                    }
                 }
 
             }catch (Exception ex){
@@ -101,7 +153,6 @@ public class OrderedEventSenderThreadQ2 extends Thread {
             long tsComment;
             long tsLike;
 
-            //handling the instance where the stream of a buffer has no more events
             if (friendshipEvent == null){
                 tsFriendship = Long.MAX_VALUE;
             }else{
@@ -143,10 +194,8 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 flag = Constants.LIKES;
             }
 
-            //When all buffers are empty
             if (friendshipEvent == null && commentEvent == null && likeEvent == null){
                 cTime = System.currentTimeMillis();
-                //Send dummy event to signal end of all streams
                 Object[] finalFriendshipEvent = new Object[]{
                         0L,
                         -2L,

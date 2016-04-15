@@ -47,11 +47,11 @@ public class OrderedEventSenderThreadQ1 extends Thread {
         boolean firstEvent = true;
         float percentageCompleted = 0;
         int flag = Constants.NOEVENT;
-
+        boolean postLastEventArrived = false;
+        boolean commentsLastEventArrived = false;
         while (true) {
 
             try {
-                //Send dummy event to mark the commencement of processing
                 if (firstEvent) {
                     Object[] firstPostEvent = new Object[]{
                             0L,
@@ -80,12 +80,44 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 try {
 
                     if (flag == Constants.POSTS) {
-                        postEvent = eventBufferList[Constants.POSTS].poll(1000, TimeUnit.MILLISECONDS);
+                        if(!postLastEventArrived) {
+                            postEvent = eventBufferList[Constants.POSTS].take();
+                            long lastEvent = (Long) postEvent[0];
+                            if (lastEvent == -1L)
+                            {
+                                postEvent = null;
+                                postLastEventArrived = true;
+                            }
+                        }
                     } else if (flag == Constants.COMMENTS) {
-                        commentEvent = eventBufferList[Constants.COMMENTS].poll(1000, TimeUnit.MILLISECONDS);
+                        if(!commentsLastEventArrived) {
+                            commentEvent = eventBufferList[Constants.COMMENTS].take();
+                            long lastEvent = (Long) commentEvent[0];
+                            if (lastEvent == -1L)
+                            {
+                                commentEvent = null;
+                                commentsLastEventArrived = true;
+                            }
+                        }
                     } else {
-                        postEvent = eventBufferList[Constants.POSTS].poll(1000, TimeUnit.MILLISECONDS);
-                        commentEvent = eventBufferList[Constants.COMMENTS].poll(1000, TimeUnit.MILLISECONDS);
+                        if(!postLastEventArrived) {
+                            postEvent = eventBufferList[Constants.POSTS].take();
+                            long lastEvent = (Long) postEvent[0];
+                            if (lastEvent == -1L)
+                            {
+                                postEvent = null;
+                                postLastEventArrived = true;
+                            }
+                        }
+                        if(!commentsLastEventArrived) {
+                            commentEvent = eventBufferList[Constants.COMMENTS].take();
+                            long lastEvent = (Long) commentEvent[0];
+                            if (lastEvent == -1L)
+                            {
+                                commentEvent = null;
+                                commentsLastEventArrived = true;
+                            }
+                        }
                     }
 
                 } catch (Exception ex) {
@@ -95,7 +127,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 long tsComment;
                 long tsPost;
 
-                //handling the instance where the stream of a buffer has no more events
                 if (commentEvent == null) {
                     tsComment = Long.MAX_VALUE;
                 } else {

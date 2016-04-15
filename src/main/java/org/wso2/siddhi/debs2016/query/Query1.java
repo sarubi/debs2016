@@ -57,8 +57,8 @@ public class Query1 {
         System.out.println("Query 1");
         LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
         orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
-        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS);
-        dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS);
+        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS,10000,100);
+        dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS,10000,100);
         eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
         eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBuffer();
     }

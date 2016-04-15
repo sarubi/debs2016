@@ -211,7 +211,7 @@ public class Q2EventManager {
                 }
 
                 if (ts != -2 && ts != -1){
-                    Long endTime = commentStore.computeKLargestComments("," , false, true);
+                    Long endTime = commentStore.computeKLargestComments("," ,false, true);
 
                     if (endTime != -1L){
                         latency += (endTime - (Long) debsEvent.getSystemArrivalTime());

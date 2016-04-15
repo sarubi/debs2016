@@ -26,6 +26,8 @@ public class DataLoaderThread extends Thread {
     private FileType fileType;
     private String MINUS_ONE = "-1";
     private boolean debug = false;
+    private int bufferLimit ;
+    private int sleepTime ;
 
     /**
      * The constructor
@@ -33,8 +35,10 @@ public class DataLoaderThread extends Thread {
      * @param fileName the name of the file to be read
      * @param fileType the type of the file to be read
      */
-    public DataLoaderThread(String fileName, FileType fileType){
+    public DataLoaderThread(String fileName, FileType fileType, int bufferLimit, int sleepTime){
         super("Data Loader");
+        this.bufferLimit = bufferLimit;
+        this.sleepTime = sleepTime;
         this.fileName = fileName;
         this.fileType = fileType;
     }
@@ -44,28 +48,29 @@ public class DataLoaderThread extends Thread {
             br = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024);
             String line = br.readLine();
             Object[] eventData;
-            String user ;
-
+            String user;
+            int count = 0;
             while (line != null) {
-                //We make an assumption here that we do not get empty strings due to missing values that may present in the input data set
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
+                if(eventBufferList.size() > bufferLimit)
+                {
+                   Thread.sleep(sleepTime);
+                }
+
                 switch(fileType) {
                     case POSTS:
-                        //ts long, post_id long, user_id long, post string, user string
-                        String postsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-01T05:12:32.921+0000
+                        String postsTimeStamp = dataStrIterator.next();
                         if (postsTimeStamp.equals("")){
                             break;
                         }
                         DateTime dt = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
-                        Long postsTimeStampLong = dt.getMillis();
-                        Long postID = Long.parseLong(dataStrIterator.next());
-                        Long userID = Long.parseLong(dataStrIterator.next());
+                        long postsTimeStampLong = dt.getMillis();
+                        long postID = Long.parseLong(dataStrIterator.next());
+                        long userID = Long.parseLong(dataStrIterator.next());
                         String post = dataStrIterator.next();
                         user = dataStrIterator.next();
                         eventData = new Object[]{
-                                0L,//We need to attach the time when we are injecting an event to the query network.
-                                // For that we have to set a separate field which will be populated when we are
-                                // injecting an event to the input stream.
+                                0L,
                                 postsTimeStampLong,
                                 postID,
                                 userID,
@@ -76,17 +81,16 @@ public class DataLoaderThread extends Thread {
                                 Constants.POSTS
                         };
                         eventBufferList.put(eventData);
+
                         break;
                     case COMMENTS:
-                        //ts long, comment_id long, user_id long, comment string, user string, comment_replied long,
-                        // post_commented long
-                        String commentTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        String commentTimeStamp = dataStrIterator.next();
                         if (commentTimeStamp.equals("")){
                             break;
                         }
                         DateTime dt2 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(commentTimeStamp);
-                        Long commentTimeStampLong = dt2.getMillis();
-                        Long commentID = Long.parseLong(dataStrIterator.next());
+                        long commentTimeStampLong = dt2.getMillis();
+                        long commentID = Long.parseLong(dataStrIterator.next());
                         userID = Long.parseLong(dataStrIterator.next());
                         String comment = dataStrIterator.next();
                         user = dataStrIterator.next();
@@ -96,19 +100,15 @@ public class DataLoaderThread extends Thread {
                             commentReplied = MINUS_ONE;
                         }
 
-                        Long comment_replied = Long.parseLong(commentReplied);
+                        long comment_replied = Long.parseLong(commentReplied);
                         String postCommented = dataStrIterator.next();
 
                         if(postCommented.equals("")){
                             postCommented = MINUS_ONE;
                         }
-
-                        Long post_commented = Long.parseLong(postCommented);
-
+                        long post_commented = Long.parseLong(postCommented);
                         eventData = new Object[]{
-                                0L,//We need to attach the time when we are injecting an event to the query network.
-                                // For that we have to set a separate field which will be populated when we are
-                                // injecting an event to the input stream.
+                                0L,
                                 commentTimeStampLong,
                                 userID,
                                 commentID,
@@ -119,23 +119,19 @@ public class DataLoaderThread extends Thread {
                                 Constants.COMMENTS
                         };
                         eventBufferList.put(eventData);
+
                         break;
                     case FRIENDSHIPS:
-                        String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        String friendshipsTimeStamp = dataStrIterator.next();
                         if (friendshipsTimeStamp.equals("")){
                             break;
                         }
                         DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
-                        Long  friendshipTimeStampLong = dt3.getMillis();
-                        Long user1ID = Long.parseLong(dataStrIterator.next());
-                        Long user2ID = Long.parseLong(dataStrIterator.next());
-                        if(debug == true) {
-                            System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + friendshipTimeStampLong + ", user_1_ID = " + user1ID + ", user_2_ID = " + user2ID + "\n");
-                        }
+                        long  friendshipTimeStampLong = dt3.getMillis();
+                        long user1ID = Long.parseLong(dataStrIterator.next());
+                        long user2ID = Long.parseLong(dataStrIterator.next());
                         eventData = new Object[]{
-                                0L,//We need to attach the time when we are injecting an event to the query network.
-                                // For that we have to set a separate field which will be populated when we are
-                                // injecting an event to the input stream.
+                                0L,
                                 friendshipTimeStampLong,
                                 user1ID,
                                 user2ID,
@@ -153,16 +149,14 @@ public class DataLoaderThread extends Thread {
                             break;
                         }
                         DateTime dt4 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(likeTimeStamp);
-                        Long  likeTimeStampLong = dt4.getMillis();
+                        long  likeTimeStampLong = dt4.getMillis();
                         userID = Long.parseLong(dataStrIterator.next());
                         commentID = Long.parseLong(dataStrIterator.next());
                         if(debug == true) {
                             System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + likeTimeStampLong + ", user_id = " + userID + ", comment_ID = " + commentID + "\n");
                         }
                         eventData = new Object[]{
-                                0L,//We need to attach the time when we are injecting an event to the query network.
-                                // For that we have to set a separate field which will be populated when we are
-                                // injecting an event to the input stream.
+                                0L,
                                 likeTimeStampLong,
                                 userID,
                                 commentID,
@@ -173,11 +167,29 @@ public class DataLoaderThread extends Thread {
                                 Constants.LIKES
                         };
                         eventBufferList.put(eventData);
-
                         break;
                 }
 				line = br.readLine();
             }
+
+            Long postsTimeStampLong = -1L;
+            Long postID = -1L;
+            Long userID = -1L;
+            String post = "";
+            user = "";
+            eventData = new Object[]{
+                    -1L,
+                    postsTimeStampLong,
+                    postID,
+                    userID,
+                    post,
+                    user,
+                    0L,
+                    0L,
+                    Constants.POSTS
+            };
+            eventBufferList.put(eventData);
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (NumberFormatException ec){
@@ -187,6 +199,8 @@ public class DataLoaderThread extends Thread {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
+
+
     }
 
     /**
