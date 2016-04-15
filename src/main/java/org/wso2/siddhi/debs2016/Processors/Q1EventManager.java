@@ -53,6 +53,8 @@ public class Q1EventManager {
         private Long latency = 0L;
         private Long numberOfOutputs = 0L;
     	public static long timeOfEvent = 0;
+        public static boolean Q1_COMPLETED  = false;
+        static StringBuilder builder = new StringBuilder();
         /**
          * The constructor
          *
@@ -244,6 +246,24 @@ public class Q1EventManager {
             ts = ts +  CommentPostMap.DURATION;
         }
     }
+
+    /**
+     * Writes the output to the file
+     */
+    public static void outputwritter() {
+        try {
+            File performance = new File("performance.txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
+            String result = builder.toString();
+            writer.write(result);
+            writer.close();
+            System.out.flush();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
     /**
      *
      * Print the throughput etc
@@ -252,21 +272,12 @@ public class Q1EventManager {
     private void showFinalStatistics()
     {
         try{
-            StringBuilder builder = new StringBuilder();
-            BufferedWriter writer;
-            File performance = new File("performance.txt");
-            writer = new BufferedWriter(new FileWriter(performance, true));
-
             builder.setLength(0);
-
             timeDifference = endiij_timestamp - startiij_timestamp;
-
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("Query 1 has completed ..........");
-            System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+            System.out.println("Query 1 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
-
             String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
             System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
             builder.append(timeDifferenceString.substring(0, 7));
@@ -286,14 +297,13 @@ public class Q1EventManager {
                 String latencyString = "000000";
                 builder.append(latencyString);
             }
-
-            writer.write(builder.toString());
-            writer.close();
-            System.out.flush();
-        }catch (IOException e) {
-            e.printStackTrace();
         }finally {
-            Query2.main(Run.INPUT_ARGUMENTS);
+            Q1_COMPLETED = true;
+            if(Q2EventManager.Q2_COMPLETED){
+                outputwritter();
+                Q2EventManager.outputwritter();
+                System.exit(0);
+            }
         }
     }
 

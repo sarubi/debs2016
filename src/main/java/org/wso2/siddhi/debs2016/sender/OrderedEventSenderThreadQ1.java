@@ -73,7 +73,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     startDateTime = new Date();
                     startTime = startDateTime.getTime();
                     SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-                    System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
                     firstEvent = false;
                 }
 

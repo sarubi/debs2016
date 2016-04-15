@@ -46,7 +46,6 @@ public class Query2 {
     public void run(){
 
 
-        System.out.println("Query 2");
         LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
 
         DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS,100000,100);

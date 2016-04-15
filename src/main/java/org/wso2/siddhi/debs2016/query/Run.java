@@ -13,12 +13,8 @@ public class Run {
             System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat, value for k, value for d");
             return;
         }else{
-
-           // Query1  query1 = new Query1(args);
-            INPUT_ARGUMENTS = args;
             Query1.main(args);
-
-
+            Query2.main(args);
         }
     }
 }

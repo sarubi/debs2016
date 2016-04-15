@@ -27,22 +27,23 @@ import java.util.concurrent.Executors;
  */
 public class Q2EventManager {
 
-
+    static StringBuilder builder = new StringBuilder();
     private Disruptor<DEBSEvent> dataReadDisruptor;
     private RingBuffer dataReadBuffer;
-    private long startiij_timestamp;
-    private long endiij_timestamp;
+    private static long startiij_timestamp;
+    private static long endiij_timestamp;
     private String ts;
     public Graph friendshipGraph ;
     private CommentStore commentStore ;
     private static int count = 0;
-    long timeDifference = 0; //This is the time difference for this time window.
+    static volatile long timeDifference = 0; //This is the time difference for this time window.
     long startTime = 0;
     private Date startDateTime;
-    private Long latency = 0L;
-    private Long numberOfOutputs = 0L;
+    private static Long latency = 0L;
+    private static Long  numberOfOutputs = 0L;
     static int bufferSize = 512;
     private long sequenceNumber;
+    public static volatile boolean Q2_COMPLETED = false;
 
 
     /**
@@ -100,7 +101,6 @@ public class Q2EventManager {
         return dataReadDisruptor.get(sequenceNumber);
     }
 
-
     /**
      * Publish the new event
      *
@@ -111,26 +111,37 @@ public class Q2EventManager {
     }
 
     /**
+     * Writes the output to the file
+     */
+    public static void outputwritter() {
+        try {
+            File performance = new File("performance.txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
+            String result = builder.toString();
+            writer.write(result);
+            writer.close();
+            System.out.flush();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+    /**
      *
      * Print the throughput etc
      *
      */
-    private void showFinalStatistics()
+    private synchronized void showFinalStatistics()
     {
         try {
-            StringBuilder builder = new StringBuilder();
-            BufferedWriter writer;
-            File performance = new File("performance.txt");
-            writer = new BufferedWriter(new FileWriter(performance, true));
+
             builder.setLength(0);
-
             timeDifference = endiij_timestamp - startiij_timestamp;
-
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("Ended experiment at : " + dNow.getTime() + "--" + ft.format(dNow));
+            System.out.println("Query 2 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
-
             String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
             System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
             builder.append(timeDifferenceString.substring(0, 7));
@@ -149,15 +160,14 @@ public class Q2EventManager {
                 String latencyString = "000000";
                 builder.append(latencyString);
             }
-
-            writer.write(builder.toString());
-            writer.close();
-            System.out.flush();
-
-        }catch (IOException e){
-            e.printStackTrace();
         }finally {
-            System.exit(0);
+            Q2EventManager.Q2_COMPLETED = true;
+            if(Q1EventManager.Q1_COMPLETED)
+            {
+                Q1EventManager.outputwritter();
+                outputwritter();
+                System.exit(0);
+            }
         }
     }
 

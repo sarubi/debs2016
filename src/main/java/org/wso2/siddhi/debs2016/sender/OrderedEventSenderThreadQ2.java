@@ -56,8 +56,6 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         boolean likesLastEventArrived = false;
 
         while(true){
-            //Send dummy event to mark the commencement of processing
-
             if(firstEvent){
                 Object[] finalFriendshipEvent = new Object[]{
                         0L,
@@ -78,7 +76,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 startDateTime = new Date();
                 startTime = startDateTime.getTime();
                 SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
-                System.out.println("Started experiment at : " + startTime + "--" + ft.format(startDateTime));
+                System.out.println("Starting the experiment at : " + startTime + "--" + ft.format(startDateTime));
                 firstEvent = false;
             }
 

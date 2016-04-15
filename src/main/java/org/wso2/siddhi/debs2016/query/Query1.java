@@ -54,7 +54,7 @@ public class Query1 {
         commentsFile = args[2];
         likesFile = args[3];
         this.args = args;
-        System.out.println("Query 1");
+
         LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
         orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
         dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS,10000,100);
