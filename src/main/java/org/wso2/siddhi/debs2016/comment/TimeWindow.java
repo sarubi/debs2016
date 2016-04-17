@@ -52,7 +52,7 @@ public class TimeWindow {
      */
     public void addComment(Post post, long ts, long commenter_id){
         long postId = post.getPostId();
-        oneDay.add(new CommentForPost(post, ts, commenter_id));
+        oneDay.add(new CommentForPost(post, ts, commenter_id, false));
         postScoreMap.remove(post.getTotalScore(), postId);
         post.addComment(ts, commenter_id);
         postScoreMap.put(post.getTotalScore(), postId);
@@ -65,7 +65,8 @@ public class TimeWindow {
      * @param post the new post
      */
     public void addNewPost(long ts, Post post){
-        postWindow.addFirst(new PostWindowObject(ts, post));
+//        postWindow.addFirst(new PostWindowObject(ts, post));
+        oneDay.add(new CommentForPost(post, ts, 0, true));
         postScoreMap.put(10, post.getPostId());
     }
 
@@ -84,8 +85,8 @@ public class TimeWindow {
         process(ts, sevenDays, eightDays, 7);
         process(ts, eightDays, nineDays, 8);
         process(ts, nineDays, tenDays, 9);
-        process(ts, tenDays, null, 10);
-        return processPost(ts);
+        return process(ts, tenDays, null, 10);
+//        return processPost(ts);
 
     }
 
@@ -96,16 +97,16 @@ public class TimeWindow {
      * @param queue the window iterator
      * @param queueNumber the window number
      */
-    private void process(long ts,  LinkedBlockingQueue<CommentForPost> queue, LinkedBlockingQueue<CommentForPost> nextQueue, int queueNumber) {
-
+    private boolean process(long ts,  LinkedBlockingQueue<CommentForPost> queue, LinkedBlockingQueue<CommentForPost> nextQueue, int queueNumber) {
+        boolean hasChanged = false;
         try {
-
+            HashMap<Long, Post> postMap = postStore.getPostList();
             Iterator<CommentForPost> iterator = queue.iterator();
 
             while (iterator.hasNext()) { //Iterate over Queue
                 CommentForPost commentPostObject = iterator.next();
-                long commentTs = commentPostObject.getTs();
-                if (commentTs <= (ts - CommentPostMap.DURATION * queueNumber)) {
+                long objectArrivalTime = commentPostObject.getTs();
+                if (objectArrivalTime <= (ts - CommentPostMap.DURATION * queueNumber)) {
                     Post post = commentPostObject.getPost();
                     long postID = post.getPostId();
                     int oldScore = post.getTotalScore();
@@ -113,11 +114,22 @@ public class TimeWindow {
                     post.decrementTotalScore();
                     int newScore = post.getTotalScore();
                     if (postStore.getPostList().containsKey(postID)){
-                        postScoreMap.put(newScore, postID);
-                        if (nextQueue != null) {
-                            nextQueue.add(commentPostObject);
+                        boolean isPost = commentPostObject.isPost();
+                        commentPostObject.setExpiringTime(commentPostObject.getExpiringTime() + CommentPostMap.DURATION);
+                        if (newScore <= 0){
+                            postMap.remove(postID);
+                            commentPostMap.getCommentToPostMap().remove(postID);
+                            Q1EventManager.timeOfEvent = commentPostObject.getExpiringTime();
+                            break;
                         }else {
-                            post.removeCommenter(commentPostObject.getUserID());
+                            postScoreMap.put(newScore, postID);
+                            if (nextQueue != null) {
+                                nextQueue.add(commentPostObject);
+                            } else {
+                                if (!isPost){
+                                    post.removeCommenter(commentPostObject.getUserID());
+                                }
+                            }
                         }
                     }
                     iterator.remove();
@@ -125,10 +137,15 @@ public class TimeWindow {
                     break;
                 }
             }
-        } catch (java.lang.Exception e)
-        {
+            if (nextQueue == null) {
+                return postStore.hasTopThreeChanged();
+            }else {
+                return false;
+            }
+        } catch (java.lang.Exception e){
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -137,57 +154,57 @@ public class TimeWindow {
      *
      * @param ts the event time
      */
-    private boolean processPost(long ts){
-
-        Iterator<PostWindowObject> iterator = postWindow.descendingIterator();
-        HashMap<Long, Post> postMap = postStore.getPostList();
-        ArrayList<PostWindowObject> deductedPosts = new ArrayList<>();
-        while (iterator.hasNext()){
-            PostWindowObject postObject = iterator.next();
-            Post post = postObject.getPost();
-            long postId = post.getPostId();
-            int oldScore = post.getTotalScore();
-            long postArrivalTime = postObject.getArrivalTime();
-
-            long timeWindowStart = ts - CommentPostMap.DURATION;
-            if (postArrivalTime > timeWindowStart){
-                break;
-            }
-
-            //Check how many days it has passed
-            while (postArrivalTime <= timeWindowStart){
-                postArrivalTime = postArrivalTime + CommentPostMap.DURATION;
-                post.decrementTotalScore();
-                if (post.getTotalScore() <= 0){
-                    postMap.remove(postId);
-                    commentPostMap.getCommentToPostMap().remove(postId);
-                    Q1EventManager.timeOfEvent = postArrivalTime;
-                    break;
-                }
-            }
-            int newScore = post.getTotalScore();
-            iterator.remove();
-            postScoreMap.remove(oldScore, postId);
-
-            if(newScore > 0){
-                deductedPosts.add(new PostWindowObject(postArrivalTime, post));
-                postScoreMap.put(post.getTotalScore(), postId);
-            }
-        }
-        addToList(deductedPosts);
-        return postStore.hasTopThreeChanged();
-    }
-
-    /**
-     * Adds the post to the list
-     *
-     * @param deductedPosts is list of post to add back to the array list
-     */
-    private void addToList(ArrayList<PostWindowObject> deductedPosts){
-        Collections.reverse(deductedPosts);
-        Iterator<PostWindowObject> iterator1 = deductedPosts.iterator();
-        while (iterator1.hasNext()){
-            postWindow.addFirst(iterator1.next());
-        }
-    }
+//    private boolean processPost(long ts){
+//
+//        Iterator<PostWindowObject> iterator = postWindow.descendingIterator();
+//        HashMap<Long, Post> postMap = postStore.getPostList();
+//        ArrayList<PostWindowObject> deductedPosts = new ArrayList<>();
+//        while (iterator.hasNext()){
+//            PostWindowObject postObject = iterator.next();
+//            Post post = postObject.getPost();
+//            long postId = post.getPostId();
+//            int oldScore = post.getTotalScore();
+//            long postArrivalTime = postObject.getArrivalTime();
+//
+//            long timeWindowStart = ts - CommentPostMap.DURATION;
+//            if (postArrivalTime > timeWindowStart){
+//                break;
+//            }
+//
+//            //Check how many days it has passed
+//            while (postArrivalTime <= timeWindowStart){
+//                postArrivalTime = postArrivalTime + CommentPostMap.DURATION;
+//                post.decrementTotalScore();
+//                if (post.getTotalScore() <= 0){
+//                    postMap.remove(postId);
+//                    commentPostMap.getCommentToPostMap().remove(postId);
+//                    Q1EventManager.timeOfEvent = postArrivalTime;
+//                    break;
+//                }
+//            }
+//            int newScore = post.getTotalScore();
+//            iterator.remove();
+//            postScoreMap.remove(oldScore, postId);
+//
+//            if(newScore > 0){
+//                deductedPosts.add(new PostWindowObject(postArrivalTime, post));
+//                postScoreMap.put(post.getTotalScore(), postId);
+//            }
+//        }
+//        addToList(deductedPosts);
+//        return postStore.hasTopThreeChanged();
+//    }
+//
+//    /**
+//     * Adds the post to the list
+//     *
+//     * @param deductedPosts is list of post to add back to the array list
+//     */
+//    private void addToList(ArrayList<PostWindowObject> deductedPosts){
+//        Collections.reverse(deductedPosts);
+//        Iterator<PostWindowObject> iterator1 = deductedPosts.iterator();
+//        while (iterator1.hasNext()){
+//            postWindow.addFirst(iterator1.next());
+//        }
+//    }
 }

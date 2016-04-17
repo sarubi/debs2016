@@ -7,14 +7,12 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
 import org.wso2.siddhi.debs2016.util.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -164,7 +162,7 @@ public class Q2EventManager {
             Q2EventManager.Q2_COMPLETED = true;
             if(Q1EventManager.Q1_COMPLETED)
             {
-                Q1EventManager.outputwritter();
+                Q1EventManager.outputwriter();
                 outputwritter();
                 System.exit(0);
             }

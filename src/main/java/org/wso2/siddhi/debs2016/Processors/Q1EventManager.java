@@ -5,30 +5,18 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.comment.TimeWindow;
-import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
-import org.wso2.siddhi.debs2016.query.Query2;
-import org.wso2.siddhi.debs2016.query.Run;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.util.Constants;
-import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
@@ -168,7 +156,7 @@ public class Q1EventManager {
                             timeWindow.updateTime(ts);
                             timeWindow.addNewPost(ts, post);
                             if (postStore.hasTopThreeChanged()){
-                                long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                                long endTime = postStore.printTopThreeComments(ts, true, true, ",");
                                 latency += (endTime - iij_timestamp);
                                 numberOfOutputs++;
                             }
@@ -188,11 +176,11 @@ public class Q1EventManager {
                                 hasChanged = timeWindow.updateTime(ts);
                                 if (hasChanged){
                                     if (postStore.getPost(post_replied_id) == null){
-                                        long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }
@@ -208,11 +196,11 @@ public class Q1EventManager {
                                 hasChanged = timeWindow.updateTime(ts);
                                 if (hasChanged){
                                     if (postStore.getPost(post_replied_id) == null){
-                                        long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
+                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }
@@ -239,7 +227,7 @@ public class Q1EventManager {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             hasChanged = timeWindow.updateTime(ts);
             if (hasChanged){
-                long endTime =  postStore.printTopThreeComments(timeOfEvent,false, true, ",");
+                long endTime =  postStore.printTopThreeComments(timeOfEvent,true, true, ",");
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;
             }
@@ -250,7 +238,7 @@ public class Q1EventManager {
     /**
      * Writes the output to the file
      */
-    public static void outputwritter() {
+    public static void outputwriter() {
         try {
             File performance = new File("performance.txt");
             BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
@@ -301,8 +289,9 @@ public class Q1EventManager {
             }
         }finally {
             Q1_COMPLETED = true;
-            if(Q2EventManager.Q2_COMPLETED){
-                outputwritter();
+//            if(Q2EventManager.Q2_COMPLETED){
+            if(true){
+                outputwriter();
                 Q2EventManager.outputwritter();
                 System.exit(0);
             }

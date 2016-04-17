@@ -107,7 +107,6 @@ public class PostStore {
      */
     public boolean hasTopThreeChanged()
     {
-
         TreeMultimap<Integer, Post> topScoreMap = getTopThreePostsMap();
         boolean changeFlag = false;
         int i = 0;
