@@ -156,7 +156,7 @@ public class Q1EventManager {
                             timeWindow.updateTime(ts);
                             timeWindow.addNewPost(ts, post);
                             if (postStore.hasTopThreeChanged()){
-                                long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                long endTime = postStore.printTopThreeComments(ts, false, true, ",");
                                 latency += (endTime - iij_timestamp);
                                 numberOfOutputs++;
                             }
@@ -169,18 +169,19 @@ public class Q1EventManager {
                             long commenter_id = (Long) objects[2];
 
                             if (post_replied_id != -1 && comment_replied_id == -1){
+                                boolean hasChanged1 = timeWindow.updateTime(ts);
                                 post = postStore.getPost(post_replied_id);
                                 if (post != null) {
                                     timeWindow.addComment(post, ts, commenter_id);
                                 }
-                                hasChanged = timeWindow.updateTime(ts);
-                                if (hasChanged){
+                                hasChanged = postStore.hasTopThreeChanged();
+                                if (hasChanged || hasChanged1){
                                     if (postStore.getPost(post_replied_id) == null){
-                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }
@@ -189,18 +190,19 @@ public class Q1EventManager {
 
                             } else if (comment_replied_id != -1 && post_replied_id == -1){
                                 long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
+                                boolean hasChanged1 = timeWindow.updateTime(ts);
                                 post = postStore.getPost(parent_post_id);
                                 if (post != null) {
                                     timeWindow.addComment(post, ts, commenter_id);
                                 }
-                                hasChanged = timeWindow.updateTime(ts);
-                                if (hasChanged){
+                                hasChanged = postStore.hasTopThreeChanged();
+                                if (hasChanged1 || hasChanged){
                                     if (postStore.getPost(post_replied_id) == null){
-                                        long endTime = postStore.printTopThreeComments(timeOfEvent, true, true, ",");
+                                        long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, true, true, ",");
+                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
                                         latency += (endTime - iij_timestamp);
                                         numberOfOutputs++;
                                     }
@@ -220,18 +222,18 @@ public class Q1EventManager {
 
     private void flush(TimeWindow timeWindow, long ts)
     {
-        ts = ts +  CommentPostMap.DURATION;
+        ts = ts +  CommentPostMap.DURATION/24/60;
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
         boolean hasChanged;
         while(!isEmpty) {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             hasChanged = timeWindow.updateTime(ts);
             if (hasChanged){
-                long endTime =  postStore.printTopThreeComments(timeOfEvent,true, true, ",");
+                long endTime =  postStore.printTopThreeComments(ts, false, true, ",");
                 latency += (endTime - endiij_timestamp);
                 numberOfOutputs++;
             }
-            ts = ts +  CommentPostMap.DURATION;
+            ts = ts +  CommentPostMap.DURATION/24/60;
         }
     }
 
@@ -289,8 +291,7 @@ public class Q1EventManager {
             }
         }finally {
             Q1_COMPLETED = true;
-//            if(Q2EventManager.Q2_COMPLETED){
-            if(true){
+            if(Q2EventManager.Q2_COMPLETED){
                 outputwriter();
                 Q2EventManager.outputwritter();
                 System.exit(0);

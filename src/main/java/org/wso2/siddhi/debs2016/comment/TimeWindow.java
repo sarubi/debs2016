@@ -52,6 +52,7 @@ public class TimeWindow {
      */
     public void addComment(Post post, long ts, long commenter_id){
         long postId = post.getPostId();
+
         oneDay.add(new CommentForPost(post, ts, commenter_id, false));
         postScoreMap.remove(post.getTotalScore(), postId);
         post.addComment(ts, commenter_id);
@@ -65,7 +66,6 @@ public class TimeWindow {
      * @param post the new post
      */
     public void addNewPost(long ts, Post post){
-//        postWindow.addFirst(new PostWindowObject(ts, post));
         oneDay.add(new CommentForPost(post, ts, 0, true));
         postScoreMap.put(10, post.getPostId());
     }
@@ -120,7 +120,6 @@ public class TimeWindow {
                             postMap.remove(postID);
                             commentPostMap.getCommentToPostMap().remove(postID);
                             Q1EventManager.timeOfEvent = commentPostObject.getExpiringTime();
-                            break;
                         }else {
                             postScoreMap.put(newScore, postID);
                             if (nextQueue != null) {
