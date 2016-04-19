@@ -17,18 +17,17 @@ import java.util.*;
  */
 public class CommentStore {
 
-    private long duration;
-    private HashMap<Long, CommentLikeGraph> commentStore = new HashMap<Long, CommentLikeGraph>(); //Comment ID, CLG
-    String[] previousKcomments;
+    private final long duration;
+    private final HashMap<Long, CommentLikeGraph> commentStore = new HashMap<>(); //Comment ID, CLG
+    private String[] previousKcomments;
     private long tsTriggeredChange;
-    private Graph friendshipGraph;
+    private final Graph friendshipGraph;
     private String[] kComments;
-    private int k ;
-    private File q2 ;
-    private StringBuilder builder = new StringBuilder();
+    private final int k ;
+    private final StringBuilder builder = new StringBuilder();
     private BufferedWriter writer;
-    private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder()); //sizeOfComponent, comment
-    private LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>(); //timeWindow
+    private final Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder()); //sizeOfComponent, comment
+    private final LinkedList<CommentComponent> commentComponentlist = new LinkedList<>(); //timeWindow
 
     /**
      * The constructor
@@ -41,7 +40,7 @@ public class CommentStore {
         this.k = k;
         kComments = new String[k];
         previousKcomments = new String[k];
-        q2 = new File("q2.txt");
+        File q2 = new File("q2.txt");
         try{
             writer = new BufferedWriter(new FileWriter(q2, true));
         }catch (IOException e) {
@@ -94,7 +93,7 @@ public class CommentStore {
                 String fmm = df.format(new java.util.Date(tsTriggeredChange));
                 builder.append(fmm);
                 for (String print : previousKcomments) {
-                    builder.append(delimiter + print);
+                    builder.append(delimiter).append(print);
                 }
                 builder.append("\n");
                 if (printKComments) {

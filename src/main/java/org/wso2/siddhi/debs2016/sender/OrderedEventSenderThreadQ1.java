@@ -4,7 +4,6 @@ import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
 import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
 
-import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -14,8 +13,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class OrderedEventSenderThreadQ1 extends Thread {
 
-    private LinkedBlockingQueue<Object[]> eventBufferList[];
-    private Q1EventManager manager = new Q1EventManager();
+    private final LinkedBlockingQueue<Object[]>[] eventBufferList;
+    private final Q1EventManager manager = new Q1EventManager();
 
     /**
      * The constructor
@@ -32,7 +31,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public void run() {
         Object[] commentEvent = null;
         Object[] postEvent = null;
-        long cTime = 0;
+        long cTime ;
         boolean firstEvent = true;
         int flag = Constants.NOEVENT;
         boolean postLastEventArrived = false;

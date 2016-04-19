@@ -7,12 +7,12 @@ import java.util.*;
  */
 public class Post {
 
-    private long arrivalTime;
+    private final long arrivalTime;
     private long latestCommentTime;
-    private long postId;
+    private final long postId;
     private int totalScore;
-    private String userName;
-    private Set<Long> commenters = new HashSet<Long>();
+    private final String userName;
+    private final Set<Long> commenters = new HashSet<>();
 
 
     /**

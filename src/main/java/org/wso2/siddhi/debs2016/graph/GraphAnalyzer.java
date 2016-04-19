@@ -2,11 +2,7 @@ package org.wso2.siddhi.debs2016.graph;
 
 import com.google.common.base.Splitter;
 import org.graphstream.algorithm.Toolkit;
-import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.*;
 import java.util.Iterator;
@@ -17,9 +13,9 @@ import java.util.Iterator;
  * Anaylzes the friendship graph
  *
  */
-public class GraphAnalyzer {
+class GraphAnalyzer {
 
-    org.graphstream.graph.Graph graph = new SingleGraph("Tutorial 1");
+    private final org.graphstream.graph.Graph graph = new SingleGraph("Tutorial 1");
 
     /**
      * Displays the friendship graph
@@ -28,7 +24,7 @@ public class GraphAnalyzer {
      * @param numberOfEventsToLoad will limit the number of events to load
      * @param updateRate speed at which graph grows
      */
-    public void loadFriendshipGraph(boolean displayWhileLoading, int numberOfEventsToLoad, int updateRate) {
+    private void loadFriendshipGraph(boolean displayWhileLoading, int numberOfEventsToLoad, int updateRate) {
 
         if(displayWhileLoading) {
             graph.display();
@@ -93,7 +89,7 @@ public class GraphAnalyzer {
      *
      * @return the friendshipgraph
      */
-    public org.graphstream.graph.Graph getFriendshipGraph()
+    private org.graphstream.graph.Graph getFriendshipGraph()
     {
         return graph;
     }
@@ -114,11 +110,9 @@ public class GraphAnalyzer {
             }
             writer.close();
 
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
     }
 

@@ -8,16 +8,13 @@ import com.lmax.disruptor.dsl.ProducerType;
 import org.wso2.siddhi.debs2016.comment.CommentStore;
 import org.wso2.siddhi.debs2016.graph.Graph;
 import org.wso2.siddhi.debs2016.util.Constants;
-import org.wso2.siddhi.query.api.definition.Attribute;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
@@ -25,21 +22,16 @@ import java.util.concurrent.Executors;
  */
 public class Q2EventManager {
 
-    static StringBuilder builder = new StringBuilder();
+    private static final StringBuilder builder = new StringBuilder();
     private Disruptor<DEBSEvent> dataReadDisruptor;
     private RingBuffer dataReadBuffer;
     private static long startiij_timestamp;
     private static long endiij_timestamp;
-    private String ts;
-    public Graph friendshipGraph ;
-    private CommentStore commentStore ;
+    private final Graph friendshipGraph ;
+    private final CommentStore commentStore ;
     private static int count = 0;
-    static volatile long timeDifference = 0; //This is the time difference for this time window.
-    long startTime = 0;
-    private Date startDateTime;
     private static Long latency = 0L;
     private static Long  numberOfOutputs = 0L;
-    static int bufferSize = 512;
     private long sequenceNumber;
     public static volatile boolean Q2_COMPLETED = false;
 
@@ -49,14 +41,8 @@ public class Q2EventManager {
      *
      */
     public Q2EventManager(int k, long duration){
-        List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
         commentStore = new CommentStore(duration, friendshipGraph, k);
-
-        //We print the start and the end times of the experiment even if the performance logging is disabled.
-        startDateTime = new Date();
-        startTime = startDateTime.getTime();
-        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
     }
 
     /**
@@ -74,13 +60,8 @@ public class Q2EventManager {
      *
      */
     public void run() {
-        dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
-
-            @Override
-            public DEBSEvent newInstance() {
-                return new DEBSEvent();
-            }
-        }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
+        int bufferSize = 512;
+        dataReadDisruptor = new Disruptor<>(DEBSEvent::new, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
 
         DEBSEventHandler debsEventHandler = new DEBSEventHandler();
@@ -135,12 +116,12 @@ public class Q2EventManager {
         try {
             commentStore.destroy();
             builder.setLength(0);
-            timeDifference = endiij_timestamp - startiij_timestamp;
+            long timeDifference = endiij_timestamp - startiij_timestamp;
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
             System.out.println("Query 2 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
-            String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
+            String timeDifferenceString = Float.toString(((float) timeDifference /1000)) + "000000";
             System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
             builder.append(timeDifferenceString.substring(0, 7));
             builder.append(", ");
@@ -202,7 +183,7 @@ public class Q2EventManager {
                             break;
                         }else if (ts == -1) {
                             count--;
-                            startiij_timestamp = (Long) debsEvent.getSystemArrivalTime();
+                            startiij_timestamp = debsEvent.getSystemArrivalTime();
                             break;
                         }else{
                             long user_id_1 = (Long) objects[2];
@@ -222,7 +203,7 @@ public class Q2EventManager {
                     Long endTime = commentStore.computeKLargestComments("," ,false, true);
 
                     if (endTime != -1L){
-                        latency += (endTime - (Long) debsEvent.getSystemArrivalTime());
+                        latency += (endTime - debsEvent.getSystemArrivalTime());
                         numberOfOutputs++;
                     }
 

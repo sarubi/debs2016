@@ -16,12 +16,11 @@ import java.util.*;
  */
 public class PostStore {
 
-    private HashMap<Long, Post> postList  = new HashMap<Long, Post> (5000); //postID, PostObject
-    private BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<Integer, Long>(3, true, true, true);
-    private Long[] previousOrderedTopThree = new Long[3];
-    StringBuilder builder=new StringBuilder();
+    private final HashMap<Long, Post> postList  = new HashMap<>(5000); //postID, PostObject
+    private final BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<>(3, true, true, true);
+    private final Long[] previousOrderedTopThree = new Long[3];
+    private final StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
-    private File q1;
 
     /**
      *
@@ -39,7 +38,7 @@ public class PostStore {
      *
      */
     public PostStore(){
-        q1= new File("q1.txt");
+        File q1= new File("q1.txt");
         try{
             writer = new BufferedWriter(new FileWriter(q1, true));
         }catch (IOException e) {
@@ -149,13 +148,13 @@ public class PostStore {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                 df.setTimeZone(TimeZone.getTimeZone("GMT"));
                 String fmm = df.format(new java.util.Date(ts));
-                builder.append(fmm + delimiter);
+                builder.append(fmm).append(delimiter);
                 for (int k = 0; k < 3 ; k++){
                     if (this.previousOrderedTopThree[k] != null){
                         Post post = postList.get(this.previousOrderedTopThree[k]);
-                        builder.append(this.previousOrderedTopThree[k] + delimiter);
-                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName() + delimiter);
-                        builder.append(post.getTotalScore() + delimiter);
+                        builder.append(this.previousOrderedTopThree[k]).append(delimiter);
+                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName()).append(delimiter);
+                        builder.append(post.getTotalScore()).append(delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{
                         builder.append("-,-,-,-");

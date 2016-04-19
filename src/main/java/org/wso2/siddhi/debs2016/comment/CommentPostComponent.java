@@ -7,11 +7,11 @@ import org.wso2.siddhi.debs2016.post.Post;
  * Created by aaw on 4/1/16.
  */
 class CommentPostComponent {
-    private long ts;
+    private final long ts;
     private long expiringTime;
-    private Post post;
-    private long userID;
-    private boolean isPost;
+    private final Post post;
+    private final long userID;
+    private final boolean isPost;
 
 
     /**

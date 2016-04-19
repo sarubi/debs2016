@@ -2,9 +2,7 @@ package org.wso2.siddhi.debs2016.query;
 
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
-import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,17 +10,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by malithjayasinghe on 4/6/16.
  */
-public class Query2 {
-    private String friendshipFile;
-    private String commentsFile;
-    private String likesFile;
-    DataLoaderThread dataLoaderThreadFriendships;
-    DataLoaderThread dataLoaderThreadComments;
-    DataLoaderThread dataLoaderThreadLikes;
-    OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2;
-    private int k;
-    private long d;
-    private final int BUFFER_LIMIT = 100000;
+class Query2 {
+    private final DataLoaderThread dataLoaderThreadFriendships;
+    private final DataLoaderThread dataLoaderThreadComments;
+    private final DataLoaderThread dataLoaderThreadLikes;
+    private final OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2;
+    private static final int BUFFER_LIMIT = 100000;
 
 
     public static void main(String[] args){
@@ -39,12 +32,12 @@ public class Query2 {
         query.run();
     }
 
-    public Query2(String[] args){
-        friendshipFile = args[0];
-        commentsFile = args[2];
-        likesFile = args[3];
-        k = Integer.parseInt(args[4]);
-        d = Long.parseLong(args[5]);
+    private Query2(String[] args){
+        String friendshipFile = args[0];
+        String commentsFile = args[2];
+        String likesFile = args[3];
+        int k = Integer.parseInt(args[4]);
+        long d = Long.parseLong(args[5]);
 
         LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
         dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS, BUFFER_LIMIT);
@@ -60,7 +53,7 @@ public class Query2 {
     /**
      * Starts the threads related to Query1
      */
-    public void run(){
+    private void run(){
         dataLoaderThreadFriendships.start();
         dataLoaderThreadComments.start();
         dataLoaderThreadLikes.start();

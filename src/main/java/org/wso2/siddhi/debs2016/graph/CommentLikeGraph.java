@@ -10,10 +10,10 @@ import java.util.*;
  */
 public class CommentLikeGraph {
 
-    private Graph graph = new Graph();
-	private String comment;
+    private final Graph graph = new Graph();
+	private final String comment;
     private long sizeOfLargestConnectedComponent;
-    private Graph friendshipGraph ;
+    private final Graph friendshipGraph ;
 
 
     /**
@@ -34,7 +34,7 @@ public class CommentLikeGraph {
      *
      * @return the size of the largest connected component
      */
-    public long computeLargestConnectedComponent()
+    private long computeLargestConnectedComponent()
     {
         sizeOfLargestConnectedComponent = graph.getLargestConnectedComponent();
         return sizeOfLargestConnectedComponent;

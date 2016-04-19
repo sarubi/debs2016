@@ -15,19 +15,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TimeWindow {
 
 
-    private LinkedBlockingQueue<CommentPostComponent> oneDay = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> twoDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> threeDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> fourDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> fiveDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> sixDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> sevenDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> eightDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> nineDays = new LinkedBlockingQueue<>();
-    private LinkedBlockingQueue<CommentPostComponent> tenDays = new LinkedBlockingQueue<>();
-    private PostStore postStore;
-    BoundedSortedMultiMap<Integer, Long> postScoreMap;
-    CommentPostMap commentPostMap;
+    private final LinkedBlockingQueue<CommentPostComponent> oneDay = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> twoDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> threeDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> fourDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> fiveDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> sixDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> sevenDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> eightDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> nineDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<CommentPostComponent> tenDays = new LinkedBlockingQueue<>();
+    private final PostStore postStore;
+    private final BoundedSortedMultiMap<Integer, Long> postScoreMap;
+    private final CommentPostMap commentPostMap;
 
     /**
      * The constructor
@@ -131,11 +131,7 @@ public class TimeWindow {
                     break;
                 }
             }
-            if (nextQueue == null) {
-                return postStore.hasTopThreeChanged();
-            } else {
-                return false;
-            }
+            return nextQueue == null && postStore.hasTopThreeChanged();
         } catch (java.lang.Exception e) {
             e.printStackTrace();
         }

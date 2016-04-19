@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class CommentPostMap {
 
     public static final long DURATION =  86400000L;
-    private HashMap<Long, Long> commentToPostMap = new HashMap<>(5000);
+    private final HashMap<Long, Long> commentToPostMap = new HashMap<>(5000);
 
     /**
      * Adding a comment to a post

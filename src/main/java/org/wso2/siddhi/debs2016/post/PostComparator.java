@@ -7,7 +7,7 @@ import java.util.Comparator;
  *
  * Compare the two posts for sorting when scores are equal
  */
-public class PostComparator implements Comparator<Post> {
+class PostComparator implements Comparator<Post> {
 
     @Override
     public int compare(Post post_1, Post post_2) {

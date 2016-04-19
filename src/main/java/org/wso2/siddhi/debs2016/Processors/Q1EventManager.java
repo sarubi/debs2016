@@ -28,30 +28,22 @@ public class Q1EventManager {
         private RingBuffer dataReadBuffer;
         private long startiij_timestamp;
         private long endiij_timestamp;
-        private String ts;
-        long timeDifference = 0; //This is the time difference for this time window.
-        static int bufferSize = 512;
         private long sequenceNumber;
         private long count;
-        private Date startDateTime;
-        long startTime = 0;
-        private PostStore postStore;
-        private CommentPostMap commentPostMap;
-        private TimeWindow timeWindow;
+        private final PostStore postStore;
+        private final CommentPostMap commentPostMap;
+        private final TimeWindow timeWindow;
         private Long latency = 0L;
         private Long numberOfOutputs = 0L;
     	public static long timeOfEvent = 0;
         public static boolean Q1_COMPLETED  = false;
-        static StringBuilder builder = new StringBuilder();
+        private static final StringBuilder builder = new StringBuilder();
         /**
          * The constructor
          *
          */
         public Q1EventManager(){
 
-            startDateTime = new Date();
-            startTime = startDateTime.getTime();
-            SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
             postStore = new PostStore();
             commentPostMap = new CommentPostMap();
             timeWindow = new TimeWindow(postStore, commentPostMap);
@@ -63,13 +55,8 @@ public class Q1EventManager {
          *
          */
         public void run() {
-            dataReadDisruptor = new Disruptor<DEBSEvent>(new com.lmax.disruptor.EventFactory<DEBSEvent>() {
-
-                @Override
-                public DEBSEvent newInstance() {
-                    return new DEBSEvent();
-                }
-            }, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
+            int bufferSize = 512;
+            dataReadDisruptor = new Disruptor<>(DEBSEvent::new, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
 
             DEBSEventHandler debsEventHandler = new DEBSEventHandler();
             dataReadDisruptor.handleEventsWith(debsEventHandler);
@@ -109,22 +96,9 @@ public class Q1EventManager {
             @Override
             public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
                 Object [] objects = debsEvent.getObjectArray();
-
-              /*Answer: When processing a new input tuple, processing steps should be performed in this order:
-                1) decrease the score of all previous posts (given the semantics of the query)
-                2) increase score of post related to the input tuple,
-                3) decrease score of posts expiring precisely on this timestamp, if any,
-                4) discard posts with 0 score. Such a post would, thus, survive the transient state. However, a post whose score reached 0 at a timestamp earlier than the current input tuple, will not survive, even if the processing of that timeout happens to be triggered by the current input tuple.
-             */
-                // Does it make difference in the final result whether we perform 1) 2) 3) in order this order or not?
-                // What is the plan for commentPostMap?
-                // What aren't we doing timeWindow(ts) at the start?
-
-                //The order given necessarily means that we have to delete a post after updating the store
-                //We need commentPostMap to point a comment to comment to the correct post (Eliminates recursion)
                 try {
 
-                    long iij_timestamp = (Long) debsEvent.getSystemArrivalTime();
+                    long iij_timestamp = debsEvent.getSystemArrivalTime();
                     endiij_timestamp = iij_timestamp;
 
                     long ts = (Long) objects[1];
@@ -133,7 +107,7 @@ public class Q1EventManager {
 
                     count++;
                     Post post;
-                    boolean hasChanged = false;
+                    boolean hasChanged;
                     switch (isPostFlag){
                         case Constants.POSTS:
                             if (ts == -1L) {
@@ -265,12 +239,12 @@ public class Q1EventManager {
 
             postStore.destroy();
             builder.setLength(0);
-            timeDifference = endiij_timestamp - startiij_timestamp;
+            long timeDifference = endiij_timestamp - startiij_timestamp;
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
             System.out.println("Query 1 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
             System.out.println("Event count : " + count);
-            String timeDifferenceString = Float.toString(((float)timeDifference/1000)) + "000000";
+            String timeDifferenceString = Float.toString(((float) timeDifference /1000)) + "000000";
             System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
             builder.append(timeDifferenceString.substring(0, 7));
             builder.append(", ");

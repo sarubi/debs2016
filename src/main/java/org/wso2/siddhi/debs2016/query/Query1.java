@@ -3,8 +3,6 @@ package org.wso2.siddhi.debs2016.query;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
-import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,13 +10,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by malithjayasinghe on 4/6/16.
  */
-public class Query1 {
-    private String postsFile;
-    private String commentsFile;
-    private OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
-    DataLoaderThread dataLoaderThreadComments ;
-    DataLoaderThread dataLoaderThreadPosts;
-    private final int BUFFER_LIMIT = 1000;
+class Query1 {
+    private final OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
+    private final DataLoaderThread dataLoaderThreadComments ;
+    private final DataLoaderThread dataLoaderThreadPosts;
+    private static final int BUFFER_LIMIT = 1000;
 
     /**
      * The main method
@@ -46,9 +42,9 @@ public class Query1 {
      *
      * @param args arguments
      */
-    public Query1(String[] args){
-        postsFile = args[1];
-        commentsFile = args[2];
+    private Query1(String[] args){
+        String postsFile = args[1];
+        String commentsFile = args[2];
 
         LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
         orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
@@ -61,7 +57,7 @@ public class Query1 {
     /**
      * Starts the threads related to Query1
      */
-    public void run(){
+    private void run(){
         dataLoaderThreadComments.start();
         dataLoaderThreadPosts.start();
         orderedEventSenderThreadQ1.start();

@@ -3,9 +3,9 @@ package org.wso2.siddhi.debs2016.comment;
 /**
  * Created by bhagya on 3/31/16.
  */
-public class CommentComponent {
-    private long ts;
-    private long commentId;
+class CommentComponent {
+    private final long ts;
+    private final long commentId;
 
     /**
      * Constructor to create commentComponent object for Query2
@@ -33,11 +33,4 @@ public class CommentComponent {
         return ts;
     }
 
-    /**
-     * Set the time of arrival of the comment
-     * @param ts is the time of arrival of the comment
-     */
-    public void setTs(long ts) {
-        this.ts = ts;
-    }
 }

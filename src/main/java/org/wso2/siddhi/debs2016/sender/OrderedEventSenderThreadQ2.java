@@ -19,9 +19,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class OrderedEventSenderThreadQ2 extends Thread {
 
-    private LinkedBlockingQueue<Object[]> eventBufferList [];
-    private Date startDateTime;
-    private Q2EventManager manager;
+    private final LinkedBlockingQueue<Object[]>[] eventBufferList ;
+    private final Q2EventManager manager;
 
 
     /**
@@ -30,7 +29,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
      * @param eventBuffer the event buffer array
      */
     public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer [], int k, long d) {
-        super("Event Sender Query 2");
+        super("Event Sender");
         this.eventBufferList = eventBuffer;
         manager = new Q2EventManager(k, d*1000);
         manager.run();
@@ -45,8 +44,8 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         Object[] friendshipEvent = null;
         Object[] commentEvent = null;
         Object[] likeEvent = null;
-        long startTime = 0;
-        long cTime = 0;
+        long startTime;
+        long cTime;
         boolean firstEvent = true;
         int flag = Constants.NOEVENT;
         boolean friendshipLastEventArrived = false;
@@ -71,7 +70,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 event.setObjectArray(finalFriendshipEvent);
                 event.setSystemArrivalTime(cTime);
                 manager.publish();
-                startDateTime = new Date();
+                Date startDateTime = new Date();
                 startTime = startDateTime.getTime();
                 SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
                 System.out.println("Starting the experiment at : " + startTime + "--" + ft.format(startDateTime));

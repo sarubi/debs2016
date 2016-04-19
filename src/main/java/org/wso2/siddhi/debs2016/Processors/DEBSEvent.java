@@ -14,7 +14,7 @@ public class DEBSEvent {
     /**
      * Sets the system time at the time of publishing the event
      *
-     * @param iij_timestamp
+     * @param iij_timestamp is the system time
      */
     public void setSystemArrivalTime(Long iij_timestamp) {
         this.iij_timestamp = iij_timestamp;

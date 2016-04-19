@@ -1,12 +1,6 @@
 package org.wso2.siddhi.debs2016.graph;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 /**
  * Create New Graph
@@ -14,7 +8,7 @@ import java.util.List;
  */
 public class Graph {
 
-    private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
+    private final HashMap<Long, List<Long>> graph = new HashMap<>();
 
     /**
      * The constructor
@@ -29,11 +23,9 @@ public class Graph {
      */
     public String toString()
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append(graph.toString()); /*Print the Graph itself*/
-        builder.append("Vertices: " + getNumberOfVertices()); /*Print number of vertices*/
-        builder.append("Edges: " + getNumberOfEdges()); /*Print the number of edges*/
-        return builder.toString();
+        return graph.toString() +
+                "Vertices: " + getNumberOfVertices() +
+                "Edges: " + getNumberOfEdges();
     }
 
 
@@ -69,7 +61,7 @@ public class Graph {
      *
      * @return the number of edges
      */
-    public int getNumberOfEdges(){
+    private int getNumberOfEdges(){
         int numberOfEdges = 0;
         for (List<Long> val: graph.values()) {
             numberOfEdges += val.size();
@@ -82,7 +74,7 @@ public class Graph {
      *
      * @return the number of vertices
      */
-    public int getNumberOfVertices(){
+    private int getNumberOfVertices(){
         return graph.size();
     }
 
@@ -96,7 +88,7 @@ public class Graph {
      */
     public boolean hasEdge(long uId1, long uId2){
         List<Long> adjacentVertices = graph.get(uId1);
-        return adjacentVertices == null ? false : adjacentVertices.contains(uId2);
+        return adjacentVertices != null && adjacentVertices.contains(uId2);
     }
 
 

@@ -18,13 +18,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 
  */
 public class DataLoaderThread extends Thread {
-    private String fileName;
+    private final String fileName;
     private final static Splitter splitter = Splitter.on('|');
-    private LinkedBlockingQueue<Object[]> eventBufferList;
-    private BufferedReader br;
-    private FileType fileType;
-    private String MINUS_ONE = "-1";
-    private boolean debug = false;
+    private final LinkedBlockingQueue<Object[]> eventBufferList;
+    private final FileType fileType;
+    private static final String MINUS_ONE = "-1";
 
     /**
      * The constructor
@@ -42,7 +40,7 @@ public class DataLoaderThread extends Thread {
 
     public void run() {
         try {
-            br = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024);
+            BufferedReader br = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024);
             String line = br.readLine();
             Object[] eventData;
             String user;
@@ -143,9 +141,6 @@ public class DataLoaderThread extends Thread {
                         long  likeTimeStampLong = dt4.getMillis();
                         userID = Long.parseLong(dataStrIterator.next());
                         commentID = Long.parseLong(dataStrIterator.next());
-                        if(debug == true) {
-                            System.out.println("data loader even buffer size " + eventBufferList.size() + ", ts = " + likeTimeStampLong + ", user_id = " + userID + ", comment_ID = " + commentID + "\n");
-                        }
                         eventData = new Object[]{
                                 0L,
                                 likeTimeStampLong,
@@ -181,13 +176,7 @@ public class DataLoaderThread extends Thread {
             };
             eventBufferList.put(eventData);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException ec){
-            ec.printStackTrace();
-        } catch (IOException ec){
-            ec.printStackTrace();
-        } catch (InterruptedException e){
+        } catch (NumberFormatException | InterruptedException | IOException e) {
             e.printStackTrace();
         }
 
