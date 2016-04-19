@@ -13,14 +13,12 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by malithjayasinghe on 4/6/16.
  */
 public class Query1 {
-    private String friendshipFile;
     private String postsFile;
     private String commentsFile;
-    private String likesFile;
-    private String[] args;
     private OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
     DataLoaderThread dataLoaderThreadComments ;
     DataLoaderThread dataLoaderThreadPosts;
+    private final int BUFFER_LIMIT = 1000;
 
     /**
      * The main method
@@ -49,22 +47,21 @@ public class Query1 {
      * @param args arguments
      */
     public Query1(String[] args){
-        friendshipFile = args[0];
         postsFile = args[1];
         commentsFile = args[2];
-        likesFile = args[3];
-        this.args = args;
 
         LinkedBlockingQueue<Object[]> eventBufferListQ1 [] = new LinkedBlockingQueue[2];
         orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(eventBufferListQ1);
-        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS,1000,10);
-        dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS,1000,10);
+        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS, BUFFER_LIMIT);
+        dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS, BUFFER_LIMIT);
         eventBufferListQ1 [0] = dataLoaderThreadPosts.getEventBuffer();
         eventBufferListQ1 [1] = dataLoaderThreadComments.getEventBuffer();
     }
 
+    /**
+     * Starts the threads related to Query1
+     */
     public void run(){
-
         dataLoaderThreadComments.start();
         dataLoaderThreadPosts.start();
         orderedEventSenderThreadQ1.start();

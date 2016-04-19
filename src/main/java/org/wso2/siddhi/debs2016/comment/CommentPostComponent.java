@@ -6,19 +6,29 @@ import org.wso2.siddhi.debs2016.post.Post;
  * An Object to record the timestamp of the comment of a post
  * Created by aaw on 4/1/16.
  */
-class CommentForPost {
+class CommentPostComponent {
     private long ts;
     private long expiringTime;
     private Post post;
     private long userID;
     private boolean isPost;
 
+
     /**
-     * Setter for post variable
-     * @param post is the Post Object
+     * Constructor to create CommentPostComponent for Query1 TimeWidow
+     *
+     * @param post the post
+     * @param ts the time stamp
+     * @param userId the user ID of the user who commented on the post
+     * @param isPost true if its a post object, false if is a comment object
      */
-    public void setPost(Post post) {
+    public CommentPostComponent(Post post, long ts, long userId, boolean isPost) {
+        this.ts = ts;
         this.post = post;
+        this.userID = userId;
+        this.isPost = isPost;
+        this.expiringTime = ts;
+
     }
 
     /**
@@ -31,7 +41,7 @@ class CommentForPost {
 
     /**
      * Getter for isPost variable
-     * @return true if object is Post object
+     * @return true if object is Post object, false if it is Comment object
      */
     public boolean isPost() {
         return isPost;
@@ -39,7 +49,7 @@ class CommentForPost {
 
     /**
      * Getter for expiringTime variable
-     * @return the value ts of when this object expired
+     * @return the time stamp of what time the object expires
      */
     public long getExpiringTime() {
         return expiringTime;
@@ -47,15 +57,14 @@ class CommentForPost {
 
     /**
      * Setter for expiringTime variable
-     * @param expiringTime
+     * @param expiringTime is the time that the object is expected to expire
      */
     public void setExpiringTime(long expiringTime) {
         this.expiringTime = expiringTime;
     }
 
     /**
-     * Gets the post
-     *
+     * Gets the post relating to he object
      * @return the post
      */
     public Post getPost() {
@@ -63,26 +72,11 @@ class CommentForPost {
     }
 
     /**
-     * Gets the arrival time of the comment
-     *
+     * Gets the arrival time of the object
      * @return the comment arrival time
      */
     public long getTs() {
         return ts;
     }
 
-    /**
-     * The constructor
-     *
-     * @param post the post
-     * @param ts   the time stamp
-     */
-    public CommentForPost(Post post, long ts, long userId, boolean isPost) {
-        this.ts = ts;
-        this.post = post;
-        this.userID = userId;
-        this.isPost = isPost;
-        this.expiringTime = ts;
-
-    }
 }

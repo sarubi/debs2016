@@ -1,15 +1,11 @@
 package org.wso2.siddhi.debs2016.sender;
 
-import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
 import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
-import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -19,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 public class OrderedEventSenderThreadQ1 extends Thread {
 
     private LinkedBlockingQueue<Object[]> eventBufferList[];
-    private Date startDateTime;
     private Q1EventManager manager = new Q1EventManager();
 
     /**
@@ -28,7 +23,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
      * @param eventBuffer  the event buffer array
      */
     public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[]) {
-        super("Event Sender");
+        super("Event Sender Query 1");
         this.eventBufferList = eventBuffer;
         manager.run();
     }
@@ -37,15 +32,8 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public void run() {
         Object[] commentEvent = null;
         Object[] postEvent = null;
-        long count = 1;
-        long timeDifferenceFromStart = 0;
-        long timeDifference = 0; //This is the time difference for this time window.
-        long currentTime = 0;
-        long prevTime = 0;
-        long startTime = 0;
         long cTime = 0;
         boolean firstEvent = true;
-        float percentageCompleted = 0;
         int flag = Constants.NOEVENT;
         boolean postLastEventArrived = false;
         boolean commentsLastEventArrived = false;
@@ -70,9 +58,6 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     event.setSystemArrivalTime(cTime);
                     manager.publish();
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
-                    startDateTime = new Date();
-                    startTime = startDateTime.getTime();
-                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
                     firstEvent = false;
                 }
 
@@ -156,13 +141,9 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     flag = Constants.POSTS;
                 }
 
-                count++;
-
                 //When all buffers are empty
                 if (commentEvent == null && postEvent == null) {
                     //Sending second dummy event to signal end of streams
-
-
                     Object[] finalPostEvent = new Object[]{
                             0L,
                             -2L,

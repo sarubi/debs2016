@@ -22,26 +22,22 @@ public class DataLoaderThread extends Thread {
     private final static Splitter splitter = Splitter.on('|');
     private LinkedBlockingQueue<Object[]> eventBufferList;
     private BufferedReader br;
-    private int count;
     private FileType fileType;
     private String MINUS_ONE = "-1";
     private boolean debug = false;
-    private int bufferLimit ;
-    private int sleepTime ;
 
     /**
      * The constructor
      *
      * @param fileName the name of the file to be read
      * @param fileType the type of the file to be read
+     * @param bufferLimit the size limit of queues
      */
-    public DataLoaderThread(String fileName, FileType fileType, int bufferLimit, int sleepTime){
+    public DataLoaderThread(String fileName, FileType fileType, int bufferLimit){
         super("Data Loader");
-        this.bufferLimit = bufferLimit;
-        this.sleepTime = sleepTime;
         this.fileName = fileName;
         this.fileType = fileType;
-        eventBufferList = new LinkedBlockingQueue<Object[]>(bufferLimit);
+        eventBufferList = new LinkedBlockingQueue<>(bufferLimit);
     }
 
     public void run() {
@@ -50,14 +46,8 @@ public class DataLoaderThread extends Thread {
             String line = br.readLine();
             Object[] eventData;
             String user;
-            int count = 0;
             while (line != null) {
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
-               // if(eventBufferList.size() > bufferLimit)
-                //{
-                  // Thread.sleep(sleepTime);
-                //}
-
                 switch(fileType) {
                     case POSTS:
                         String postsTimeStamp = dataStrIterator.next();

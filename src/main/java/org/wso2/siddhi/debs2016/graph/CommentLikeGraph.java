@@ -10,7 +10,6 @@ import java.util.*;
  */
 public class CommentLikeGraph {
 
-    private long ts;
     private Graph graph = new Graph();
 	private String comment;
     private long sizeOfLargestConnectedComponent;
@@ -21,22 +20,13 @@ public class CommentLikeGraph {
      *
      * The constructor
      *
-     * @param ts the arrival time of the comment
+     * @param comment is the comment string
+     * @param friendshipGraph is the reference to the friendshipGraph
      */
-    public CommentLikeGraph(long ts, String comment, Graph friendshipGraph) {
-        this.ts = ts;
+    public CommentLikeGraph(String comment, Graph friendshipGraph) {
         this.comment = comment;
         this.friendshipGraph = friendshipGraph;
         this.sizeOfLargestConnectedComponent = 0;
-    }
-
-    /**
-     * Gets the arrival time of the comment
-     *
-     * @return the arrival time of the comment
-     */
-    public long getArrivalTime() {
-        return ts;
     }
 
     /**
@@ -46,7 +36,6 @@ public class CommentLikeGraph {
      */
     public long computeLargestConnectedComponent()
     {
-
         sizeOfLargestConnectedComponent = graph.getLargestConnectedComponent();
         return sizeOfLargestConnectedComponent;
     }
@@ -55,6 +44,7 @@ public class CommentLikeGraph {
      * Register a new like for the comment
      *
      * @param uId is user id of person who likes comment
+     * @param componentSizeCommentMap is reference to Map that holds size and comment string of each comment
      */
     public void registerLike(long uId, Multimap componentSizeCommentMap) {
         graph.addVertex(uId);
@@ -77,6 +67,7 @@ public class CommentLikeGraph {
      *
      * @param uId1 the userID of friend one
      * @param uId2 the userID of friend two
+     * @param componentSizeCommentMap is reference to Map that holds size and comment string of each comment
      */
     public void handleNewFriendship(long uId1, long uId2, Multimap componentSizeCommentMap) {
         if (graph.hasVertex(uId1) && graph.hasVertex(uId2)) {
@@ -89,8 +80,6 @@ public class CommentLikeGraph {
         }
     }
 
-
-
     /**
      * Getter method for comment variable
      *
@@ -99,16 +88,6 @@ public class CommentLikeGraph {
     public String getComment() {
         return comment;
     }
-
-    /**
-     * Getter method for graph
-     *
-     * @return the graph
-     */
-    public Graph getGraph() {
-        return graph;
-    }
-
 
     /**
      *

@@ -1,7 +1,5 @@
 package org.wso2.siddhi.debs2016.post;
 
-import org.wso2.siddhi.debs2016.comment.Comment;
-
 import java.util.*;
 
 /**
@@ -17,6 +15,10 @@ public class Post {
     private Set<Long> commenters = new HashSet<Long>();
 
 
+    /**
+     * Remove a commenter when comment score reaches zero
+     * @param userID is the ID of the user whose comment has been expired
+     */
     public void removeCommenter(long userID){
         commenters.remove(userID);
     }
@@ -46,10 +48,9 @@ public class Post {
 
 
     /**
+     * Get the total score of a post
      *
-     * Get the previous total commentScore of a post before before updated for current timestamp
-     *
-     * @return Old commentScore of post
+     * @return total score of post
      */
     public int getTotalScore(){
         return totalScore;
@@ -64,10 +65,9 @@ public class Post {
 
 
     /**
-     * Adds a new comment to a post
-     *
+     * Adds a new comment to a post, adds 10 to the total score
      * @param userID the ID of the user
-     * @param arrivalTime the arrival time
+     * @param arrivalTime the arrival time of the comment
      */
     public void addComment(Long arrivalTime, Long userID)
     {
@@ -78,9 +78,8 @@ public class Post {
 
 
     /**
-     *
-     * The arrival time of the post
-     *
+     * Retrieve the arrival time of the post
+     * @return the arrival time
      */
     public long getArrivalTime()
     {
@@ -97,10 +96,11 @@ public class Post {
         return  commenters.size();
     }
 
+
     /**
      * Return the timestamp of the latest comment that arrived
      *
-     * @return
+     * @return timestamp of the last comment that was registered in the post
      */
     public long getLatestCommentTime() {
         return latestCommentTime;

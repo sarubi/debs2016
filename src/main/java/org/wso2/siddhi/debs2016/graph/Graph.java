@@ -15,31 +15,6 @@ import java.util.List;
 public class Graph {
 
     private HashMap<Long, List<Long>> graph = new HashMap<Long, List<Long>>();
-    public static Graph friendshipGraph = new Graph();
-
-    /**
-     * The constructor
-     *
-     * @param location the location of the file to create the graph from
-     */
-    public Graph(String location) { /*Constructor*/
-        final String file = location;
-        long uId1;
-        long uId2;
-
-        try {
-            Scanner in = new Scanner(new File(file));
-            in.useDelimiter("\\||\\n"); //Delimit using pipe symbol and return
-            while (in.hasNext()) {
-                in.next();  /*The Timestamp will not be saved for now*/
-                uId1 = in.nextLong();
-                uId2 = in.nextLong();
-                addEdge(uId1, uId2);
-            }
-        }catch (IOException  e){
-            e.printStackTrace();
-        }
-    }
 
     /**
      * The constructor
@@ -47,7 +22,6 @@ public class Graph {
     public Graph() {
 
     }
-
 
     /**
      * Prints the graph information
@@ -77,17 +51,6 @@ public class Graph {
         graph.get(uId2).add(uId1);
     }
 
-    /**
-     * Check vertex
-     *
-     * @param uId the user id
-     * @return true if vertex exists, false otherwise
-     */
-
-    private boolean checkVertex(long uId) { /*Check if vertex already present*/
-        boolean flag = false;
-        return graph.containsKey(uId) || flag;
-    }
 
     /**
      * Create new vertex if vertex not already present
@@ -96,8 +59,8 @@ public class Graph {
      *
      */
     public void addVertex(long uId){
-        if (!checkVertex(uId)){
-            graph.put(uId, new ArrayList<Long>());
+        if (!hasVertex(uId)){
+            graph.put(uId, new ArrayList<>());
         }
     }
 
@@ -106,7 +69,7 @@ public class Graph {
      *
      * @return the number of edges
      */
-    public int getNumberOfEdges(){ /*Calculate number of edges*/
+    public int getNumberOfEdges(){
         int numberOfEdges = 0;
         for (List<Long> val: graph.values()) {
             numberOfEdges += val.size();
@@ -133,7 +96,7 @@ public class Graph {
      */
     public boolean hasEdge(long uId1, long uId2){
         List<Long> adjacentVertices = graph.get(uId1);
-        return adjacentVertices == null? false : adjacentVertices.contains(uId2);
+        return adjacentVertices == null ? false : adjacentVertices.contains(uId2);
     }
 
 
@@ -147,13 +110,22 @@ public class Graph {
         return graph.containsKey(uId);
     }
 
+
+    /**
+     * Gets set of vertices
+     *
+     * @return the vertices set
+     */
+    public Set<Long> getVerticesList(){
+        return graph.keySet();
+    }
+
     /**
      * Gets the number of vertices of the largest connected component of the graph
      *
      * @return the number of vertices in the largest connected component
      */
     public long getLargestConnectedComponent() {
-        /*Creating the Pegasus Data Structure*/
 
         if (graph.size() == 0) {
             return 0L;
@@ -185,33 +157,28 @@ public class Graph {
                 }
             }
         }
-        /*End Creating the Pegasus Data Structure*/
-
-        /*Calculate Largest Component*/
-        long largeComponent = 0;
-            for(Long nodeId: pegasusMap.values()){
-                int count = 0;
-                for(Long referNodeId: pegasusMap.values()){
-                    if (nodeId == referNodeId){
-                        count++;
-                    }
-                }
-                if (count > largeComponent){
-                    largeComponent = count;
-                }
-            }
-        return largeComponent;
+        return calculateLargestComponent(pegasusMap);
     }
 
-        /*End Calculate Largest Component*/
-
     /**
-     * Gets set of verticies
-     *
-     * @return the verticies set
+     * Calculates the size largest connected component
+     * @param pegasusMap is the reference to the pegasusmap
+     * @return size of largest connected component
      */
-    public Set<Long> getVerticesList(){
-        return graph.keySet();
+    private long calculateLargestComponent(HashMap<Long, Long> pegasusMap){
+        long largeComponent = 0;
+        for(Long nodeId: pegasusMap.values()){
+            int count = 0;
+            for(Long referNodeId: pegasusMap.values()){
+                if (nodeId == referNodeId){
+                    count++;
+                }
+            }
+            if (count > largeComponent){
+                largeComponent = count;
+            }
+        }
+        return largeComponent;
     }
 }
 

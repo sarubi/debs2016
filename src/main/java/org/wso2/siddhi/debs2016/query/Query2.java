@@ -14,11 +14,16 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Query2 {
     private String friendshipFile;
-    private String postsFile;
     private String commentsFile;
     private String likesFile;
+    DataLoaderThread dataLoaderThreadFriendships;
+    DataLoaderThread dataLoaderThreadComments;
+    DataLoaderThread dataLoaderThreadLikes;
+    OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2;
     private int k;
     private long d;
+    private final int BUFFER_LIMIT = 100000;
+
 
     public static void main(String[] args){
 
@@ -36,37 +41,29 @@ public class Query2 {
 
     public Query2(String[] args){
         friendshipFile = args[0];
-        postsFile = args[1];
         commentsFile = args[2];
         likesFile = args[3];
         k = Integer.parseInt(args[4]);
         d = Long.parseLong(args[5]);
-    }
-
-    public void run(){
-
 
         LinkedBlockingQueue<Object[]> eventBufferListQ2 [] = new LinkedBlockingQueue[3];
-
-        DataLoaderThread dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS,100000,100);
-        DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS, 100000, 100);
-        DataLoaderThread dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES, 100000, 100);
-
+        dataLoaderThreadFriendships = new DataLoaderThread(friendshipFile, FileType.FRIENDSHIPS, BUFFER_LIMIT);
+        dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS, BUFFER_LIMIT);
+        dataLoaderThreadLikes = new DataLoaderThread(likesFile, FileType.LIKES, BUFFER_LIMIT);
         eventBufferListQ2[0] = dataLoaderThreadFriendships.getEventBuffer();
         eventBufferListQ2[1] = dataLoaderThreadComments.getEventBuffer();
         eventBufferListQ2[2] = dataLoaderThreadLikes.getEventBuffer();
-
-        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2, k, d);
-
-
-        dataLoaderThreadFriendships.start();
-        dataLoaderThreadComments.start();
-        dataLoaderThreadLikes.start();
-
-
-        orderedEventSenderThreadQ2.start();
-
+        orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(eventBufferListQ2, k, d);
 
     }
 
+    /**
+     * Starts the threads related to Query1
+     */
+    public void run(){
+        dataLoaderThreadFriendships.start();
+        dataLoaderThreadComments.start();
+        dataLoaderThreadLikes.start();
+        orderedEventSenderThreadQ2.start();
+    }
 }

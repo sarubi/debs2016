@@ -4,7 +4,6 @@ package org.wso2.siddhi.debs2016.sender;
  * Created by malithjayasinghe on 4/6/16.
  */
 
-import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
 import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
@@ -12,7 +11,6 @@ import org.wso2.siddhi.debs2016.util.Constants;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The event sender for query 2
@@ -32,7 +30,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
      * @param eventBuffer the event buffer array
      */
     public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer [], int k, long d) {
-        super("Event Sender");
+        super("Event Sender Query 2");
         this.eventBufferList = eventBuffer;
         manager = new Q2EventManager(k, d*1000);
         manager.run();

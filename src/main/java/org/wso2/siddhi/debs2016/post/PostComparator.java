@@ -5,7 +5,7 @@ import java.util.Comparator;
 /**
  * Created by malithjayasinghe on 4/6/16.
  *
- * Compare the two posts
+ * Compare the two posts for sorting when scores are equal
  */
 public class PostComparator implements Comparator<Post> {
 

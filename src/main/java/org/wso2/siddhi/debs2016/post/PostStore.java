@@ -22,8 +22,6 @@ public class PostStore {
     StringBuilder builder=new StringBuilder();
     private BufferedWriter writer;
     private File q1;
-    private int count = 0;
-
 
     /**
      *
@@ -48,6 +46,7 @@ public class PostStore {
             e.printStackTrace();
         }
     }
+
     /**
      * Adds a new post to the Store
      * @param postId of new post
@@ -72,8 +71,8 @@ public class PostStore {
 
     /**
      *
-     * Gets map which contains the top three posts
-     *
+     * Gets map which contains the top three posts in no particular order
+     * @return the postScoreMap
      */
     public BoundedSortedMultiMap<Integer, Long> getPostScoreMap()
     {
@@ -81,7 +80,7 @@ public class PostStore {
     }
 
     /**
-     * Gets the map which contains the top three posts
+     * Gets the map which contains the top three posts in required order
      *
      * @return the map with top three scores
      */

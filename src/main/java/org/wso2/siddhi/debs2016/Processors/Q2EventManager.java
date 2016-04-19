@@ -192,7 +192,7 @@ public class Q2EventManager {
                     case Constants.COMMENTS:
                         long comment_id = (Long) objects[3];
                         String comment = (String) objects[4];
-                        commentStore.registerComment(comment_id, ts, comment, false);
+                        commentStore.registerComment(comment_id, ts, comment);
                         break;
                     case Constants.FRIENDSHIPS:
                         if (ts == -2){

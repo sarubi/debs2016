@@ -20,7 +20,6 @@ public class CommentStore {
     private long duration;
     private HashMap<Long, CommentLikeGraph> commentStore = new HashMap<Long, CommentLikeGraph>(); //Comment ID, CLG
     String[] previousKcomments;
-    private boolean debug = false;
     private long tsTriggeredChange;
     private Graph friendshipGraph;
     private String[] kComments;
@@ -30,8 +29,6 @@ public class CommentStore {
     private BufferedWriter writer;
     private Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder()); //sizeOfComponent, comment
     private LinkedList<CommentComponent> commentComponentlist = new LinkedList<CommentComponent>(); //timeWindow
-
-
 
     /**
      * The constructor
@@ -60,7 +57,6 @@ public class CommentStore {
      */
     public void cleanCommentStore(long time) {
         tsTriggeredChange = time;
-
         for(Iterator<CommentComponent> iter = commentComponentlist.iterator(); iter.hasNext();){
             CommentComponent commentComponent=iter.next();
             long arrivalTime = commentComponent.getTs();
@@ -82,29 +78,11 @@ public class CommentStore {
     }
 
     /**
-     * Print the comment store
-     *
-     * @param time current time
-     */
-    public void printCommentStore(Long time) {
-
-        System.out.println("number of comments " + getNumberOfComments());
-        for (Long key : commentStore.keySet()) {
-            String comment = commentStore.get(key).getComment();
-            Long arrivalTime = commentStore.get(key).getArrivalTime();
-            Long lifeTime = (time - (Long) arrivalTime);
-            System.out.println("   comment_id = " + key + ", comment = " + comment + ", arrival time = " + arrivalTime + ", lifeTime  = " + lifeTime + ", Remaining life= " + (duration - lifeTime));
-        }
-
-    }
-
-
-    /**
      * print the k largest comments if there is change in the order
      *
-
-     * @param delimiter the delimiter to printed in between outputs
+     * @param delimiter the delimiter to be printed in between outputs
      * @param printKComments true would print in terminal. False will not print in terminal
+     * @param writeToFile true would write to file. false will not write to file
      */
     public long computeKLargestComments(String delimiter, boolean printKComments, boolean writeToFile) {
 
@@ -138,10 +116,8 @@ public class CommentStore {
     /**
      *
      * De-allocate resources
-     *
      */
     public void destroy(){
-
         try {
             writer.close();
         }catch (IOException e)
@@ -158,9 +134,6 @@ public class CommentStore {
      */
     private boolean hasKLargestCommentsChanged()
     {
-         /*Check if a change has taken place in K largest comments*/
-        boolean debug = true;
-
         boolean flagChange = false;
         kComments = new String[k];
         if (componentSizeCommentMap != null) {
@@ -192,37 +165,19 @@ public class CommentStore {
         return flagChange;
     }
 
-
-
-
     /**
      * Registers a comment in the comment store
      *
      * @param commentID the comment id
-     * @param ts        the arrival time of the comment
-     * @printComment indicate whether to print the new comment details or not.
-     */
-    public void registerComment(long commentID, long ts, String comment, boolean printComment) {
-
-
-        if (printComment) {
-            System.out.println("new comment has arrived comment id " + commentID + ", arrival time " + ts + ", comment = " + comment);
-        }
-        commentStore.put(commentID, new CommentLikeGraph(ts, comment, friendshipGraph));
-        commentComponentlist.add(new CommentComponent( ts , commentID));
-    }
-
-
-    /**
-     * Registers a comment in the comment store
-     *
-     * @param commentID the comment id
-     * @param ts        the arrival time of the comment
+     * @param ts the arrival time of the comment
+     * @param comment the comment string
      */
     public void registerComment(long commentID, long ts, String comment) {
 
-        registerComment(commentID, ts, comment, false);
+        commentStore.put(commentID, new CommentLikeGraph(comment, friendshipGraph));
+        commentComponentlist.add(new CommentComponent(ts, commentID));
     }
+
 
     /**
      * Registers a like in the comment store

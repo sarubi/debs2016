@@ -7,9 +7,7 @@ import java.util.HashMap;
  */
 public class CommentPostMap {
 
-
     public static final long DURATION =  86400000L;
-    public static final int INITIAL_SCORE = 10;
     private HashMap<Long, Long> commentToPostMap = new HashMap<>(5000);
 
     /**
@@ -22,7 +20,7 @@ public class CommentPostMap {
     }
 
     /**
-     * Adding a comment to a post
+     * Adding a comment to a comment
      * @param commentId the comment id
      * @param parentCommentId the parent comment id
      * @return ID of the parent post 
@@ -33,6 +31,10 @@ public class CommentPostMap {
         return parentPostId;
     }
 
+    /**
+     * Get the commentPostMap
+     * @return commentPostMap
+     */
     public HashMap<Long, Long> getCommentToPostMap() {
         return commentToPostMap;
     }

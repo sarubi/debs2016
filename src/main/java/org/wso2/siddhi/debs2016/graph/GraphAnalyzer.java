@@ -24,6 +24,9 @@ public class GraphAnalyzer {
     /**
      * Displays the friendship graph
      *
+     * @param displayWhileLoading true will display while stream is processing
+     * @param numberOfEventsToLoad will limit the number of events to load
+     * @param updateRate speed at which graph grows
      */
     public void loadFriendshipGraph(boolean displayWhileLoading, int numberOfEventsToLoad, int updateRate) {
 
@@ -37,13 +40,8 @@ public class GraphAnalyzer {
             Splitter splitter = Splitter.on('|');
             BufferedReader br = new BufferedReader(new FileReader("/Users/malithjayasinghe/debs2016/DataSet/data" + "/friendships.dat"), 10 * 1024 * 1024);
             String line = br.readLine();
-            Object[] eventData;
-            String user;
             while (line != null) {
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
-                String friendshipsTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
-                DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
-                Long friendshipTimeStampLong = dt3.getMillis();
                 Long user1ID = Long.parseLong(dataStrIterator.next());
                 Long user2ID = Long.parseLong(dataStrIterator.next());
 
@@ -71,13 +69,8 @@ public class GraphAnalyzer {
         }
     }
 
-    public void loadFriendshipGraph() {
-        loadFriendshipGraph(false, 0, 0);
-    }
-
-
     /**
-     * Display the friendshipgraph
+     * Add edge to the friendshipGraph
      *
      * @param user1ID the id of user 1
      * @param user2ID the id of user 2
