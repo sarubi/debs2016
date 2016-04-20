@@ -194,6 +194,12 @@ public class Q1EventManager {
             }
         }
 
+    /**
+     * Flush each remaining tuple every 24 hours until the post store ie empty
+     *
+     * @param timeWindow the time window
+     * @param ts the arrival time of the last event
+     */
     private void flush(TimeWindow timeWindow, long ts)
     {
         ts = ts +  CommentPostMap.DURATION/24/60;
