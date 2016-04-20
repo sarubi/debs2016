@@ -13,17 +13,27 @@ The corresponding queries require continuous analysis of a dynamic graph under t
 This repository contains the solution developed by Wso2 for the grand challenge
 
 **Inputs**
+
 1. Path to friendship.dat file
+
 2. Path to posts.dat file
+
 3. Path to comments.dat file
+
 4. Path to likes.dat file
+
 5. Value of k for Query 2 (The number of top comments to print)
+
 6. Value of d for Query 2 (The time period in which to analyse the large community)
 
 **Outputs**
+
 1. q1.txt (Contains Query 1 results)
+
 2. q2.txt (Contains Query 2 results)
+
 3. performance.txt (Contains 4 digits representing run time of query 1, average latency of query 1, run time of query 2 and average latency of query 2)
+
 
 **How to build**
 
