@@ -25,7 +25,7 @@ public class CommentStoreTest {
 
 
         comment.cleanCommentStore(111);
-        assertEquals(9,comment.getNumberOfComments());
+        assertEquals(10,comment.getNumberOfComments());
 
     }
 

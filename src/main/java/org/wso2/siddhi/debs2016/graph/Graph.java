@@ -61,7 +61,7 @@ public class Graph {
      *
      * @return the number of edges
      */
-    private int getNumberOfEdges(){
+    public int getNumberOfEdges(){
         int numberOfEdges = 0;
         for (List<Long> val: graph.values()) {
             numberOfEdges += val.size();
@@ -74,7 +74,7 @@ public class Graph {
      *
      * @return the number of vertices
      */
-    private int getNumberOfVertices(){
+    public int getNumberOfVertices(){
         return graph.size();
     }
 

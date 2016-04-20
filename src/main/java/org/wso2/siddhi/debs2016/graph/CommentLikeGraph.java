@@ -98,4 +98,13 @@ public class CommentLikeGraph {
     public long getSizeOfLargestConnectedComponent() {
         return sizeOfLargestConnectedComponent;
     }
+
+    /**
+     * Getter method for graph
+     *
+     * @return the graph
+     */
+    public Graph getGraph() {
+        return graph;
+    }
 }
