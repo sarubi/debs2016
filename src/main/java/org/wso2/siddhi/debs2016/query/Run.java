@@ -18,7 +18,7 @@
 
 package org.wso2.siddhi.debs2016.query;
 
-class Run {
+public class Run {
 
     public static void main(String[] args) {
         if(args.length != 6){
