@@ -7,9 +7,6 @@ import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by malithjayasinghe on 4/6/16.
- */
 class Query1 {
     private final OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
     private final DataLoaderThread dataLoaderThreadComments ;

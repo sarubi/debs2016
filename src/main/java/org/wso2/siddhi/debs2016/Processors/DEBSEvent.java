@@ -1,10 +1,7 @@
 package org.wso2.siddhi.debs2016.Processors;
 
-/**
- * Created by bhagya on 3/30/16.
- */
 public class DEBSEvent {
-    private Long iij_timestamp;
+    private Long inputTimestamp;
     private Object[] objectArray;
 
     public DEBSEvent(){
@@ -14,10 +11,10 @@ public class DEBSEvent {
     /**
      * Sets the system time at the time of publishing the event
      *
-     * @param iij_timestamp is the system time
+     * @param inputTimestamp is the system time
      */
-    public void setSystemArrivalTime(Long iij_timestamp) {
-        this.iij_timestamp = iij_timestamp;
+    public void setSystemArrivalTime(Long inputTimestamp) {
+        this.inputTimestamp = inputTimestamp;
     }
 
     /**
@@ -35,7 +32,7 @@ public class DEBSEvent {
      * @return the system time
      */
     public Long getSystemArrivalTime() {
-        return iij_timestamp;
+        return inputTimestamp;
     }
 
     /**

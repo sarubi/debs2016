@@ -7,12 +7,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 import java.io.*;
 import java.util.Iterator;
 
-/**
- * Created by malithjayasinghe on 3/12/16.
- *
- * Anaylzes the friendship graph
- *
- */
 class GraphAnalyzer {
 
     private final org.graphstream.graph.Graph graph = new SingleGraph("Tutorial 1");

@@ -11,12 +11,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by malithjayasinghe on 3/25/16.
- */
 public class PostStore {
 
-    private final HashMap<Long, Post> postList  = new HashMap<>(5000); //postID, PostObject
+    private final HashMap<Long, Post> postMap = new HashMap<>(5000); //postID, PostObject
     private final BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<>(3, true, true, true);
     private final Long[] previousOrderedTopThree = new Long[3];
     private final StringBuilder builder=new StringBuilder();
@@ -28,9 +25,9 @@ public class PostStore {
      *
      * @return the post list
      */
-    public HashMap<Long, Post> getPostList()
+    public HashMap<Long, Post> getPostMap()
     {
-        return postList;
+        return postMap;
     }
 
     /**
@@ -54,7 +51,7 @@ public class PostStore {
      */
     public Post addPost(Long postId, Long ts, String userName){
         Post post = new Post(ts, userName, postId);
-        postList.put(postId, post);
+        postMap.put(postId, post);
         return post;
     }
 
@@ -65,7 +62,7 @@ public class PostStore {
      * @return the Post object related to postId
      */
     public Post getPost(Long postId){
-        return postList.get(postId);
+        return postMap.get(postId);
     }
 
     /**
@@ -87,12 +84,12 @@ public class PostStore {
 
         TreeMultimap<Integer, Post> topScoreMap = TreeMultimap.create(Comparator.reverseOrder(), new PostComparator());
 
-        Iterator itr = postScoreMap.entrySet().iterator();
-        for (Iterator<Map.Entry<Integer, Long>> it = itr; it.hasNext(); ) {
-            Map.Entry<Integer, Long> entry = it.next();
+        Iterator<Map.Entry<Integer, Long>> iterator = postScoreMap.entrySet().iterator();
+        for (; iterator.hasNext(); ) {
+            Map.Entry<Integer, Long> entry = iterator.next();
             int score = entry.getKey();
             long id = entry.getValue();
-            topScoreMap.put(score, postList.get(id));
+            topScoreMap.put(score, postMap.get(id));
         }
 
         return topScoreMap;
@@ -135,25 +132,25 @@ public class PostStore {
      *
      * Print/write top three posts to a file
      *
-     * @param ts is the timestamp of event that might trigger a change
+     * @param timestamp is the timestamp of event that might trigger a change
      * @param printComments print output
      * @param writeToFile write the output to a file
      * @param delimiter the delimiter to use
      */
 
-    public long printTopThreeComments(Long ts, boolean printComments, boolean writeToFile, String delimiter) {
+    public long printTopThreeComments(Long timestamp, boolean printComments, boolean writeToFile, String delimiter) {
 
         try{
                 builder.setLength(0);
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                df.setTimeZone(TimeZone.getTimeZone("GMT"));
-                String fmm = df.format(new java.util.Date(ts));
-                builder.append(fmm).append(delimiter);
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                String formattedDate = dateFormat.format(new java.util.Date(timestamp));
+                builder.append(formattedDate).append(delimiter);
                 for (int k = 0; k < 3 ; k++){
                     if (this.previousOrderedTopThree[k] != null){
-                        Post post = postList.get(this.previousOrderedTopThree[k]);
+                        Post post = postMap.get(this.previousOrderedTopThree[k]);
                         builder.append(this.previousOrderedTopThree[k]).append(delimiter);
-                        builder.append(postList.get(this.previousOrderedTopThree[k]).getUserName()).append(delimiter);
+                        builder.append(postMap.get(this.previousOrderedTopThree[k]).getUserName()).append(delimiter);
                         builder.append(post.getTotalScore()).append(delimiter);
                         builder.append(post.getNumberOfCommenters());
                     }else{

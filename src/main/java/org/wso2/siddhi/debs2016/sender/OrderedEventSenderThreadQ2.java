@@ -1,9 +1,5 @@
 package org.wso2.siddhi.debs2016.sender;
 
-/**
- * Created by malithjayasinghe on 4/6/16.
- */
-
 import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
 import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
 import org.wso2.siddhi.debs2016.util.Constants;
@@ -12,14 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * The event sender for query 2
- *
- * Created by anoukh on 3/15/16.
- */
 public class OrderedEventSenderThreadQ2 extends Thread {
 
-    private final LinkedBlockingQueue<Object[]>[] eventBufferList ;
+    private final LinkedBlockingQueue<Object[]>[] eventBufferList;
     private final Q2EventManager manager;
 
 
@@ -45,9 +36,9 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         Object[] commentEvent = null;
         Object[] likeEvent = null;
         long startTime;
-        long cTime;
+        long systemCurrentTime;
         boolean firstEvent = true;
-        int flag = Constants.NOEVENT;
+        int flag = Constants.NO_EVENT;
         boolean friendshipLastEventArrived = false;
         boolean commentsLastEventArrived = false;
         boolean likesLastEventArrived = false;
@@ -65,10 +56,10 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                         0L,
                         0,
                 };
-                cTime = System.currentTimeMillis();
+                systemCurrentTime = System.currentTimeMillis();
                 DEBSEvent event = manager.getNextDebsEvent();
                 event.setObjectArray(finalFriendshipEvent);
-                event.setSystemArrivalTime(cTime);
+                event.setSystemArrivalTime(systemCurrentTime);
                 manager.publish();
                 Date startDateTime = new Date();
                 startTime = startDateTime.getTime();
@@ -144,53 +135,53 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                 ex.printStackTrace();
             }
 
-            long tsFriendship;
-            long tsComment;
-            long tsLike;
+            long timestampFriendship;
+            long timestampComment;
+            long timestampLike;
 
             if (friendshipEvent == null){
-                tsFriendship = Long.MAX_VALUE;
+                timestampFriendship = Long.MAX_VALUE;
             }else{
-                tsFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                timestampFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
             }
 
             if (commentEvent == null){
-                tsComment = Long.MAX_VALUE;
+                timestampComment = Long.MAX_VALUE;
             }else{
-                tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                timestampComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
             }
 
             if (likeEvent == null){
-                tsLike = Long.MAX_VALUE;
+                timestampLike = Long.MAX_VALUE;
             }else{
-                tsLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                timestampLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
             }
 
-            if (tsFriendship <= tsComment && tsFriendship <= tsLike && tsFriendship != Long.MAX_VALUE){
-                cTime = System.currentTimeMillis();
+            if (timestampFriendship <= timestampComment && timestampFriendship <= timestampLike && timestampFriendship != Long.MAX_VALUE){
+                systemCurrentTime = System.currentTimeMillis();
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(friendshipEvent);
-                debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setSystemArrivalTime(systemCurrentTime);
                 manager.publish();
                 flag = Constants.FRIENDSHIPS;
-            }else if (tsComment <= tsFriendship && tsComment <= tsLike && tsComment != Long.MAX_VALUE){
-                cTime = System.currentTimeMillis();
+            }else if (timestampComment <= timestampFriendship && timestampComment <= timestampLike && timestampComment != Long.MAX_VALUE){
+                systemCurrentTime = System.currentTimeMillis();
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(commentEvent);
-                debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setSystemArrivalTime(systemCurrentTime);
                 manager.publish();
                 flag = Constants.COMMENTS;
-            }else if (tsLike != Long.MAX_VALUE){
-                cTime = System.currentTimeMillis();
+            }else if (timestampLike != Long.MAX_VALUE){
+                systemCurrentTime = System.currentTimeMillis();
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(likeEvent);
-                debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setSystemArrivalTime(systemCurrentTime);
                 manager.publish();
                 flag = Constants.LIKES;
             }
 
             if (friendshipEvent == null && commentEvent == null && likeEvent == null){
-                cTime = System.currentTimeMillis();
+                systemCurrentTime = System.currentTimeMillis();
                 Object[] finalFriendshipEvent = new Object[]{
                         0L,
                         -2L,
@@ -205,7 +196,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
 
                 DEBSEvent debsEvent = manager.getNextDebsEvent();
                 debsEvent.setObjectArray(finalFriendshipEvent);
-                debsEvent.setSystemArrivalTime(cTime);
+                debsEvent.setSystemArrivalTime(systemCurrentTime);
                 manager.publish();
                 manager.getDataReadDisruptor().shutdown();
                 break;

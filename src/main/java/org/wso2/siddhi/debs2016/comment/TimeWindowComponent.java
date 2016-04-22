@@ -2,41 +2,37 @@ package org.wso2.siddhi.debs2016.comment;
 
 import org.wso2.siddhi.debs2016.post.Post;
 
-/**
- * An Object to record the timestamp of the comment of a post
- * Created by aaw on 4/1/16.
- */
-class CommentPostComponent {
-    private final long ts;
+class TimeWindowComponent {
+    private final long timestamp;
     private long expiringTime;
     private final Post post;
-    private final long userID;
+    private final long userId;
     private final boolean isPost;
 
 
     /**
-     * Constructor to create CommentPostComponent for Query1 TimeWidow
+     * Constructor to create TimeWindowComponent for Query1 TimeWidow
      *
      * @param post the post
-     * @param ts the time stamp
+     * @param timestamp the time stamp
      * @param userId the user ID of the user who commented on the post
      * @param isPost true if its a post object, false if is a comment object
      */
-    public CommentPostComponent(Post post, long ts, long userId, boolean isPost) {
-        this.ts = ts;
+    public TimeWindowComponent(Post post, long timestamp, long userId, boolean isPost) {
+        this.timestamp = timestamp;
         this.post = post;
-        this.userID = userId;
+        this.userId = userId;
         this.isPost = isPost;
-        this.expiringTime = ts;
+        this.expiringTime = timestamp;
 
     }
 
     /**
-     * Getter for userID variable
-     * @return userID
+     * Getter for userId variable
+     * @return userId
      */
-    public long getUserID() {
-        return userID;
+    public long getUserId() {
+        return userId;
     }
 
     /**
@@ -75,8 +71,8 @@ class CommentPostComponent {
      * Gets the arrival time of the object
      * @return the comment arrival time
      */
-    public long getTs() {
-        return ts;
+    public long getTimestamp() {
+        return timestamp;
     }
 
 }

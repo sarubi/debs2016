@@ -6,11 +6,7 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by malithjayasinghe on 3/8/16.
- */
 public class GraphTest {
-
 
     @Test
     public void testConstruction(){
@@ -62,28 +58,28 @@ public class GraphTest {
     @Test
     public void testGetLargestConnectedComponentData1()
     {
-        Multimap mp = TreeMultimap.create();
+        Multimap<Long, String> multimap = TreeMultimap.create();
         CommentLikeGraph commentLikeGraph = new CommentLikeGraph("Hi", new Graph());
 
-        commentLikeGraph.registerLike(100, mp);
-        commentLikeGraph.registerLike(101, mp);
-        commentLikeGraph.registerLike(102, mp);
-        commentLikeGraph.registerLike(103, mp);
-        commentLikeGraph.registerLike(104, mp);
-        commentLikeGraph.registerLike(105, mp);
-        commentLikeGraph.registerLike(106, mp);
-        commentLikeGraph.registerLike(107, mp);
-        commentLikeGraph.registerLike(108, mp);
-        commentLikeGraph.registerLike(109, mp);
+        commentLikeGraph.registerLike(100, multimap);
+        commentLikeGraph.registerLike(101, multimap);
+        commentLikeGraph.registerLike(102, multimap);
+        commentLikeGraph.registerLike(103, multimap);
+        commentLikeGraph.registerLike(104, multimap);
+        commentLikeGraph.registerLike(105, multimap);
+        commentLikeGraph.registerLike(106, multimap);
+        commentLikeGraph.registerLike(107, multimap);
+        commentLikeGraph.registerLike(108, multimap);
+        commentLikeGraph.registerLike(109, multimap);
 
-        commentLikeGraph.handleNewFriendship(100, 101, mp);
-        commentLikeGraph.handleNewFriendship(100, 105, mp);
-        commentLikeGraph.handleNewFriendship(105, 106, mp);
-        commentLikeGraph.handleNewFriendship(106, 103, mp);
-        commentLikeGraph.handleNewFriendship(107, 102, mp);
-        commentLikeGraph.handleNewFriendship(107, 104, mp);
-        commentLikeGraph.handleNewFriendship(102, 108, mp);
-        commentLikeGraph.handleNewFriendship(109, 108, mp);
+        commentLikeGraph.handleNewFriendship(100, 101, multimap);
+        commentLikeGraph.handleNewFriendship(100, 105, multimap);
+        commentLikeGraph.handleNewFriendship(105, 106, multimap);
+        commentLikeGraph.handleNewFriendship(106, 103, multimap);
+        commentLikeGraph.handleNewFriendship(107, 102, multimap);
+        commentLikeGraph.handleNewFriendship(107, 104, multimap);
+        commentLikeGraph.handleNewFriendship(102, 108, multimap);
+        commentLikeGraph.handleNewFriendship(109, 108, multimap);
 
 
         assertEquals(5, commentLikeGraph.getGraph().getLargestConnectedComponent());
@@ -92,43 +88,43 @@ public class GraphTest {
     @Test
     public void testGetLargestConnectedComponentData2()
     {
-        Multimap mp = TreeMultimap.create();
+        Multimap<Long, String> multimap = TreeMultimap.create();
         CommentLikeGraph commentLikeGraph = new CommentLikeGraph("Hi", new Graph());
 
-        commentLikeGraph.registerLike(100, mp);
-        commentLikeGraph.registerLike(101, mp);
-        commentLikeGraph.registerLike(102, mp);
-        commentLikeGraph.registerLike(103, mp);
-        commentLikeGraph.registerLike(104, mp);
-        commentLikeGraph.registerLike(105, mp);
-        commentLikeGraph.registerLike(106, mp);
-        commentLikeGraph.registerLike(107, mp);
-        commentLikeGraph.registerLike(108, mp);
-        commentLikeGraph.registerLike(109, mp);
-        commentLikeGraph.registerLike(110, mp);
-        commentLikeGraph.registerLike(111, mp);
-        commentLikeGraph.registerLike(112, mp);
-        commentLikeGraph.registerLike(113, mp);
-        commentLikeGraph.registerLike(114, mp);
-        commentLikeGraph.registerLike(115, mp);
-        commentLikeGraph.registerLike(116, mp);
-        commentLikeGraph.registerLike(120, mp);
+        commentLikeGraph.registerLike(100, multimap);
+        commentLikeGraph.registerLike(101, multimap);
+        commentLikeGraph.registerLike(102, multimap);
+        commentLikeGraph.registerLike(103, multimap);
+        commentLikeGraph.registerLike(104, multimap);
+        commentLikeGraph.registerLike(105, multimap);
+        commentLikeGraph.registerLike(106, multimap);
+        commentLikeGraph.registerLike(107, multimap);
+        commentLikeGraph.registerLike(108, multimap);
+        commentLikeGraph.registerLike(109, multimap);
+        commentLikeGraph.registerLike(110, multimap);
+        commentLikeGraph.registerLike(111, multimap);
+        commentLikeGraph.registerLike(112, multimap);
+        commentLikeGraph.registerLike(113, multimap);
+        commentLikeGraph.registerLike(114, multimap);
+        commentLikeGraph.registerLike(115, multimap);
+        commentLikeGraph.registerLike(116, multimap);
+        commentLikeGraph.registerLike(120, multimap);
 
 
-        commentLikeGraph.handleNewFriendship(113, 103, mp);
-        commentLikeGraph.handleNewFriendship(101, 103, mp);
-        commentLikeGraph.handleNewFriendship(103, 114, mp);
-        commentLikeGraph.handleNewFriendship(102, 103, mp);
-        commentLikeGraph.handleNewFriendship(104, 102, mp);
-        commentLikeGraph.handleNewFriendship(109, 102, mp);
-        commentLikeGraph.handleNewFriendship(109, 110, mp);
-        commentLikeGraph.handleNewFriendship(105, 106, mp);
-        commentLikeGraph.handleNewFriendship(107, 106, mp);
-        commentLikeGraph.handleNewFriendship(107, 115, mp);
-        commentLikeGraph.handleNewFriendship(107, 111, mp);
-        commentLikeGraph.handleNewFriendship(107, 108, mp);
-        commentLikeGraph.handleNewFriendship(112, 108, mp);
-        commentLikeGraph.handleNewFriendship(116, 120, mp);
+        commentLikeGraph.handleNewFriendship(113, 103, multimap);
+        commentLikeGraph.handleNewFriendship(101, 103, multimap);
+        commentLikeGraph.handleNewFriendship(103, 114, multimap);
+        commentLikeGraph.handleNewFriendship(102, 103, multimap);
+        commentLikeGraph.handleNewFriendship(104, 102, multimap);
+        commentLikeGraph.handleNewFriendship(109, 102, multimap);
+        commentLikeGraph.handleNewFriendship(109, 110, multimap);
+        commentLikeGraph.handleNewFriendship(105, 106, multimap);
+        commentLikeGraph.handleNewFriendship(107, 106, multimap);
+        commentLikeGraph.handleNewFriendship(107, 115, multimap);
+        commentLikeGraph.handleNewFriendship(107, 111, multimap);
+        commentLikeGraph.handleNewFriendship(107, 108, multimap);
+        commentLikeGraph.handleNewFriendship(112, 108, multimap);
+        commentLikeGraph.handleNewFriendship(116, 120, multimap);
 
         assertEquals(8, commentLikeGraph.getGraph().getLargestConnectedComponent());
     }

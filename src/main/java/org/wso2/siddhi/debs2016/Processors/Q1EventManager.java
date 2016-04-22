@@ -19,23 +19,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
 
-/**
- * Created by malithjayasinghe on 4/6/16.
- */
 public class Q1EventManager {
 
         private Disruptor<DEBSEvent> dataReadDisruptor;
         private RingBuffer dataReadBuffer;
-        private long startiij_timestamp;
-        private long endiij_timestamp;
+        private long startTimestamp;
+        private long endTimestamp;
         private long sequenceNumber;
         private long count;
         private final PostStore postStore;
         private final CommentPostMap commentPostMap;
         private final TimeWindow timeWindow;
-        private Long latency = 0L;
-        private Long numberOfOutputs = 0L;
-    	public static long timeOfEvent = 0;
+        private long latency;
+        private long numberOfOutputs;
+    	public static long timeOfEvent;
         public static boolean Q1_COMPLETED  = false;
         private static final StringBuilder builder = new StringBuilder();
         /**
@@ -91,93 +88,93 @@ public class Q1EventManager {
          *
          */
         private class DEBSEventHandler implements EventHandler<DEBSEvent> {
-            long last_timestamp = 0;
+            long lastTimestamp = 0;
 
             @Override
             public void onEvent(DEBSEvent debsEvent, long l, boolean b) throws Exception {
                 Object [] objects = debsEvent.getObjectArray();
                 try {
 
-                    long iij_timestamp = debsEvent.getSystemArrivalTime();
-                    endiij_timestamp = iij_timestamp;
+                    long timestamp = debsEvent.getSystemArrivalTime();
+                    endTimestamp = timestamp;
 
-                    long ts = (Long) objects[1];
-                    String user_name = (String) objects[5];
+                    long logicalTimestamp = (Long) objects[1];
+                    String userName = (String) objects[5];
                     int isPostFlag = (int) objects[8];
 
                     count++;
                     Post post;
-                    boolean hasChanged;
+                    boolean hasTopChanged;
                     switch (isPostFlag){
                         case Constants.POSTS:
-                            if (ts == -1L) {
+                            if (logicalTimestamp == -1L) {
                                 //This is the place where time measuring starts.
                                 count--;
-                                startiij_timestamp = iij_timestamp;
+                                startTimestamp = timestamp;
                                 break;
                             }
 
-                            if (ts == -2L) {
+                            if (logicalTimestamp == -2L) {
                                 //This is the place where time measuring ends.
                                 count--;
-                                flush(timeWindow, last_timestamp);
+                                flush(timeWindow, lastTimestamp);
                                 showFinalStatistics();
                                 postStore.destroy();
                                 break;
                             }
                             long post_id = (Long) objects[2];
-                            post = postStore.addPost(post_id, ts, user_name); // 2)
-                            timeWindow.updateTime(ts);
-                            timeWindow.addNewPost(ts, post);
+                            post = postStore.addPost(post_id, logicalTimestamp, userName); // 2)
+                            timeWindow.updateTime(logicalTimestamp);
+                            timeWindow.addNewPost(logicalTimestamp, post);
                             if (postStore.hasTopThreeChanged()){
-                                long endTime = postStore.printTopThreeComments(ts, false, true, ",");
-                                latency += (endTime - iij_timestamp);
+                                long endTime = postStore.printTopThreeComments(logicalTimestamp, false, true, ",");
+                                latency += (endTime - timestamp);
                                 numberOfOutputs++;
                             }
                             break;
 
                         case Constants.COMMENTS:
-                            long comment_id = (Long) objects[3];
-                            long comment_replied_id = (Long) objects[6];
-                            long post_replied_id = (Long) objects[7];
-                            long commenter_id = (Long) objects[2];
+                            long commentId = (Long) objects[3];
+                            long commentRepliedId = (Long) objects[6];
+                            long postRepliedId = (Long) objects[7];
+                            long commenterId = (Long) objects[2];
 
-                            if (post_replied_id != -1 && comment_replied_id == -1){
-                                boolean hasChanged1 = timeWindow.updateTime(ts);
-                                post = postStore.getPost(post_replied_id);
+                            if (postRepliedId != -1 && commentRepliedId == -1){
+                                boolean hasUpdateChangedTop = timeWindow.updateTime(logicalTimestamp);
+                                post = postStore.getPost(postRepliedId);
                                 if (post != null) {
-                                    timeWindow.addComment(post, ts, commenter_id);
+                                    timeWindow.addComment(post, logicalTimestamp, commenterId);
                                 }
-                                hasChanged = postStore.hasTopThreeChanged();
-                                if (hasChanged || hasChanged1){
-                                    if (postStore.getPost(post_replied_id) == null){
+                                hasTopChanged = postStore.hasTopThreeChanged();
+                                if (hasTopChanged || hasUpdateChangedTop){
+                                    if (postStore.getPost(postRepliedId) == null){
                                         long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
-                                        latency += (endTime - iij_timestamp);
+                                        latency += (endTime - timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
-                                        latency += (endTime - iij_timestamp);
+                                        long endTime = postStore.printTopThreeComments(logicalTimestamp, false, true, ",");
+                                        latency += (endTime - timestamp);
                                         numberOfOutputs++;
                                     }
                                 }
-                                commentPostMap.addCommentToPost(comment_id, post_replied_id);
+                                commentPostMap.addCommentToPost(commentId, postRepliedId);
 
-                            } else if (comment_replied_id != -1 && post_replied_id == -1){
-                                long parent_post_id = commentPostMap.addCommentToComment(comment_id, comment_replied_id);
-                                boolean hasChanged1 = timeWindow.updateTime(ts);
+                            } else if (commentRepliedId != -1 && postRepliedId == -1){
+                                long parent_post_id = commentPostMap.addCommentToComment(commentId, commentRepliedId);
+                                boolean hasUpdateChangedTop = timeWindow.updateTime(logicalTimestamp);
                                 post = postStore.getPost(parent_post_id);
                                 if (post != null) {
-                                    timeWindow.addComment(post, ts, commenter_id);
+                                    timeWindow.addComment(post, logicalTimestamp, commenterId);
                                 }
-                                hasChanged = postStore.hasTopThreeChanged();
-                                if (hasChanged1 || hasChanged){
-                                    if (postStore.getPost(post_replied_id) == null){
+                                hasTopChanged = postStore.hasTopThreeChanged();
+                                if (hasUpdateChangedTop || hasTopChanged){
+                                    if (postStore.getPost(postRepliedId) == null){
                                         long endTime = postStore.printTopThreeComments(timeOfEvent, false, true, ",");
-                                        latency += (endTime - iij_timestamp);
+                                        latency += (endTime - timestamp);
                                         numberOfOutputs++;
                                     }else{
-                                        long endTime = postStore.printTopThreeComments(ts, false, true, ",");
-                                        latency += (endTime - iij_timestamp);
+                                        long endTime = postStore.printTopThreeComments(logicalTimestamp, false, true, ",");
+                                        latency += (endTime - timestamp);
                                         numberOfOutputs++;
                                     }
                                 }
@@ -185,7 +182,7 @@ public class Q1EventManager {
                             break;
                     }
 
-                    last_timestamp = ts;
+                    lastTimestamp = logicalTimestamp;
 
 
                     } catch (Exception e) {
@@ -204,7 +201,7 @@ public class Q1EventManager {
             hasChanged = timeWindow.updateTime(ts);
             if (hasChanged){
                 long endTime =  postStore.printTopThreeComments(ts, false, true, ",");
-                latency += (endTime - endiij_timestamp);
+                latency += (endTime - endTimestamp);
                 numberOfOutputs++;
             }
             ts = ts +  CommentPostMap.DURATION/24/60;
@@ -214,7 +211,7 @@ public class Q1EventManager {
     /**
      * Writes the output to the file
      */
-    public static void outputwriter() {
+    public static void writeOutput() {
         try {
             File performance = new File("performance.txt");
             BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
@@ -236,10 +233,9 @@ public class Q1EventManager {
     private void showFinalStatistics()
     {
         try{
-
             postStore.destroy();
             builder.setLength(0);
-            long timeDifference = endiij_timestamp - startiij_timestamp;
+            long timeDifference = endTimestamp - startTimestamp;
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
             System.out.println("Query 1 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
@@ -252,7 +248,6 @@ public class Q1EventManager {
             System.out.println("Total Latency " + latency);
             System.out.println("Total Outputs " + numberOfOutputs);
             if (numberOfOutputs!=0){
-
                 float temp = ((float)latency/numberOfOutputs)/1000;
                 BigDecimal averageLatency = new BigDecimal(temp);
                 String latencyString = averageLatency.toPlainString() + "000000";
@@ -266,8 +261,8 @@ public class Q1EventManager {
         }finally {
             Q1_COMPLETED = true;
             if(Q2EventManager.Q2_COMPLETED){
-                outputwriter();
-                Q2EventManager.outputwritter();
+                writeOutput();
+                Q2EventManager.writeOutput();
                 System.exit(0);
             }
         }

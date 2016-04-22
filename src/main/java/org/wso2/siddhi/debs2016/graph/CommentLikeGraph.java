@@ -3,11 +3,7 @@ package org.wso2.siddhi.debs2016.graph;
 import com.google.common.collect.Multimap;
 
 import java.util.*;
-/**
- * The graph of users who have liked a given comment where edges of the represents the friendship relationship between them.
- *
- * Created by malithjayasinghe on 3/9/16.
- */
+
 public class CommentLikeGraph {
 
     private final Graph graph = new Graph();
@@ -43,15 +39,15 @@ public class CommentLikeGraph {
     /**
      * Register a new like for the comment
      *
-     * @param uId is user id of person who likes comment
+     * @param userId is user id of person who likes comment
      * @param componentSizeCommentMap is reference to Map that holds size and comment string of each comment
      */
-    public void registerLike(long uId, Multimap componentSizeCommentMap) {
-        graph.addVertex(uId);
+    public void registerLike(long userId, Multimap<Long, String> componentSizeCommentMap) {
+        graph.addVertex(userId);
         Set<Long> verticesList = graph.getVerticesList();
         for (long vertex: verticesList) {
-            if (friendshipGraph.hasEdge(uId, vertex)){
-                    graph.addEdge(uId, vertex);
+            if (friendshipGraph.hasEdge(userId, vertex)){
+                    graph.addEdge(userId, vertex);
             }
         }
         if (sizeOfLargestConnectedComponent != 0){
@@ -65,13 +61,13 @@ public class CommentLikeGraph {
     /**
      * Handle event of a new friendship in CommentLikeGraph
      *
-     * @param uId1 the userID of friend one
-     * @param uId2 the userID of friend two
+     * @param userOneId the userID of friend one
+     * @param userTwoId the userID of friend two
      * @param componentSizeCommentMap is reference to Map that holds size and comment string of each comment
      */
-    public void handleNewFriendship(long uId1, long uId2, Multimap componentSizeCommentMap) {
-        if (graph.hasVertex(uId1) && graph.hasVertex(uId2)) {
-            graph.addEdge(uId1, uId2);
+    public void handleNewFriendship(long userOneId, long userTwoId, Multimap<Long, String> componentSizeCommentMap) {
+        if (graph.hasVertex(userOneId) && graph.hasVertex(userTwoId)) {
+            graph.addEdge(userOneId, userTwoId);
             if (sizeOfLargestConnectedComponent != 0){
                 componentSizeCommentMap.remove(getSizeOfLargestConnectedComponent(), comment);
             }

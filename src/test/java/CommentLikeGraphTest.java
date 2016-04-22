@@ -6,18 +6,15 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by anoukh on 3/10/16.
- */
 public class CommentLikeGraphTest {
 
     @Test
     public void testCommentLikeGraphConstruction(){
-        Multimap mp = TreeMultimap.create();
+        Multimap<Long, String> multimap = TreeMultimap.create();
         CommentLikeGraph commentLikeGraph = new CommentLikeGraph("Hi", new Graph());
-        commentLikeGraph.registerLike(31, mp);
-        commentLikeGraph.registerLike(12, mp);
-        commentLikeGraph.handleNewFriendship(12, 31, mp);
+        commentLikeGraph.registerLike(31, multimap);
+        commentLikeGraph.registerLike(12, multimap);
+        commentLikeGraph.handleNewFriendship(12, 31, multimap);
 
         Graph testGraph = new Graph();
         testGraph.addVertex(31);
@@ -31,27 +28,27 @@ public class CommentLikeGraphTest {
 
     @Test
     public void testRegisterLike(){
-        Multimap mp = TreeMultimap.create();
+        Multimap<Long, String> multimap = TreeMultimap.create();
         CommentLikeGraph graph = new CommentLikeGraph("Hi", new Graph());
         assertEquals(0,graph.getGraph().getNumberOfVertices());
-        graph.registerLike(31, mp);
+        graph.registerLike(31, multimap);
         assertEquals(1,graph.getGraph().getNumberOfVertices());
-        graph.registerLike(12, mp);
+        graph.registerLike(12, multimap);
         assertEquals(2,graph.getGraph().getNumberOfVertices());
     }
 
     @Test
     public void testHandleFriendship(){
-        Multimap mp = TreeMultimap.create();
+        Multimap<Long, String> multimap = TreeMultimap.create();
         CommentLikeGraph commentLikeGraph = new CommentLikeGraph("Hi", new Graph());
 
-        commentLikeGraph.registerLike(12, mp);
-        commentLikeGraph.registerLike(15, mp);
-        commentLikeGraph.registerLike(16, mp);
+        commentLikeGraph.registerLike(12, multimap);
+        commentLikeGraph.registerLike(15, multimap);
+        commentLikeGraph.registerLike(16, multimap);
 
-        commentLikeGraph.handleNewFriendship(15,16, mp);
-        commentLikeGraph.handleNewFriendship(15,6, mp);
-        commentLikeGraph.handleNewFriendship(2,9, mp);
+        commentLikeGraph.handleNewFriendship(15,16, multimap);
+        commentLikeGraph.handleNewFriendship(15,6, multimap);
+        commentLikeGraph.handleNewFriendship(2,9, multimap);
 
         assertEquals(1, commentLikeGraph.getGraph().getNumberOfEdges());
     }

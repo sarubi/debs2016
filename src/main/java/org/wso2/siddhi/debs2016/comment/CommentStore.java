@@ -10,24 +10,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * Created by malithjayasinghe on 3/8/16.
- * <p/>
- * Stores a commentComponentlist of active comments (i.e. comments arrived < d time)
- */
 public class CommentStore {
 
     private final long duration;
     private final HashMap<Long, CommentLikeGraph> commentStore = new HashMap<>(); //Comment ID, CLG
-    private String[] previousKcomments;
-    private long tsTriggeredChange;
+    private String[] previousKComments;
+    private long timestampTriggeredChange;
     private final Graph friendshipGraph;
     private String[] kComments;
     private final int k ;
     private final StringBuilder builder = new StringBuilder();
     private BufferedWriter writer;
     private final Multimap<Long, String> componentSizeCommentMap = TreeMultimap.create(Comparator.<Long>reverseOrder(), Comparator.<String>naturalOrder()); //sizeOfComponent, comment
-    private final LinkedList<CommentComponent> commentComponentlist = new LinkedList<>(); //timeWindow
+    private final LinkedList<CommentComponent> commentTimeWindow = new LinkedList<>();
 
     /**
      * The constructor
@@ -39,7 +34,7 @@ public class CommentStore {
         this.friendshipGraph = friendshipGraph;
         this.k = k;
         kComments = new String[k];
-        previousKcomments = new String[k];
+        previousKComments = new String[k];
         File q2 = new File("q2.txt");
         try{
             writer = new BufferedWriter(new FileWriter(q2, true));
@@ -55,17 +50,17 @@ public class CommentStore {
      * @param time logical time of the new event
      */
     public void cleanCommentStore(long time) {
-        tsTriggeredChange = time;
-        for(Iterator<CommentComponent> iter = commentComponentlist.iterator(); iter.hasNext();){
-            CommentComponent commentComponent=iter.next();
-            long arrivalTime = commentComponent.getTs();
+        timestampTriggeredChange = time;
+        for(Iterator<CommentComponent> iterator = commentTimeWindow.iterator(); iterator.hasNext();){
+            CommentComponent commentComponent=iterator.next();
+            long arrivalTime = commentComponent.getTimestamp();
             long lifeTime = time - arrivalTime;
             long commentId = commentComponent.getCommentId();
             if(duration  < lifeTime){
-                iter.remove();
-                CommentLikeGraph clg = commentStore.get(commentId);
-                long size = clg.getSizeOfLargestConnectedComponent();
-                String comment = clg.getComment();
+                iterator.remove();
+                CommentLikeGraph commentLikeGraph = commentStore.get(commentId);
+                long size = commentLikeGraph.getSizeOfLargestConnectedComponent();
+                String comment = commentLikeGraph.getComment();
                 componentSizeCommentMap.remove(size, comment);
                 commentStore.remove(commentId);
             }
@@ -88,11 +83,11 @@ public class CommentStore {
         try {
             if (hasKLargestCommentsChanged()) {
                 builder.setLength(0);
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-                df.setTimeZone(TimeZone.getTimeZone("GMT"));
-                String fmm = df.format(new java.util.Date(tsTriggeredChange));
-                builder.append(fmm);
-                for (String print : previousKcomments) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                String formattedDate = dateFormat.format(new java.util.Date(timestampTriggeredChange));
+                builder.append(formattedDate);
+                for (String print : previousKComments) {
                     builder.append(delimiter).append(print);
                 }
                 builder.append("\n");
@@ -133,7 +128,7 @@ public class CommentStore {
      */
     private boolean hasKLargestCommentsChanged()
     {
-        boolean flagChange = false;
+        boolean changeFlag = false;
         kComments = new String[k];
         if (componentSizeCommentMap != null) {
             int limit = (k <= componentSizeCommentMap.size() ? k : componentSizeCommentMap.size());
@@ -141,10 +136,8 @@ public class CommentStore {
 
             for (String comment: componentSizeCommentMap.values()){
                 kComments[i] = comment;
-                if (previousKcomments == null) {
-                    flagChange = true;
-                } else if (!(kComments[i].equals(previousKcomments[i]))) {
-                    flagChange = true;
+                if (previousKComments == null || !(kComments[i].equals(previousKComments[i]))) {
+                    changeFlag = true;
                 }
                 i++;
                 if (i == limit){
@@ -156,38 +149,37 @@ public class CommentStore {
                     kComments[j] = "-";
                 }
             }
-
-            if (flagChange) {
-                previousKcomments = kComments;
+            if (changeFlag) {
+                previousKComments = kComments;
             }
         }
-        return flagChange;
+        return changeFlag;
     }
 
     /**
      * Registers a comment in the comment store
      *
-     * @param commentID the comment id
-     * @param ts the arrival time of the comment
+     * @param commentId the comment id
+     * @param timestamp the arrival time of the comment
      * @param comment the comment string
      */
-    public void registerComment(long commentID, long ts, String comment) {
+    public void registerComment(long commentId, long timestamp, String comment) {
 
-        commentStore.put(commentID, new CommentLikeGraph(comment, friendshipGraph));
-        commentComponentlist.add(new CommentComponent(ts, commentID));
+        commentStore.put(commentId, new CommentLikeGraph(comment, friendshipGraph));
+        commentTimeWindow.add(new CommentComponent(timestamp, commentId));
     }
 
 
     /**
      * Registers a like in the comment store
      *
-     * @param userID    the userID
-     * @param commentID the comment id
+     * @param userId    the userID
+     * @param commentId the comment id
      */
-    public void registerLike(long commentID, long userID) {
-        CommentLikeGraph commentLikeGraph = commentStore.get(commentID);
+    public void registerLike(long commentId, long userId) {
+        CommentLikeGraph commentLikeGraph = commentStore.get(commentId);
         if (commentLikeGraph != null) {
-            commentLikeGraph.registerLike(userID, componentSizeCommentMap);
+            commentLikeGraph.registerLike(userId, componentSizeCommentMap);
         }
 
     }
@@ -195,12 +187,12 @@ public class CommentStore {
     /**
      * Handles a new friendship
      *
-     * @param uId1 the userID of friend one
-     * @param uId2 the userID of friend two
+     * @param userOneId the userID of friend one
+     * @param userTwoId the userID of friend two
      */
-    public void handleNewFriendship(long uId1, long uId2) {
+    public void handleNewFriendship(long userOneId, long userTwoId) {
         for (CommentLikeGraph commentLikeGraph : commentStore.values()) {
-            commentLikeGraph.handleNewFriendship(uId1, uId2, componentSizeCommentMap);
+            commentLikeGraph.handleNewFriendship(userOneId, userTwoId, componentSizeCommentMap);
         }
 
     }

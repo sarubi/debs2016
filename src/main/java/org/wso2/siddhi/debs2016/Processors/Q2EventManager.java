@@ -17,21 +17,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
 
-/**
- * Created by bhagya on 3/30/16.
- */
 public class Q2EventManager {
 
     private static final StringBuilder builder = new StringBuilder();
     private Disruptor<DEBSEvent> dataReadDisruptor;
     private RingBuffer dataReadBuffer;
-    private static long startiij_timestamp;
-    private static long endiij_timestamp;
+    private static long startTimestamp;
+    private static long endTimestamp;
     private final Graph friendshipGraph ;
     private final CommentStore commentStore ;
-    private static int count = 0;
-    private static Long latency = 0L;
-    private static Long  numberOfOutputs = 0L;
+    private static int count;
+    private static long latency;
+    private static long  numberOfOutputs;
     private long sequenceNumber;
     public static volatile boolean Q2_COMPLETED = false;
 
@@ -62,8 +59,6 @@ public class Q2EventManager {
     public void run() {
         int bufferSize = 512;
         dataReadDisruptor = new Disruptor<>(DEBSEvent::new, bufferSize, Executors.newFixedThreadPool(1), ProducerType.SINGLE, new SleepingWaitStrategy());
-
-
         DEBSEventHandler debsEventHandler = new DEBSEventHandler();
         dataReadDisruptor.handleEventsWith(debsEventHandler);
         dataReadBuffer = dataReadDisruptor.start();
@@ -92,10 +87,9 @@ public class Q2EventManager {
     /**
      * Writes the output to the file
      */
-    public static void outputwritter() {
-        try {
-            File performance = new File("performance.txt");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
+    public static void writeOutput() {
+        File performance = new File("performance.txt");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true))) {
             String result = builder.toString();
             writer.write(result);
             writer.close();
@@ -116,10 +110,10 @@ public class Q2EventManager {
         try {
             commentStore.destroy();
             builder.setLength(0);
-            long timeDifference = endiij_timestamp - startiij_timestamp;
+            long timeDifference = endTimestamp - startTimestamp;
             Date dNow = new Date();
-            SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("Query 2 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+            System.out.println("Query 2 completed .....at : " + dNow.getTime() + "--" + simpleDateFormat.format(dNow));
             System.out.println("Event count : " + count);
             String timeDifferenceString = Float.toString(((float) timeDifference /1000)) + "000000";
             System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
@@ -143,8 +137,8 @@ public class Q2EventManager {
             Q2EventManager.Q2_COMPLETED = true;
             if(Q1EventManager.Q1_COMPLETED)
             {
-                Q1EventManager.outputwriter();
-                outputwritter();
+                Q1EventManager.writeOutput();
+                writeOutput();
                 System.exit(0);
             }
         }
@@ -163,43 +157,43 @@ public class Q2EventManager {
 
                 Object [] objects = debsEvent.getObjectArray();
 
-                long ts = (Long) objects[1];
+                long logicalTimestamp = (Long) objects[1];
                 //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
                 int streamType = (Integer) objects[8];
-                commentStore.cleanCommentStore(ts);
+                commentStore.cleanCommentStore(logicalTimestamp);
                 count++;
 
                 switch (streamType) {
                     case Constants.COMMENTS:
-                        long comment_id = (Long) objects[3];
+                        long commentId = (Long) objects[3];
                         String comment = (String) objects[4];
-                        commentStore.registerComment(comment_id, ts, comment);
+                        commentStore.registerComment(commentId, logicalTimestamp, comment);
                         break;
                     case Constants.FRIENDSHIPS:
-                        if (ts == -2){
+                        if (logicalTimestamp == -2){
                             count--;
                             showFinalStatistics();
                             commentStore.destroy();
                             break;
-                        }else if (ts == -1) {
+                        }else if (logicalTimestamp == -1) {
                             count--;
-                            startiij_timestamp = debsEvent.getSystemArrivalTime();
+                            startTimestamp = debsEvent.getSystemArrivalTime();
                             break;
                         }else{
-                            long user_id_1 = (Long) objects[2];
-                            long friendship_user_id_2 = (Long) objects[3];
-                            friendshipGraph.addEdge(user_id_1, friendship_user_id_2);
-                            commentStore.handleNewFriendship(user_id_1, friendship_user_id_2);
+                            long userOneId = (Long) objects[2];
+                            long userTwoId = (Long) objects[3];
+                            friendshipGraph.addEdge(userOneId, userTwoId);
+                            commentStore.handleNewFriendship(userOneId, userTwoId);
                             break;
                         }
                     case Constants.LIKES:
-                        long user_id_1 = (Long) objects[2];
-                        long like_comment_id = (Long) objects[3];
-                        commentStore.registerLike(like_comment_id, user_id_1);
+                        long userId = (Long) objects[2];
+                        long likeCommentId = (Long) objects[3];
+                        commentStore.registerLike(likeCommentId, userId);
                         break;
                 }
 
-                if (ts != -2 && ts != -1){
+                if (logicalTimestamp != -2 && logicalTimestamp != -1){
                     Long endTime = commentStore.computeKLargestComments("," ,false, true);
 
                     if (endTime != -1L){
@@ -207,7 +201,7 @@ public class Q2EventManager {
                         numberOfOutputs++;
                     }
 
-                    endiij_timestamp = System.currentTimeMillis();
+                    endTimestamp = System.currentTimeMillis();
                 }
 
             }catch (Exception e)

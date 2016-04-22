@@ -6,15 +6,10 @@ import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- *
- * The event sender for query 1
- *
- */
 public class OrderedEventSenderThreadQ1 extends Thread {
 
     private final LinkedBlockingQueue<Object[]>[] eventBufferList;
-    private final Q1EventManager manager = new Q1EventManager();
+    private final Q1EventManager manager;
 
     /**
      * The constructor
@@ -24,6 +19,7 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[]) {
         super("Event Sender Query 1");
         this.eventBufferList = eventBuffer;
+        manager = new Q1EventManager();
         manager.run();
     }
 
@@ -31,9 +27,9 @@ public class OrderedEventSenderThreadQ1 extends Thread {
     public void run() {
         Object[] commentEvent = null;
         Object[] postEvent = null;
-        long cTime ;
+        long systemCurrentTime;
         boolean firstEvent = true;
-        int flag = Constants.NOEVENT;
+        int flag = Constants.NO_EVENT;
         boolean postLastEventArrived = false;
         boolean commentsLastEventArrived = false;
         while (true) {
@@ -51,17 +47,16 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             0L,
                             Constants.POSTS
                     };
-                    cTime = System.currentTimeMillis();
+                    systemCurrentTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(firstPostEvent);
-                    event.setSystemArrivalTime(cTime);
+                    event.setSystemArrivalTime(systemCurrentTime);
                     manager.publish();
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
                     firstEvent = false;
                 }
 
                 try {
-
                     if (flag == Constants.POSTS) {
                         if(!postLastEventArrived) {
                             postEvent = eventBufferList[Constants.POSTS].take();
@@ -107,36 +102,36 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                     ex.printStackTrace();
                 }
 
-                long tsComment;
-                long tsPost;
+                long timestampComment;
+                long timestampPost;
 
                 if (commentEvent == null) {
-                    tsComment = Long.MAX_VALUE;
+                    timestampComment = Long.MAX_VALUE;
                 } else {
-                    tsComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                    timestampComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
                 }
 
                 if (postEvent == null) {
-                    tsPost = Long.MAX_VALUE;
+                    timestampPost = Long.MAX_VALUE;
                 } else {
-                    tsPost = (Long) postEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                    timestampPost = (Long) postEvent[Constants.EVENT_TIMESTAMP_FIELD];
                 }
 
-                if (tsComment < tsPost && tsComment != Long.MAX_VALUE) {
+                if (timestampComment < timestampPost && timestampComment != Long.MAX_VALUE) {
 
-                    cTime = System.currentTimeMillis();
+                    systemCurrentTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(commentEvent);
-                    event.setSystemArrivalTime(cTime);
+                    event.setSystemArrivalTime(systemCurrentTime);
                     manager.publish();
                     flag = Constants.COMMENTS;
-                } else if (tsPost != Long.MAX_VALUE) {
+                } else if (timestampPost != Long.MAX_VALUE) {
 
-                    cTime = System.currentTimeMillis();
+                    systemCurrentTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(postEvent);
-                    event.setSystemArrivalTime(cTime);
-                     manager.publish();
+                    event.setSystemArrivalTime(systemCurrentTime);
+                    manager.publish();
                     flag = Constants.POSTS;
                 }
 
@@ -154,10 +149,10 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             0L,
                             Constants.POSTS
                     };
-                    cTime = System.currentTimeMillis();
+                    systemCurrentTime = System.currentTimeMillis();
                     DEBSEvent event = manager.getNextDebsEvent();
                     event.setObjectArray(finalPostEvent);
-                    event.setSystemArrivalTime(cTime);
+                    event.setSystemArrivalTime(systemCurrentTime);
                     manager.publish();
                     break;
                 }

@@ -9,22 +9,19 @@ import org.wso2.siddhi.debs2016.post.PostStore;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by anoukh on 3/29/16.
- */
 public class TimeWindow {
 
 
-    private final LinkedBlockingQueue<CommentPostComponent> oneDay = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> twoDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> threeDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> fourDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> fiveDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> sixDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> sevenDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> eightDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> nineDays = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<CommentPostComponent> tenDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> oneDay = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> twoDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> threeDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> fourDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> fiveDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> sixDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> sevenDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> eightDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> nineDays = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<TimeWindowComponent> tenDays = new LinkedBlockingQueue<>();
     private final PostStore postStore;
     private final BoundedSortedMultiMap<Integer, Long> postScoreMap;
     private final CommentPostMap commentPostMap;
@@ -47,12 +44,12 @@ public class TimeWindow {
      * @param post is the post object that received the new comment
      * @param ts is the time of arrival of the new comment
      */
-    public void addComment(Post post, long ts, long commenter_id){
+    public void addComment(Post post, long ts, long commenterId){
         long postId = post.getPostId();
 
-        oneDay.add(new CommentPostComponent(post, ts, commenter_id, false));
+        oneDay.add(new TimeWindowComponent(post, ts, commenterId, false));
         postScoreMap.remove(post.getTotalScore(), postId);
-        post.addComment(ts, commenter_id);
+        post.addComment(ts, commenterId);
         postScoreMap.put(post.getTotalScore(), postId);
     }
 
@@ -62,8 +59,8 @@ public class TimeWindow {
      *
      * @param post the new post
      */
-    public void addNewPost(long ts, Post post){
-        oneDay.add(new CommentPostComponent(post, ts, 0, true));
+    public void addNewPost(long timestamp, Post post){
+        oneDay.add(new TimeWindowComponent(post, timestamp, 0, true));
         postScoreMap.put(10, post.getPostId());
     }
 
@@ -93,35 +90,35 @@ public class TimeWindow {
      * @param queue the window iterator
      * @param queueNumber the window number
      */
-    private boolean process(long ts, LinkedBlockingQueue<CommentPostComponent> queue, LinkedBlockingQueue<CommentPostComponent> nextQueue, int queueNumber) {
+    private boolean process(long ts, LinkedBlockingQueue<TimeWindowComponent> queue, LinkedBlockingQueue<TimeWindowComponent> nextQueue, int queueNumber) {
         try {
-            HashMap<Long, Post> postMap = postStore.getPostList();
-            Iterator<CommentPostComponent> iterator = queue.iterator();
+            HashMap<Long, Post> postMap = postStore.getPostMap();
+            Iterator<TimeWindowComponent> iterator = queue.iterator();
 
-            while (iterator.hasNext()) { //Iterate over Queue
-                CommentPostComponent commentPostObject = iterator.next();
-                long objectArrivalTime = commentPostObject.getTs();
-                if (objectArrivalTime <= (ts - CommentPostMap.DURATION * queueNumber)) {
-                    Post post = commentPostObject.getPost();
+            while (iterator.hasNext()) {
+                TimeWindowComponent timeWindowComponent = iterator.next();
+                long objectArrivalTime = timeWindowComponent.getTimestamp();
+                if (objectArrivalTime <= (ts - (CommentPostMap.DURATION * queueNumber))) {
+                    Post post = timeWindowComponent.getPost();
                     long postID = post.getPostId();
                     int oldScore = post.getTotalScore();
                     postScoreMap.remove(oldScore, postID);
                     post.decrementTotalScore();
                     int newScore = post.getTotalScore();
-                    if (postStore.getPostList().containsKey(postID)) {
-                        boolean isPost = commentPostObject.isPost();
-                        commentPostObject.setExpiringTime(commentPostObject.getExpiringTime() + CommentPostMap.DURATION);
+                    if (postStore.getPostMap().containsKey(postID)) {
+                        boolean isPost = timeWindowComponent.isPost();
+                        timeWindowComponent.setExpiringTime(timeWindowComponent.getExpiringTime() + CommentPostMap.DURATION);
                         if (newScore <= 0) {
                             postMap.remove(postID);
                             commentPostMap.getCommentToPostMap().remove(postID);
-                            Q1EventManager.timeOfEvent = commentPostObject.getExpiringTime();
+                            Q1EventManager.timeOfEvent = timeWindowComponent.getExpiringTime();
                         } else {
                             postScoreMap.put(newScore, postID);
                             if (nextQueue != null) {
-                                nextQueue.add(commentPostObject);
+                                nextQueue.add(timeWindowComponent);
                             } else {
                                 if (!isPost) {
-                                    post.removeCommenter(commentPostObject.getUserID());
+                                    post.removeCommenter(timeWindowComponent.getUserId());
                                 }
                             }
                         }

@@ -1,19 +1,16 @@
 package org.wso2.siddhi.debs2016.comment;
 
-/**
- * Created by bhagya on 3/31/16.
- */
 class CommentComponent {
-    private final long ts;
+    private final long timestamp;
     private final long commentId;
 
     /**
      * Constructor to create commentComponent object for Query2
-     * @param ts is time of arrival of the comment
+     * @param timestamp is time of arrival of the comment
      * @param commentId is the ID of the comment
      */
-    public CommentComponent(long ts, long commentId) {
-        this.ts = ts;
+    public CommentComponent(long timestamp, long commentId) {
+        this.timestamp = timestamp;
         this.commentId = commentId;
     }
 
@@ -27,10 +24,10 @@ class CommentComponent {
 
     /**
      * Get the time of arrival of the comment
-     * @return ts
+     * @return timestamp
      */
-    public long getTs() {
-        return ts;
+    public long getTimestamp() {
+        return timestamp;
     }
 
 }

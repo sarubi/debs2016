@@ -7,7 +7,6 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
@@ -39,25 +38,24 @@ public class DataLoaderThread extends Thread {
     }
 
     public void run() {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024);
-            String line = br.readLine();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName), 10 * 1024 * 1024)){
+            String line = bufferedReader.readLine();
             Object[] eventData;
             String user;
             while (line != null) {
-                Iterator<String> dataStrIterator = splitter.split(line).iterator();
+                Iterator<String> dataStreamIterator = splitter.split(line).iterator();
                 switch(fileType) {
                     case POSTS:
-                        String postsTimeStamp = dataStrIterator.next();
-                        if (postsTimeStamp.equals("")){
+                        String postsTimeStamp = dataStreamIterator.next();
+                        if (("").equals(postsTimeStamp)){
                             break;
                         }
-                        DateTime dt = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
-                        long postsTimeStampLong = dt.getMillis();
-                        long postID = Long.parseLong(dataStrIterator.next());
-                        long userID = Long.parseLong(dataStrIterator.next());
-                        String post = dataStrIterator.next();
-                        user = dataStrIterator.next();
+                        DateTime postDateTime = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(postsTimeStamp);
+                        long postsTimeStampLong = postDateTime.getMillis();
+                        long postID = Long.parseLong(dataStreamIterator.next());
+                        long userID = Long.parseLong(dataStreamIterator.next());
+                        String post = dataStreamIterator.next();
+                        user = dataStreamIterator.next();
                         eventData = new Object[]{
                                 0L,
                                 postsTimeStampLong,
@@ -73,29 +71,29 @@ public class DataLoaderThread extends Thread {
 
                         break;
                     case COMMENTS:
-                        String commentTimeStamp = dataStrIterator.next();
-                        if (commentTimeStamp.equals("")){
+                        String commentTimeStamp = dataStreamIterator.next();
+                        if (("").equals(commentTimeStamp)){
                             break;
                         }
-                        DateTime dt2 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(commentTimeStamp);
-                        long commentTimeStampLong = dt2.getMillis();
-                        long commentID = Long.parseLong(dataStrIterator.next());
-                        userID = Long.parseLong(dataStrIterator.next());
-                        String comment = dataStrIterator.next();
-                        user = dataStrIterator.next();
-                        String commentReplied = dataStrIterator.next();
+                        DateTime commentDateTime = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(commentTimeStamp);
+                        long commentTimeStampLong = commentDateTime.getMillis();
+                        long commentID = Long.parseLong(dataStreamIterator.next());
+                        userID = Long.parseLong(dataStreamIterator.next());
+                        String comment = dataStreamIterator.next();
+                        user = dataStreamIterator.next();
+                        String commentReplied = dataStreamIterator.next();
 
-                        if(commentReplied.equals("")){
+                        if(("").equals(commentReplied)){
                             commentReplied = MINUS_ONE;
                         }
 
-                        long comment_replied = Long.parseLong(commentReplied);
-                        String postCommented = dataStrIterator.next();
+                        long commentRepliedId = Long.parseLong(commentReplied);
+                        String postCommented = dataStreamIterator.next();
 
-                        if(postCommented.equals("")){
+                        if(("").equals(postCommented)){
                             postCommented = MINUS_ONE;
                         }
-                        long post_commented = Long.parseLong(postCommented);
+                        long postCommentedId = Long.parseLong(postCommented);
                         eventData = new Object[]{
                                 0L,
                                 commentTimeStampLong,
@@ -103,22 +101,22 @@ public class DataLoaderThread extends Thread {
                                 commentID,
                                 comment,
                                 user,
-                                comment_replied,
-                                post_commented,
+                                commentRepliedId,
+                                postCommentedId,
                                 Constants.COMMENTS
                         };
                         eventBufferList.put(eventData);
 
                         break;
                     case FRIENDSHIPS:
-                        String friendshipsTimeStamp = dataStrIterator.next();
-                        if (friendshipsTimeStamp.equals("")){
+                        String friendshipsTimeStamp = dataStreamIterator.next();
+                        if (("").equals(friendshipsTimeStamp)){
                             break;
                         }
-                        DateTime dt3 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
-                        long  friendshipTimeStampLong = dt3.getMillis();
-                        long user1ID = Long.parseLong(dataStrIterator.next());
-                        long user2ID = Long.parseLong(dataStrIterator.next());
+                        DateTime friendshipDateTime = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(friendshipsTimeStamp);
+                        long  friendshipTimeStampLong = friendshipDateTime.getMillis();
+                        long user1ID = Long.parseLong(dataStreamIterator.next());
+                        long user2ID = Long.parseLong(dataStreamIterator.next());
                         eventData = new Object[]{
                                 0L,
                                 friendshipTimeStampLong,
@@ -133,14 +131,14 @@ public class DataLoaderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                     case LIKES:
-                        String likeTimeStamp = dataStrIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
-                        if (likeTimeStamp.equals("")){
+                        String likeTimeStamp = dataStreamIterator.next(); //e.g., 2010-02-09T04:05:20.777+0000
+                        if (("").equals(likeTimeStamp)){
                             break;
                         }
-                        DateTime dt4 = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(likeTimeStamp);
-                        long  likeTimeStampLong = dt4.getMillis();
-                        userID = Long.parseLong(dataStrIterator.next());
-                        commentID = Long.parseLong(dataStrIterator.next());
+                        DateTime likeDateTime = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC).parseDateTime(likeTimeStamp);
+                        long  likeTimeStampLong = likeDateTime.getMillis();
+                        userID = Long.parseLong(dataStreamIterator.next());
+                        commentID = Long.parseLong(dataStreamIterator.next());
                         eventData = new Object[]{
                                 0L,
                                 likeTimeStampLong,
@@ -155,21 +153,19 @@ public class DataLoaderThread extends Thread {
                         eventBufferList.put(eventData);
                         break;
                 }
-				line = br.readLine();
+				line = bufferedReader.readLine();
             }
 
             Long postsTimeStampLong = -1L;
             Long postID = -1L;
             Long userID = -1L;
-            String post = "";
-            user = "";
             eventData = new Object[]{
                     -1L,
                     postsTimeStampLong,
                     postID,
                     userID,
-                    post,
-                    user,
+                    0L,
+                    0L,
                     0L,
                     0L,
                     Constants.POSTS

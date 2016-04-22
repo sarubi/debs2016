@@ -1,9 +1,5 @@
 package org.wso2.siddhi.debs2016.query;
 
-
-/**
- * Created by anoukh on 3/16/16.
- */
 class Run {
 
     public static void main(String[] args) {

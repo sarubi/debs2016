@@ -4,9 +4,6 @@ import org.wso2.siddhi.debs2016.graph.Graph;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by bhagya on 3/11/16.
- */
 public class CommentStoreTest {
     @Test
     public void testUpdateCommentStoreData1(){
@@ -102,8 +99,6 @@ public class CommentStoreTest {
         theStore.handleNewFriendship(8,100);
         theStore.handleNewFriendship(100,105);
         theStore.handleNewFriendship(8,110);
-//        theStore.handleNewFriendship(200,24);
         theStore.computeKLargestComments(",", false, false);
-//        System.out.println(Arrays.toString(theStore.getKLargestComments(8)));
     }
 }

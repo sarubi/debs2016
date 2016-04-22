@@ -2,12 +2,9 @@ package org.wso2.siddhi.debs2016.post;
 
 import java.util.HashMap;
 
-/**
- * Created by malithjayasinghe on 3/25/16.
- */
 public class CommentPostMap {
 
-    public static final long DURATION =  86400000L;
+    public static final long DURATION = 86400000L;
     private final HashMap<Long, Long> commentToPostMap = new HashMap<>(5000);
 
     /**

@@ -2,9 +2,6 @@ package org.wso2.siddhi.debs2016.post;
 
 import java.util.*;
 
-/**
- * Created by malithjayasinghe on 3/25/16.
- */
 public class Post {
 
     private final long arrivalTime;
@@ -17,10 +14,10 @@ public class Post {
 
     /**
      * Remove a commenter when comment score reaches zero
-     * @param userID is the ID of the user whose comment has been expired
+     * @param userId is the ID of the user whose comment has been expired
      */
-    public void removeCommenter(long userID){
-        commenters.remove(userID);
+    public void removeCommenter(long userId){
+        commenters.remove(userId);
     }
 
 
@@ -60,7 +57,7 @@ public class Post {
      * Decrement total score by one
      */
     public void decrementTotalScore(){
-        totalScore = totalScore - 1;
+        totalScore -= 1;
     }
 
 
@@ -73,7 +70,7 @@ public class Post {
     {
         commenters.add(userID);
         latestCommentTime = arrivalTime;
-        totalScore = totalScore + 10;
+        totalScore += 10;
     }
 
 

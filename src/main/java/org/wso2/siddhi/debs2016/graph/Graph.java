@@ -2,10 +2,6 @@ package org.wso2.siddhi.debs2016.graph;
 
 import java.util.*;
 
-/**
- * Create New Graph
- * Created by anoukh on 3/7/16.
- */
 public class Graph {
 
     private final HashMap<Long, List<Long>> graph = new HashMap<>();
@@ -32,27 +28,27 @@ public class Graph {
     /**
      * Adds an edge to the graph
      *
-     * @param uId1 user id 1
-     * @param uId2 user id 2
+     * @param userOneId user id 1
+     * @param userTwoId user id 2
      */
 
-    public void addEdge(long uId1, long uId2){
-        addVertex(uId1);
-        graph.get(uId1).add(uId2);
-        addVertex(uId2);
-        graph.get(uId2).add(uId1);
+    public void addEdge(long userOneId, long userTwoId){
+        addVertex(userOneId);
+        graph.get(userOneId).add(userTwoId);
+        addVertex(userTwoId);
+        graph.get(userTwoId).add(userOneId);
     }
 
 
     /**
      * Create new vertex if vertex not already present
      *
-     * @param uId the user id
+     * @param userId the user id
      *
      */
-    public void addVertex(long uId){
-        if (!hasVertex(uId)){
-            graph.put(uId, new ArrayList<>());
+    public void addVertex(long userId){
+        if (!hasVertex(userId)){
+            graph.put(userId, new ArrayList<>());
         }
     }
 
@@ -82,24 +78,24 @@ public class Graph {
     /**
      * Check if an edge is present in the graph
      *
-     * @param uId1 the vertex 1
-     * @param uId2 the vertex 2
+     * @param userOneId the vertex 1
+     * @param userTwoId the vertex 2
      * @return true if edge is found else false
      */
-    public boolean hasEdge(long uId1, long uId2){
-        List<Long> adjacentVertices = graph.get(uId1);
-        return adjacentVertices != null && adjacentVertices.contains(uId2);
+    public boolean hasEdge(long userOneId, long userTwoId){
+        List<Long> adjacentVertices = graph.get(userOneId);
+        return adjacentVertices != null && adjacentVertices.contains(userTwoId);
     }
 
 
     /**
      * Check if vertex is present in the graph
      *
-     * @param uId the vertex
+     * @param userId the vertex
      * @return true if vertex is found else false
      */
-    public boolean hasVertex(long uId){
-        return graph.containsKey(uId);
+    public boolean hasVertex(long userId){
+        return graph.containsKey(userId);
     }
 
 
@@ -130,25 +126,24 @@ public class Graph {
             pegasusMap.put(key, i);
             i++;
         }
-
-            int changes = 1;
-            while(changes != 0){
-                changes = 0;
+            boolean changes;
+            do{
+                changes = false;
             for(Long userId: pegasusMap.keySet()) {
                 for (Long referUserId: pegasusMap.keySet()) {
                     if (hasEdge(userId, referUserId)) {
 
                         if (pegasusMap.get(userId) > pegasusMap.get(referUserId)) {
                             pegasusMap.replace(userId, pegasusMap.get(referUserId));
-                            changes++;
+                            changes = true;
                         } else if (pegasusMap.get(userId) < pegasusMap.get(referUserId)) {
                             pegasusMap.replace(referUserId, pegasusMap.get(userId));
-                            changes++;
+                            changes = true;
                         }
                     }
                 }
             }
-        }
+        }while(changes);
         return calculateLargestComponent(pegasusMap);
     }
 
@@ -162,7 +157,7 @@ public class Graph {
         for(Long nodeId: pegasusMap.values()){
             int count = 0;
             for(Long referNodeId: pegasusMap.values()){
-                if (nodeId == referNodeId){
+                if (nodeId.equals(referNodeId)){
                     count++;
                 }
             }
