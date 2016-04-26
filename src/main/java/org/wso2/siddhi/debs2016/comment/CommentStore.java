@@ -20,6 +20,7 @@ package org.wso2.siddhi.debs2016.comment;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.wso2.siddhi.debs2016.graph.CommentLikeGraph;
 import org.wso2.siddhi.debs2016.graph.Graph;
 
@@ -31,7 +32,8 @@ import java.util.*;
 public class CommentStore {
 
     private final long duration;
-    private final HashMap<Long, CommentLikeGraph> commentStore = new HashMap<>(); //Comment ID, CLG
+//    private final HashMap<Long, CommentLikeGraph> commentStore = new HashMap<>(); //Comment ID, CLG
+    private LongObjectHashMap<CommentLikeGraph> commentStore = LongObjectHashMap.newMap();
     private String[] previousKComments;
     private long timestampTriggeredChange;
     private final Graph friendshipGraph;

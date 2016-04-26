@@ -140,7 +140,7 @@ public class Graph {
         HashMap<Long, Long> pegasusMap = new HashMap<>();
 
         long i = 0;
-        for (Long key : graph.keySet()) {
+        for (long key : graph.keySet()) {
             pegasusMap.put(key, i);
             i++;
         }

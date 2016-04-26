@@ -44,10 +44,9 @@ class GraphAnalyzer {
 
         int count = 0;
 
-        try {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("/Users/malithjayasinghe/debs2016/DataSet/data" + "/friendships.dat"), 10 * 1024 * 1024)){
             Splitter splitter = Splitter.on('|');
-            BufferedReader br = new BufferedReader(new FileReader("/Users/malithjayasinghe/debs2016/DataSet/data" + "/friendships.dat"), 10 * 1024 * 1024);
-            String line = br.readLine();
+            String line = bufferedReader.readLine();
             while (line != null) {
                 Iterator<String> dataStrIterator = splitter.split(line).iterator();
                 Long user1ID = Long.parseLong(dataStrIterator.next());
@@ -63,7 +62,7 @@ class GraphAnalyzer {
                 }
 
                 addEdge(user1ID, user2ID);
-                line =  br.readLine();
+                line =  bufferedReader.readLine();
                 count++;
 
                 if(count == numberOfEventsToLoad)
@@ -113,8 +112,7 @@ class GraphAnalyzer {
         GraphAnalyzer analyzer = new GraphAnalyzer();
         analyzer.loadFriendshipGraph(true, 1000, 0);
         int degreeDistribution [] = Toolkit.degreeDistribution(analyzer.getFriendshipGraph());
-        try {
-            PrintWriter writer = new PrintWriter("/Users/malithjayasinghe/debs2016/DataSet/data" + "/degreeDistribution.csv", "UTF-8");
+        try (PrintWriter writer = new PrintWriter("/Users/malithjayasinghe/debs2016/DataSet/data" + "/degreeDistribution.csv", "UTF-8")){
 
             int numElements = degreeDistribution.length;
             for(int i = 0; i <numElements; i++) {

@@ -18,6 +18,7 @@
 
 package org.wso2.siddhi.debs2016.comment;
 
+import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
@@ -110,7 +111,7 @@ public class TimeWindow {
      */
     private boolean process(long ts, LinkedBlockingQueue<TimeWindowComponent> queue, LinkedBlockingQueue<TimeWindowComponent> nextQueue, int queueNumber) {
         try {
-            HashMap<Long, Post> postMap = postStore.getPostMap();
+            LongObjectHashMap<Post> postMap = postStore.getPostMap();
             Iterator<TimeWindowComponent> iterator = queue.iterator();
 
             while (iterator.hasNext()) {

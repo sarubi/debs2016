@@ -19,6 +19,7 @@
 package org.wso2.siddhi.debs2016.post;
 
 import com.google.common.collect.*;
+import com.gs.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
 
 import java.io.BufferedWriter;
@@ -31,7 +32,8 @@ import java.util.*;
 
 public class PostStore {
 
-    private final HashMap<Long, Post> postMap = new HashMap<>(5000); //postID, PostObject
+//    private final HashMap<Long, Post> postMap = new HashMap<>(5000); //postID, PostObject
+    private LongObjectHashMap<Post> postMap = LongObjectHashMap.newMap();
     private final BoundedSortedMultiMap<Integer, Long> postScoreMap = new BoundedSortedMultiMap<>(3, true, true, true);
     private final Long[] previousOrderedTopThree = new Long[3];
     private final StringBuilder builder=new StringBuilder();
@@ -43,7 +45,7 @@ public class PostStore {
      *
      * @return the post list
      */
-    public HashMap<Long, Post> getPostMap()
+    public LongObjectHashMap<Post> getPostMap()
     {
         return postMap;
     }
