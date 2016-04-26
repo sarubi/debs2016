@@ -41,7 +41,10 @@ Run `mvn clean install`
 
 **How to Run**
 
-After building, you can just run the JAR file. Use the `test.sh` helper script to run a system for a test data set
+After building, you can just run the JAR file. 
+Use `testCase1.sh` through `testCase7.sh` helper scripts to run the system for several given test data sets
+
+Example: `./testCase1.sh`
 
 Use the `run.sh` helper script to run the system by giving the data set as arguments
 
