@@ -18,8 +18,7 @@
 
 package org.wso2.siddhi.debs2016.sender;
 
-import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
-import org.wso2.siddhi.debs2016.Processors.Q2EventManager;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.text.SimpleDateFormat;
@@ -29,19 +28,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class OrderedEventSenderThreadQ2 extends Thread {
 
     private final LinkedBlockingQueue<Object[]>[] eventBufferList;
-    private final Q2EventManager manager;
-
+    private InputHandler inputHandler;
+    public boolean doneFlag = false;
+    int k;
+    long duration;
 
     /**
      * The constructor
      *
      * @param eventBuffer the event buffer array
      */
-    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer [], int k, long d) {
-        super("Event Sender");
+
+    public OrderedEventSenderThreadQ2(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler, int k, long duration) {
+        super("Event Sender Query 2");
         this.eventBufferList = eventBuffer;
-        manager = new Q2EventManager(k, d*1000);
-        manager.run();
+        this.inputHandler = inputHandler;
+        this.k = k;
+        this.duration = duration;
     }
 
     /**
@@ -61,165 +64,155 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         boolean commentsLastEventArrived = false;
         boolean likesLastEventArrived = false;
 
-        while(true){
-            if(firstEvent){
-                Object[] finalFriendshipEvent = new Object[]{
-                        0L,
-                        -1L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0,
-                };
-                systemCurrentTime = System.currentTimeMillis();
-                DEBSEvent event = manager.getNextDebsEvent();
-                event.setObjectArray(finalFriendshipEvent);
-                event.setSystemArrivalTime(systemCurrentTime);
-                manager.publish();
-                Date startDateTime = new Date();
-                startTime = startDateTime.getTime();
-                SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd.hh:mm:ss-a-zzz");
-                System.out.println("Starting the experiment at : " + startTime + "--" + ft.format(startDateTime));
-                firstEvent = false;
-            }
-
-            try{
-                if (flag == Constants.FRIENDSHIPS) {
-                    if(!friendshipLastEventArrived)
-                    {
-                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
-                        long lastEvent = (Long) friendshipEvent[0];
-                        if (lastEvent == -1L)
-                        {
-                            friendshipEvent = null;
-                            friendshipLastEventArrived = true;
-                        }
-                    }
-                }else if (flag == 1){
-                    if(!commentsLastEventArrived) {
-                        commentEvent = eventBufferList[Constants.COMMENTS].take();
-                        long lastEvent = (Long) commentEvent[0];
-                        if (lastEvent == -1L) {
-
-                            commentEvent = null;
-                            commentsLastEventArrived = true;
-                        }
-                    }
-                }else if (flag == 2) {
-                    if (!likesLastEventArrived) {
-                        likeEvent = eventBufferList[Constants.LIKES].take();
-                        long lastEvent = (Long) likeEvent[0];
-
-                        if (lastEvent == -1L) {
-                            likeEvent = null;
-                            likesLastEventArrived = true;
-                         }
-                    }
-                }else{
-
-                    if(!friendshipLastEventArrived) {
-                        friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
-                        long lastEvent = (Long) friendshipEvent[0];
-                        if (lastEvent == -1L)
-                        {
-                            friendshipEvent = null;
-                            friendshipLastEventArrived = true;
-                        }
-                    }
-                    if(!commentsLastEventArrived) {
-                        commentEvent = eventBufferList[Constants.COMMENTS].take();
-                        long lastEvent = (Long) commentEvent[0];
-                        if (lastEvent == -1L) {
-
-                            commentEvent = null;
-                            commentsLastEventArrived = true;
-                        }
-
-                    }
-                    if(!likesLastEventArrived) {
-                        likeEvent = eventBufferList[Constants.LIKES].take();
-                        long lastEvent = (Long) likeEvent[0];
-                        if (lastEvent == -1L) {
-                            likeEvent = null;
-                            likesLastEventArrived = true;
-                        }
-                    }
+        while (true) {
+            try {
+                if (firstEvent) {
+                    Object[] finalFriendshipEvent = new Object[]{
+                            0L,
+                            -1L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            duration,
+                            k,
+                    };
+                    systemCurrentTime = System.currentTimeMillis();
+                    finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;
+                    inputHandler.send(systemCurrentTime, finalFriendshipEvent);
+                    Date startDateTime = new Date();
+                    startTime = startDateTime.getTime();
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
+                    System.out.println("Starting the experiment at : " + startTime + "--" + ft.format(startDateTime));
+                    firstEvent = false;
                 }
 
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+                try {
+                    if (flag == Constants.FRIENDSHIPS) {
+                        if (!friendshipLastEventArrived) {
+                            friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+                            long lastEvent = (Long) friendshipEvent[0];
+                            if (lastEvent == -1L) {
+                                friendshipEvent = null;
+                                friendshipLastEventArrived = true;
+                            }
+                        }
+                    } else if (flag == 1) {
+                        if (!commentsLastEventArrived) {
+                            commentEvent = eventBufferList[Constants.COMMENTS].take();
+                            long lastEvent = (Long) commentEvent[0];
+                            if (lastEvent == -1L) {
 
-            long timestampFriendship;
-            long timestampComment;
-            long timestampLike;
+                                commentEvent = null;
+                                commentsLastEventArrived = true;
+                            }
+                        }
+                    } else if (flag == 2) {
+                        if (!likesLastEventArrived) {
+                            likeEvent = eventBufferList[Constants.LIKES].take();
+                            long lastEvent = (Long) likeEvent[0];
 
-            if (friendshipEvent == null){
-                timestampFriendship = Long.MAX_VALUE;
-            }else{
-                timestampFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
-            }
+                            if (lastEvent == -1L) {
+                                likeEvent = null;
+                                likesLastEventArrived = true;
+                            }
+                        }
+                    } else {
 
-            if (commentEvent == null){
-                timestampComment = Long.MAX_VALUE;
-            }else{
-                timestampComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
-            }
+                        if (!friendshipLastEventArrived) {
+                            friendshipEvent = eventBufferList[Constants.FRIENDSHIPS].take();
+                            long lastEvent = (Long) friendshipEvent[0];
+                            if (lastEvent == -1L) {
+                                friendshipEvent = null;
+                                friendshipLastEventArrived = true;
+                            }
+                        }
+                        if (!commentsLastEventArrived) {
+                            commentEvent = eventBufferList[Constants.COMMENTS].take();
+                            long lastEvent = (Long) commentEvent[0];
+                            if (lastEvent == -1L) {
 
-            if (likeEvent == null){
-                timestampLike = Long.MAX_VALUE;
-            }else{
-                timestampLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
-            }
+                                commentEvent = null;
+                                commentsLastEventArrived = true;
+                            }
 
-            if (timestampFriendship <= timestampComment && timestampFriendship <= timestampLike && timestampFriendship != Long.MAX_VALUE){
-                systemCurrentTime = System.currentTimeMillis();
-                DEBSEvent debsEvent = manager.getNextDebsEvent();
-                debsEvent.setObjectArray(friendshipEvent);
-                debsEvent.setSystemArrivalTime(systemCurrentTime);
-                manager.publish();
-                flag = Constants.FRIENDSHIPS;
-            }else if (timestampComment <= timestampFriendship && timestampComment <= timestampLike && timestampComment != Long.MAX_VALUE){
-                systemCurrentTime = System.currentTimeMillis();
-                DEBSEvent debsEvent = manager.getNextDebsEvent();
-                debsEvent.setObjectArray(commentEvent);
-                debsEvent.setSystemArrivalTime(systemCurrentTime);
-                manager.publish();
-                flag = Constants.COMMENTS;
-            }else if (timestampLike != Long.MAX_VALUE){
-                systemCurrentTime = System.currentTimeMillis();
-                DEBSEvent debsEvent = manager.getNextDebsEvent();
-                debsEvent.setObjectArray(likeEvent);
-                debsEvent.setSystemArrivalTime(systemCurrentTime);
-                manager.publish();
-                flag = Constants.LIKES;
-            }
+                        }
+                        if (!likesLastEventArrived) {
+                            likeEvent = eventBufferList[Constants.LIKES].take();
+                            long lastEvent = (Long) likeEvent[0];
+                            if (lastEvent == -1L) {
+                                likeEvent = null;
+                                likesLastEventArrived = true;
+                            }
+                        }
+                    }
 
-            if (friendshipEvent == null && commentEvent == null && likeEvent == null){
-                systemCurrentTime = System.currentTimeMillis();
-                Object[] finalFriendshipEvent = new Object[]{
-                        0L,
-                        -2L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0L,
-                        0,
-                };
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
-                DEBSEvent debsEvent = manager.getNextDebsEvent();
-                debsEvent.setObjectArray(finalFriendshipEvent);
-                debsEvent.setSystemArrivalTime(systemCurrentTime);
-                manager.publish();
-                manager.getDataReadDisruptor().shutdown();
-                break;
+                long timestampFriendship;
+                long timestampComment;
+                long timestampLike;
+
+                if (friendshipEvent == null) {
+                    timestampFriendship = Long.MAX_VALUE;
+                } else {
+                    timestampFriendship = (Long) friendshipEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+                if (commentEvent == null) {
+                    timestampComment = Long.MAX_VALUE;
+                } else {
+                    timestampComment = (Long) commentEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+                if (likeEvent == null) {
+                    timestampLike = Long.MAX_VALUE;
+                } else {
+                    timestampLike = (Long) likeEvent[Constants.EVENT_TIMESTAMP_FIELD];
+                }
+
+                if (timestampFriendship <= timestampComment && timestampFriendship <= timestampLike && timestampFriendship != Long.MAX_VALUE) {
+                    systemCurrentTime = System.currentTimeMillis();
+                    friendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;
+                    inputHandler.send(systemCurrentTime, friendshipEvent);
+                    flag = Constants.FRIENDSHIPS;
+                } else if (timestampComment <= timestampFriendship && timestampComment <= timestampLike && timestampComment != Long.MAX_VALUE) {
+                    systemCurrentTime = System.currentTimeMillis();
+                    commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime; //This corresponds to the iij_timestamp
+                    inputHandler.send(systemCurrentTime, commentEvent);
+                    flag = Constants.COMMENTS;
+                } else if (timestampLike != Long.MAX_VALUE) {
+                    systemCurrentTime = System.currentTimeMillis();
+                    likeEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime; //This corresponds to the iij_timestamp
+                    inputHandler.send(systemCurrentTime, likeEvent);
+                    flag = Constants.LIKES;
+                }
+
+                if (friendshipEvent == null && commentEvent == null && likeEvent == null) {
+                    systemCurrentTime = System.currentTimeMillis();
+                    Object[] finalFriendshipEvent = new Object[]{
+                            0L,
+                            -2L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0L,
+                            0,
+                    };
+
+                    finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;
+                    inputHandler.send(systemCurrentTime, finalFriendshipEvent);
+                    doneFlag = true;
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-
     }
 }

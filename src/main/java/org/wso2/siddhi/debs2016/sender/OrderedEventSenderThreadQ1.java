@@ -18,27 +18,28 @@
 
 package org.wso2.siddhi.debs2016.sender;
 
-import org.wso2.siddhi.debs2016.Processors.DEBSEvent;
-import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
+import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.util.Constants;
 
+import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class OrderedEventSenderThreadQ1 extends Thread {
 
-    private final LinkedBlockingQueue<Object[]>[] eventBufferList;
-    private final Q1EventManager manager;
+    private LinkedBlockingQueue<Object[]> eventBufferList[];
+    private InputHandler inputHandler;
+    private Date startDateTime;
+    public boolean doneFlag = false;
 
     /**
      * The constructor
      *
      * @param eventBuffer  the event buffer array
      */
-    public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[]) {
+    public OrderedEventSenderThreadQ1(LinkedBlockingQueue<Object[]> eventBuffer[], InputHandler inputHandler) {
         super("Event Sender Query 1");
         this.eventBufferList = eventBuffer;
-        manager = new Q1EventManager();
-        manager.run();
+        this.inputHandler = inputHandler;
     }
 
 
@@ -66,10 +67,8 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             Constants.POSTS
                     };
                     systemCurrentTime = System.currentTimeMillis();
-                    DEBSEvent event = manager.getNextDebsEvent();
-                    event.setObjectArray(firstPostEvent);
-                    event.setSystemArrivalTime(systemCurrentTime);
-                    manager.publish();
+                    firstPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;
+                    inputHandler.send(systemCurrentTime, firstPostEvent);
                     //We print the start and the end times of the experiment even if the performance logging is disabled.
                     firstEvent = false;
                 }
@@ -138,18 +137,14 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                 if (timestampComment < timestampPost && timestampComment != Long.MAX_VALUE) {
 
                     systemCurrentTime = System.currentTimeMillis();
-                    DEBSEvent event = manager.getNextDebsEvent();
-                    event.setObjectArray(commentEvent);
-                    event.setSystemArrivalTime(systemCurrentTime);
-                    manager.publish();
+                    commentEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime; //This corresponds to the iij_timestamp
+                    inputHandler.send(systemCurrentTime, commentEvent);
                     flag = Constants.COMMENTS;
                 } else if (timestampPost != Long.MAX_VALUE) {
 
                     systemCurrentTime = System.currentTimeMillis();
-                    DEBSEvent event = manager.getNextDebsEvent();
-                    event.setObjectArray(postEvent);
-                    event.setSystemArrivalTime(systemCurrentTime);
-                    manager.publish();
+                    postEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime; //This corresponds to the iij_timestamp
+                    inputHandler.send(systemCurrentTime, postEvent);
                     flag = Constants.POSTS;
                 }
 
@@ -168,10 +163,10 @@ public class OrderedEventSenderThreadQ1 extends Thread {
                             Constants.POSTS
                     };
                     systemCurrentTime = System.currentTimeMillis();
-                    DEBSEvent event = manager.getNextDebsEvent();
-                    event.setObjectArray(finalPostEvent);
-                    event.setSystemArrivalTime(systemCurrentTime);
-                    manager.publish();
+                    finalPostEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;
+                    Thread.sleep(1000);//We just sleep for short period so that we can ensure that all the data events have been processed by the ranker properly before we shutdown.
+                    inputHandler.send(systemCurrentTime, finalPostEvent);
+                    doneFlag = true;
                     break;
                 }
             } catch (Exception e) {
