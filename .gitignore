@@ -1,3 +1,6 @@
 debs2016gc.iml
 .idea
 target
+*.jfr
+*.txt
+classes
