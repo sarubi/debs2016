@@ -40,7 +40,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
             long logicalTimestamp = (Long) objects[1];
             //Note that we cannot cast int to enum type. Java enums are classes. Hence we cannot cast them to int.
             int streamType = (Integer) objects[8];
-            commentStore.cleanCommentStore(logicalTimestamp);
+            if (commentStore != null) {
+                commentStore.cleanCommentStore(logicalTimestamp);
+            }
             count++;
 
             switch (streamType) {
@@ -58,8 +60,9 @@ public class RankerQuery2 extends StreamFunctionProcessor {
                     } else if (logicalTimestamp == -1) {
                         count--;
                         startTimestamp = (long) objects[0];
-                        duration = (long) objects[7];
-                        k = (int) objects[8];
+                        duration = (long) objects[6];
+                        k = (Integer) objects[7];
+                        commentStore = new CommentStore(duration, friendshipGraph, k);
                         break;
                     } else {
                         long userOneId = (Long) objects[2];
@@ -104,7 +107,7 @@ public class RankerQuery2 extends StreamFunctionProcessor {
         }
         List<Attribute> attributeList = new ArrayList<Attribute>();
         friendshipGraph = new Graph();
-        commentStore = new CommentStore(duration, friendshipGraph, k);
+        commentStore = null;
         return attributeList;
     }
 

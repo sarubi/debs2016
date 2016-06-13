@@ -44,7 +44,7 @@ public class OrderedEventSenderThreadQ2 extends Thread {
         this.eventBufferList = eventBuffer;
         this.inputHandler = inputHandler;
         this.k = k;
-        this.duration = duration;
+        this.duration = duration * 1000;
     }
 
     /**
@@ -74,9 +74,9 @@ public class OrderedEventSenderThreadQ2 extends Thread {
                             0L,
                             0L,
                             0L,
-                            0L,
                             duration,
                             k,
+                            0,
                     };
                     systemCurrentTime = System.currentTimeMillis();
                     finalFriendshipEvent[Constants.INPUT_INJECTION_TIMESTAMP_FIELD] = systemCurrentTime;

@@ -24,7 +24,6 @@ import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.debs2016.input.DataLoaderThread;
 import org.wso2.siddhi.debs2016.input.FileType;
 import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
-import org.wso2.siddhi.debs2016.util.Constants;
 
 import java.io.File;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -87,28 +86,17 @@ class Query1 {
         System.out.println(inStreamDefinition + query);
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(inStreamDefinition + query);
 
-//        executionPlanRuntime.addCallback("query1OutputStream", new StreamCallback() {
-//
-//            @Override
-//            public void receive(Event[] events) {
-//                //EventPrinter.print(events);
-//
-//            }
-//        });
-
         System.out.println("Incremental data loading is performed.");
 
         LinkedBlockingQueue<Object[]> eventBufferList[] = new LinkedBlockingQueue[2];
         InputHandler inputHandler = executionPlanRuntime.getInputHandler("inStream");
 
 
-        LinkedBlockingQueue<Object[]> eventBufferListPosts = new LinkedBlockingQueue<Object[]>(Constants.EVENT_BUFFER_SIZE);
         //Posts
         DataLoaderThread dataLoaderThreadPosts = new DataLoaderThread(postsFile, FileType.POSTS, BUFFER_LIMIT);
 //        InputHandler inputHandlerPosts = executionPlanRuntime.getInputHandler("postsStream");
 
         //Comments
-        LinkedBlockingQueue<Object[]> eventBufferListComments = new LinkedBlockingQueue<Object[]>();
         DataLoaderThread dataLoaderThreadComments = new DataLoaderThread(commentsFile, FileType.COMMENTS, BUFFER_LIMIT);
 //        InputHandler inputHandlerComments = executionPlanRuntime.getInputHandler("commentsStream");
 
@@ -131,22 +119,6 @@ class Query1 {
         //from here onwards we start sending the events
         orderedEventSenderThread.start();
 
-        //Just make the main thread sleep infinitely
-        //Note that we cannot have an event based mechanism to exit from this infinit loop. It is
-        //because even if the data sending thread has completed its task of sending the data to
-        //the SiddhiManager, the SiddhiManager object may be conducting the processing of the remaining
-        //data. Furthermore, since this is CEP its better have this type of mechanism, rather than
-        //terminating once we are done sending the data to the CEP engine.
-        while (true) {
-            try {
-                Thread.currentThread().sleep(Constants.MAIN_THREAD_SLEEP_TIME);
-                if (orderedEventSenderThread.doneFlag) {
-                    System.exit(0);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 
