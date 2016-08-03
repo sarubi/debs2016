@@ -20,6 +20,7 @@ package org.wso2.siddhi.debs2016.comment;
 
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
 import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
+import org.wso2.siddhi.debs2016.Processors.Q1EventSingle;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
@@ -129,7 +130,7 @@ public class TimeWindow {
                         if (newScore <= 0) {
                             postMap.remove(postID);
                             commentPostMap.getCommentToPostMap().remove(postID);
-                            Q1EventManager.timeOfEvent = timeWindowComponent.getExpiringTime();
+                            Q1EventSingle.timeOfEvent = timeWindowComponent.getExpiringTime();
                         } else {
                             postScoreMap.put(newScore, postID);
                             if (nextQueue != null) {
