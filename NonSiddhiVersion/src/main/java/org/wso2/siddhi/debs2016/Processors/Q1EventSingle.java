@@ -22,17 +22,15 @@ import org.wso2.siddhi.debs2016.comment.TimeWindow;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;
 import org.wso2.siddhi.debs2016.post.PostStore;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
 import org.wso2.siddhi.debs2016.util.Constants;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class Q1EventSingle implements Runnable{
+public class Q1EventSingle implements Runnable {
+
 
     private long startTimestamp;
     private long endTimestamp;
@@ -43,53 +41,58 @@ public class Q1EventSingle implements Runnable{
     private long latency;
     private long numberOfOutputs;
     public static long timeOfEvent;
-    static boolean Q1_COMPLETED  = false;
-    private static final StringBuilder builder = new StringBuilder();
+    private final StringBuilder builder = new StringBuilder();
 
-    private OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1;
+    private LinkedBlockingQueue<Object[]> workloadQueue = new LinkedBlockingQueue<>();
+
+    public static long total_latency = 0;
+    public static long total_outputs = 0;
 
     /**
      * Constructor
      */
-    public Q1EventSingle(OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1){
-        this.orderedEventSenderThreadQ1 = orderedEventSenderThreadQ1;
+    public Q1EventSingle(LinkedBlockingQueue<Object[]> linkedBlockingQueue) {
+        this.workloadQueue = linkedBlockingQueue;
 
         postStore = new PostStore();
         commentPostMap = new CommentPostMap();
         timeWindow = new TimeWindow(postStore, commentPostMap);
     }
 
-
     private long lastTimestamp = 0;
-     private static boolean firstEvent = true;
+    private boolean firstEvent = true;
+
     /**
      * Main Method
      */
     public void run() {
 
+        //Label
+        outerLoop:
         while (true) {
-            Object[] objects;
-            boolean finished = false;
-            if (!firstEvent){
-                objects = orderedEventSenderThreadQ1.getNextEvent();
-            } else {
-                firstEvent = false;
-                objects = new Object[]{
-                        0L,
-                        -1L,
-                        0L,
-                        0L,
-                        "",
-                        "",
-                        0L,
-                        0L,
-                        Constants.POSTS
-                };
-            }
-
             try {
+                Object[] objects;
+                boolean finished = false;
+                if (!firstEvent) {
+                    objects = workloadQueue.take();
+                } else {
+                    firstEvent = false;
+                    //first event
+                    objects = new Object[]{
+                            0L,
+                            -1L,
+                            0L,
+                            0L,
+                            "",
+                            "",
+                            0L,
+                            0L,
+                            Constants.POSTS
+                    };
+                }
 
-                long timestamp = System.currentTimeMillis(); //TODO: Take System Current Time Here
+
+                long timestamp = System.currentTimeMillis();
 
                 endTimestamp = timestamp;
 
@@ -180,8 +183,8 @@ public class Q1EventSingle implements Runnable{
 
                 lastTimestamp = logicalTimestamp;
 
-                if (finished){
-                    break;
+                if (finished) {
+                    break ;
                 }
 
             } catch (Exception e) {
@@ -194,81 +197,61 @@ public class Q1EventSingle implements Runnable{
      * Flush each remaining tuple every 24 hours until the post store ie empty
      *
      * @param timeWindow the time window
-     * @param ts the arrival time of the last event
+     * @param ts         the arrival time of the last event
      */
-    private void flush(TimeWindow timeWindow, long ts)
-    {
-        ts = ts +  CommentPostMap.DURATION/24/60;
+    private void flush(TimeWindow timeWindow, long ts) {
+        ts = ts + CommentPostMap.DURATION / 24 / 60;
         boolean isEmpty = postStore.getPostScoreMap().isEmpty();
         boolean hasChanged;
-        while(!isEmpty) {
+        while (!isEmpty) {
             isEmpty = postStore.getPostScoreMap().isEmpty();
             hasChanged = timeWindow.updateTime(ts);
-            if (hasChanged){
-                long endTime =  postStore.printTopThreeComments(ts, false, true, ",");
+            if (hasChanged) {
+                long endTime = postStore.printTopThreeComments(ts, false, true, ",");
                 latency += (endTime - endTimestamp);
                 numberOfOutputs++;
             }
-            ts = ts +  CommentPostMap.DURATION/24/60;
+            ts = ts + CommentPostMap.DURATION / 24 / 60;
         }
     }
 
     /**
-     * Writes the output to the file
-     */
-    public static void writeOutput() {
-        try {
-            File performance = new File("performance.txt");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(performance, true));
-            String result = builder.toString();
-            writer.write(result);
-            writer.close();
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-    }
-    /**
-     *
      * Print the throughput etc
-     *
      */
-    private void showFinalStatistics()
-    {
-        try{
+    private void showFinalStatistics() {
+        try {
             postStore.destroy();
             builder.setLength(0);
             long timeDifference = endTimestamp - startTimestamp;
             Date dNow = new Date();
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd.hh:mm:ss-a-zzz");
-            System.out.println("Query 1 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
-            System.out.println("Event count : " + count);
-            String timeDifferenceString = Float.toString(((float) timeDifference /1000)) + "000000";
-            System.out.println("Total run time : " + timeDifferenceString.substring(0, 7));
+            System.out.println("\nThread Id : " + Thread.currentThread().getId());
+            System.out.println(Thread.currentThread().getId() + " Query 1 completed .....at : " + dNow.getTime() + "--" + ft.format(dNow));
+            System.out.println(Thread.currentThread().getId() + " Event count : " + count);
+            String timeDifferenceString = Float.toString(((float) timeDifference / 1000)) + "000000";
+            System.out.println(Thread.currentThread().getId() + " Total run time : " + timeDifferenceString.substring(0, 7));
             builder.append(timeDifferenceString.substring(0, 7));
             builder.append(", ");
-            System.out.println("Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
-            System.out.println("Total Latency " + latency);
-            System.out.println("Total Outputs " + numberOfOutputs);
-            if (numberOfOutputs!=0){
-                float temp = ((float)latency/numberOfOutputs)/1000;
+
+            System.out.println(Thread.currentThread().getId() + " Throughput (events/s): " + Math.round((count * 1000.0) / timeDifference));
+            System.out.println(Thread.currentThread().getId() + " Total Latency " + latency);
+            total_latency = total_latency + latency;
+            System.out.println(Thread.currentThread().getId() + " Total Outputs " + numberOfOutputs);
+            total_outputs = total_outputs + numberOfOutputs;
+
+            if (numberOfOutputs != 0) {
+                float temp = ((float) latency / numberOfOutputs) / 1000;
                 BigDecimal averageLatency = new BigDecimal(temp);
                 String latencyString = averageLatency.toPlainString() + "000000";
-                System.out.println("Average Latency " + latencyString.substring(0, 7));
+                System.out.println(Thread.currentThread().getId() + " Average Latency " + latencyString.substring(0, 7));
                 builder.append(latencyString.substring(0, 7));
                 builder.append(", ");
             } else {
                 String latencyString = "000000";
                 builder.append(latencyString);
             }
-        }finally {
-            Q1_COMPLETED = true;
-            if(Q2EventSingle.Q2_COMPLETED){
-                writeOutput();
-                Q2EventSingle.writeOutput();
-                System.exit(0);
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -19,7 +19,6 @@
 package org.wso2.siddhi.debs2016.comment;
 
 import edu.ucla.sspace.util.BoundedSortedMultiMap;
-import org.wso2.siddhi.debs2016.Processors.Q1EventManager;
 import org.wso2.siddhi.debs2016.Processors.Q1EventSingle;
 import org.wso2.siddhi.debs2016.post.CommentPostMap;
 import org.wso2.siddhi.debs2016.post.Post;

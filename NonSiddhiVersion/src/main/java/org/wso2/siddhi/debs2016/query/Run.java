@@ -21,11 +21,33 @@ package org.wso2.siddhi.debs2016.query;
 public class Run {
 
     public static void main(String[] args) {
-        if(args.length != 6){
-            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat, value for k, value for d");
-        }else{
-            Query1.main(args);
-            Query2.main(args);
+        int y = Integer.parseInt(args[7]);
+        int z;
+        int f = Integer.parseInt(args[6]);
+
+        if ((f < 3) && (f > -1) && (y > 1)) {
+            if (args.length == 8) {
+                if (f == 0) {
+                    Query1.main(args);
+                } else if ((f == 1)) {
+                    Query2.main(args);
+                } else if (f == 2) {
+                    Query1.main(args);
+                    Query2.main(args);
+                }
+            } else if (args.length == 9) {
+                z = Integer.parseInt(args[8]);
+                if ((z > 1)) {
+                    Query1.main(args);
+                    Query2.main(args);
+                } else {
+                    System.err.println("Incorrect arguments. Required:  Number of threads should be grater than one");
+                }
+            } else {
+                System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat, value for k, value for d,Flag No , Number of threads > 1");
+            }
+        } else {
+            System.err.println("Incorrect arguments. Required:  Required: Flag No. 0- Query1  1- Query2   2- Query1&Query2 , Number of threads should be grether than one");
         }
     }
 }

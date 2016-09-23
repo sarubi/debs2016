@@ -18,50 +18,38 @@
 
 package org.wso2.siddhi.debs2016.query;
 
-import org.wso2.siddhi.debs2016.Processors.Q2EventSingle;
-import org.wso2.siddhi.debs2016.input.DataLoaderThread;
-import org.wso2.siddhi.debs2016.input.FileType;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ2;
+import org.wso2.siddhi.debs2016.sender.Q2ThreadsWorkLoadDistributed;
 
 import java.io.File;
-import java.util.concurrent.LinkedBlockingQueue;
 
 class Query2 {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         File q2 = new File("q2.txt");
         q2.delete();
 
-        if(args.length == 0){
-            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
+        if (args.length == 0) {
+            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat,  Number of threads");
             return;
         }
 
         new Query2(args);
     }
 
-    private Query2(String[] args){
-
+    private Query2(String[] args) {
         String friendshipFile = args[0];
         String commentsFile = args[2];
         String likesFile = args[3];
         int k = Integer.parseInt(args[4]);
         long d = Long.parseLong(args[5]);
+        int noOfThreads;
+        noOfThreads = Integer.parseInt(args[7]);
+        if (args.length == 9) {
+            noOfThreads = Integer.parseInt(args[8]);
+        }
 
-        OrderedEventSenderThreadQ2 orderedEventSenderThreadQ2 = new OrderedEventSenderThreadQ2(friendshipFile, commentsFile, likesFile);
-
-        Thread q2 = new Thread(new Q2EventSingle(orderedEventSenderThreadQ2, d*1000, k));
-        q2.start();
-    }
-
-    /**
-     * Starts the threads related to Query1
-     */
-    private void run(){
-//        dataLoaderThreadFriendships.start();
-//        dataLoaderThreadComments.start();
-//        dataLoaderThreadLikes.start();
-//        orderedEventSenderThreadQ2.start();
+        Q2ThreadsWorkLoadDistributed q2ThreadsWorkLoadDistributed = new Q2ThreadsWorkLoadDistributed(friendshipFile, commentsFile, likesFile, d, k, noOfThreads);
+        q2ThreadsWorkLoadDistributed.startProcess();
     }
 }

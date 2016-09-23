@@ -18,10 +18,11 @@
 
 package org.wso2.siddhi.debs2016.query;
 
-import org.wso2.siddhi.debs2016.Processors.Q1EventSingle;
-import org.wso2.siddhi.debs2016.sender.OrderedEventSenderThreadQ1;
+
+import org.wso2.siddhi.debs2016.sender.Q1ThreadsWorkLoadDistributed;
 
 import java.io.File;
+
 
 class Query1 {
 
@@ -39,7 +40,7 @@ class Query1 {
         performance.delete();
 
         if (args.length == 0) {
-            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat");
+            System.err.println("Incorrect arguments. Required: <Path to>friendships.dat, <Path to>posts.dat, <Path to>comments.dat, <Path to>likes.dat, Number of threads");
             return;
         }
         new Query1(args);
@@ -53,10 +54,11 @@ class Query1 {
     private Query1(String[] args) {
         String postsFile = args[1];
         String commentsFile = args[2];
+        String noOfThreads = args[7];
+        int num = Integer.parseInt(noOfThreads);
 
-        OrderedEventSenderThreadQ1 orderedEventSenderThreadQ1 = new OrderedEventSenderThreadQ1(postsFile, commentsFile);
-        Thread q1 = new Thread(new Q1EventSingle(orderedEventSenderThreadQ1));
-        q1.start();
+        Q1ThreadsWorkLoadDistributed q1ThreadsWorkLoadDistributed = new Q1ThreadsWorkLoadDistributed(postsFile, commentsFile, num);
+        q1ThreadsWorkLoadDistributed.startProcess();
     }
 
 }
